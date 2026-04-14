@@ -13,16 +13,13 @@ permissions:
 jobs:
   main:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v5
         with:
           filter: tree:0
           fetch-depth: 0
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-          run_install: false
 
       - uses: actions/setup-node@v5
         with:
@@ -30,6 +27,8 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
 
+      - run: corepack enable
+      - run: pnpm --version
       - run: pnpm install --frozen-lockfile
 
       # This enables task distribution via Nx Cloud.
