@@ -22,5 +22,29 @@
     }
   ],
   "nxCloudId": "69de7044f4f8f24808239581",
-  "analytics": true
+  "analytics": true,
+  "targetDefaults": {
+    "build": {
+      "cache": true,
+      "inputs": ["production", "^production"]
+    },
+    "test": {
+      "cache": true,
+      "inputs": ["default", "^production"]
+    },
+    "lint": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "{workspaceRoot}/eslint.config.*",
+        "{workspaceRoot}/.eslintrc*"
+      ]
+    },
+    "dev": {
+      "cache": false
+    },
+    "preview": {
+      "cache": false
+    }
+  }
 }
