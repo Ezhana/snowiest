@@ -36,6 +36,7 @@
       "cache": true,
       "inputs": [
         "default",
+        "{workspaceRoot}/packages/eslint-config/**/*",
         "{workspaceRoot}/eslint.config.*",
         "{workspaceRoot}/.eslintrc*"
       ]
