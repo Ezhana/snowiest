@@ -6,7 +6,7 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "lint": "eslint .",
+    "lint": "pnpm exec eslint .",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
@@ -18,12 +18,17 @@
     "@nuxt/hints": "1.0.3",
     "@nuxt/icon": "2.2.1",
     "@nuxt/image": "2.0.0",
+    "@snowiest/theme-cerulean": "workspace:*",
     "@snowiest/eslint-config": "workspace:*",
+    "@snowiest/theme-contract": "workspace:*",
     "nuxt": "^4.4.2",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.14",
+    "eslint": "^10.2.0",
+    "tailwindcss": "^4.1.14",
     "vue-tsc": "^3.2.6"
   }
 }

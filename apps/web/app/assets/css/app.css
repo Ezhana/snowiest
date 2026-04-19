@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@import "@snowiest/theme-contract/theme.css";
+@import "@snowiest/theme-cerulean/theme.css";
+
+html {
+  background-color: var(--color-background);
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
