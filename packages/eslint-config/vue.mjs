@@ -34,7 +34,8 @@ export default [
     plugins: sharedPlugins,
     rules: {
       ...sharedRules,
+      'vue/no-multiple-template-root': 'off',
       'vue/multi-word-component-names': 'off',
     },
   },
-]
+];
