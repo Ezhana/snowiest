@@ -4,7 +4,7 @@ const navItems = [
   { label: 'Posts', to: '/posts' },
   { label: 'Tags', to: '/tags' },
   { label: 'About', to: '/about' },
-];
+]
 </script>
 <template>
   <header class="border-b border-border">
