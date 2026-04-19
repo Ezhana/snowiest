@@ -1,0 +1,19 @@
+/* Generated from src/contract.ts via createThemeContractCss(). */
+@theme inline static {
+  --font-sans: var(--ds-font-sans);
+  --color-background: var(--ds-color-background);
+  --color-surface: var(--ds-color-surface);
+  --color-foreground: var(--ds-color-foreground);
+  --color-muted: var(--ds-color-muted);
+  --color-border: var(--ds-color-border);
+  --color-primary: var(--ds-color-primary);
+  --color-primary-foreground: var(--ds-color-primary-foreground);
+  --color-accent: var(--ds-color-accent);
+  --color-accent-foreground: var(--ds-color-accent-foreground);
+  --color-link: var(--ds-color-link);
+  --radius-sm: var(--ds-radius-sm);
+  --radius-md: var(--ds-radius-md);
+  --radius-lg: var(--ds-radius-lg);
+  --radius-xl: var(--ds-radius-xl);
+  --spacing: var(--ds-spacing);
+}
