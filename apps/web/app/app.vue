@@ -1,5 +1,17 @@
+<script setup lang="ts">
+const { resolvedTheme } = useTheme()
+const { currentLocale } = useLocale()
+
+useHead({
+  htmlAttrs: {
+    'data-theme': resolvedTheme,
+    lang: currentLocale,
+  },
+})
+</script>
+
 <template>
-  <NuxtLoadingIndicator color="var(--accent)" />
+  <NuxtLoadingIndicator color="var(--color-primary)" />
   <NuxtRouteAnnouncer />
   <NuxtLayout>
     <NuxtPage />
