@@ -11,4 +11,4 @@ export type {
   CeruleanSpacingStep,
   CeruleanTokens,
 } from './tokens.js'
-export { ceruleanThemeCss, createCeruleanThemeCss } from './theme.js'
+export { ceruleanTheme, ceruleanThemeCss, createCeruleanThemeCss } from './theme.js'

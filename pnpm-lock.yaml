@@ -59,12 +59,9 @@ importers:
       '@snowiest/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@snowiest/theme-cerulean':
+      '@snowiest/theme':
         specifier: workspace:*
-        version: link:../../packages/theme-cerulean
-      '@snowiest/theme-contract':
-        specifier: workspace:*
-        version: link:../../packages/theme-contract
+        version: link:../../packages/theme
       nuxt:
         specifier: ^4.4.2
         version: 4.4.2(@babel/core@7.29.0)(@babel/plugin-proposal-decorators@7.29.0(@babel/core@7.29.0))(@babel/plugin-syntax-jsx@7.28.6(@babel/core@7.29.0))(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@parcel/watcher@2.5.6)(@vue/compiler-sfc@3.5.32)(cac@6.7.14)(db0@0.3.4)(eslint@10.2.0(jiti@2.6.1))(ioredis@5.10.1)(lightningcss@1.32.0)(magicast@0.5.2)(optionator@0.9.4)(rollup-plugin-visualizer@7.0.1(rollup@4.60.1))(rollup@4.60.1)(srvx@0.11.15)(terser@5.46.1)(typescript@5.9.3)(vite@7.3.2(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.46.1)(yaml@2.8.3))(vue-tsc@3.2.6(typescript@5.9.3))(yaml@2.8.3)
@@ -115,19 +112,34 @@ importers:
         specifier: ^10.4.0
         version: 10.4.0(eslint@10.2.0(jiti@2.6.1))
 
+  packages/theme:
+    devDependencies:
+      '@snowiest/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@snowiest/theme-cerulean':
+        specifier: workspace:*
+        version: link:../theme-cerulean
+      '@snowiest/theme-vars':
+        specifier: workspace:*
+        version: link:../theme-vars
+      eslint:
+        specifier: ^10.2.0
+        version: 10.2.0(jiti@2.6.1)
+
   packages/theme-cerulean:
     devDependencies:
       '@snowiest/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@snowiest/theme-contract':
+      '@snowiest/theme-vars':
         specifier: workspace:*
-        version: link:../theme-contract
+        version: link:../theme-vars
       eslint:
         specifier: ^10.2.0
         version: 10.2.0(jiti@2.6.1)
 
-  packages/theme-contract:
+  packages/theme-vars:
     devDependencies:
       '@snowiest/eslint-config':
         specifier: workspace:*

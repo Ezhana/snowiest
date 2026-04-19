@@ -18,9 +18,8 @@
     "@nuxt/hints": "1.0.3",
     "@nuxt/icon": "2.2.1",
     "@nuxt/image": "2.0.0",
-    "@snowiest/theme-cerulean": "workspace:*",
     "@snowiest/eslint-config": "workspace:*",
-    "@snowiest/theme-contract": "workspace:*",
+    "@snowiest/theme": "workspace:*",
     "nuxt": "^4.4.2",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"

@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "emitDeclarationOnly": true,
-    "outDir": "../../dist/packages/theme-contract",
+    "outDir": "../../dist/packages/theme",
     "rootDir": "./src"
   },
   "include": ["src/**/*.ts"]

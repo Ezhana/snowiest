@@ -1,10 +1,10 @@
-import type { DesignSystemContract } from '@snowiest/theme-contract'
+import type { DesignSystemThemeVars } from '@snowiest/theme-vars'
 
-export interface CeruleanTokens extends DesignSystemContract {
-  readonly font: DesignSystemContract['font'] & {
+export interface CeruleanTokens extends DesignSystemThemeVars {
+  readonly font: DesignSystemThemeVars['font'] & {
     readonly sans: readonly string[]
   }
-  readonly spacing: DesignSystemContract['spacing'] & {
+  readonly spacing: DesignSystemThemeVars['spacing'] & {
     readonly scale: Readonly<Record<string, string>>
   }
 }

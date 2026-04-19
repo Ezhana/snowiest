@@ -1,4 +1,4 @@
-export interface DesignSystemContract {
+export interface DesignSystemThemeVars {
   readonly font: {
     readonly family: string
   }
@@ -25,7 +25,7 @@ export interface DesignSystemContract {
   }
 }
 
-export const designSystemThemeSelectors = {
+export const designSystemThemeVarSelectors = {
   font: {
     family: '--ds-font-sans',
   },

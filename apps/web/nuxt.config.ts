@@ -1,3 +1,4 @@
+import { defaultThemeVariant } from '@snowiest/theme'
 import tailwindcss from '@tailwindcss/vite'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -5,7 +6,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: {
-        'data-theme': 'cerulean',
+        'data-theme': defaultThemeVariant,
       },
     },
   },

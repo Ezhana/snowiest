@@ -1,5 +1,5 @@
 {
-  "name": "@snowiest/theme-cerulean",
+  "name": "@snowiest/theme",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -11,14 +11,13 @@
     "./theme.css": "./src/theme.css"
   },
   "scripts": {
-    "build": "pnpm run check:theme && pnpm run typecheck",
-    "check:theme": "node --import @swc-node/register/esm-register ./scripts/check-theme.mjs",
+    "build": "pnpm run typecheck",
     "lint": "pnpm exec eslint .",
-    "sync:theme": "node --import @swc-node/register/esm-register ./scripts/sync-theme.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.lib.json"
   },
   "devDependencies": {
     "@snowiest/eslint-config": "workspace:*",
+    "@snowiest/theme-cerulean": "workspace:*",
     "@snowiest/theme-vars": "workspace:*",
     "eslint": "^10.2.0"
   }
