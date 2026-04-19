@@ -26,8 +26,15 @@ export default defineNuxtConfig({
       },
     ],
   },
-  modules: ['@nuxt/eslint', '@nuxt/fonts'],
+  modules: ['@nuxt/eslint', '@nuxt/fonts', '@nuxtjs/seo'],
   vite: {
     plugins: [tailwindcss()],
   },
-})
+  site: {
+    url: 'https://snowiest.me',
+    name: 'Snowiest',
+    description:
+      'Nostalgia for the rustle of snow, there is plenty of pity to find.',
+    defaultLocale: 'zh-CN',
+  },
+});
