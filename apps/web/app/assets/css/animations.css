@@ -1,0 +1,56 @@
+@layer components {
+  .animate-fade-in,
+  .animate-fade-out {
+    --fade-duration: 480ms;
+    --fade-easing: ease-out;
+    --fade-fill-mode: forwards;
+    animation-duration: var(--fade-duration);
+    animation-timing-function: var(--fade-easing);
+    animation-fill-mode: var(--fade-fill-mode);
+  }
+
+  .animate-fade-in {
+    opacity: 0;
+    animation-name: fade-in;
+  }
+
+  .animate-fade-out {
+    opacity: 1;
+    animation-name: fade-out;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-fade-out {
+    animation: none;
+  }
+
+  .animate-fade-in {
+    opacity: 1;
+  }
+
+  .animate-fade-out {
+    opacity: 0;
+  }
+}
