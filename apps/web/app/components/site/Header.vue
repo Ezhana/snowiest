@@ -22,9 +22,12 @@ const { setTheme } = useTheme();
 </script>
 <template>
   <header
-    class="border-b border-border flex justify-between px-4 min-h-16 items-center"
+    class="border-b border-border grid min-h-16 grid-cols-[1fr_auto_1fr] items-center px-6"
   >
-    <NuxtLink to="/"> Snowiest </NuxtLink>
+    <NuxtLink to="/" class="justify-self-start">
+      <p class="uppercase text-xl">Snowiest</p>
+      <p class="text-sm">Notes on writing, systems, and the web.</p>
+    </NuxtLink>
     <nav aria-label="Primary" class="site-nav">
       <ul class="site-nav__list flex gap-4 list-none">
         <li v-for="item in navItems" :key="item.to" class="site-nav__item">
@@ -38,7 +41,7 @@ const { setTheme } = useTheme();
         </li>
       </ul>
     </nav>
-    <div class="flex gap-4">
+    <div class="flex justify-self-end gap-4">
       <button @click="setTheme('system')">
         <Icon name="mdi:theme-light-dark" size="calc(var(--spacing) * 5)" />
       </button>
