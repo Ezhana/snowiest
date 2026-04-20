@@ -26,7 +26,7 @@ export default defineNuxtConfig({
       },
     ],
   },
-  modules: ['@nuxt/eslint', '@nuxt/fonts', '@nuxtjs/seo'],
+  modules: ['@nuxt/eslint', '@nuxt/fonts', '@nuxtjs/seo', '@nuxt/icon'],
   vite: {
     plugins: [tailwindcss()],
   },
@@ -36,5 +36,10 @@ export default defineNuxtConfig({
     description:
       'Nostalgia for the rustle of snow, there is plenty of pity to find.',
     defaultLocale: 'zh-CN',
+  },
+  icon: {
+    serverBundle: {
+      collections: ['mdi']
+    },
   },
 });

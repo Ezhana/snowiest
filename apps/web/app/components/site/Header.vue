@@ -27,11 +27,7 @@ const { setTheme } = useTheme();
     <NuxtLink to="/"> Snowiest </NuxtLink>
     <nav aria-label="Primary" class="site-nav">
       <ul class="site-nav__list flex gap-4 list-none">
-        <li
-          v-for="item in navItems"
-          :key="item.to"
-          class="site-nav__item"
-        >
+        <li v-for="item in navItems" :key="item.to" class="site-nav__item">
           <NuxtLink
             :to="item.to"
             :aria-current="isActive(item.to) ? 'page' : undefined"
@@ -43,8 +39,15 @@ const { setTheme } = useTheme();
       </ul>
     </nav>
     <div class="flex gap-4">
-      <button @click="setTheme('system')">Theme</button>
-      <a>RSS</a>
+      <button @click="setTheme('system')">
+        <Icon name="mdi:theme-light-dark" size="calc(var(--spacing) * 5)" />
+      </button>
+      <a
+        ><Icon
+          name="mdi:rss"
+          style="color: orange"
+          size="calc(var(--spacing) * 5)"
+      /></a>
     </div>
   </header>
 </template>
