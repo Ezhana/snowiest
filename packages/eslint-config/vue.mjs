@@ -1,6 +1,6 @@
-import vueParser from 'vue-eslint-parser'
-import tsParser from '@typescript-eslint/parser'
-import vue from 'eslint-plugin-vue'
+import vueParser from 'vue-eslint-parser';
+import tsParser from '@typescript-eslint/parser';
+import vue from 'eslint-plugin-vue';
 
 import {
   browserGlobals,
@@ -8,7 +8,7 @@ import {
   ignoreConfig,
   sharedPlugins,
   sharedRules,
-} from './internal.mjs'
+} from './internal.mjs';
 
 export default [
   ignoreConfig,
@@ -34,8 +34,10 @@ export default [
     plugins: sharedPlugins,
     rules: {
       ...sharedRules,
+      'vue/max-attributes-per-line': 'off',
       'vue/no-multiple-template-root': 'off',
       'vue/multi-word-component-names': 'off',
+      'vue/singleline-html-element-content-newline': 'off',
     },
   },
 ];

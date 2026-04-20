@@ -19,6 +19,7 @@ const isActive = (to: string) => {
 
 const { setTheme } = useTheme();
 </script>
+
 <template>
   <header
     class="grid min-h-16 grid-cols-[1fr_auto_1fr] items-center border-b border-border px-6"
@@ -27,6 +28,7 @@ const { setTheme } = useTheme();
       <p class="text-xl uppercase">Snowiest</p>
       <p class="text-sm">Notes on writing, systems, and the web.</p>
     </NuxtLink>
+
     <nav aria-label="Primary" class="site-nav">
       <ul class="site-nav__list flex list-none gap-4">
         <li v-for="item in navItems" :key="item.to" class="site-nav__item">
@@ -40,6 +42,7 @@ const { setTheme } = useTheme();
         </li>
       </ul>
     </nav>
+
     <div class="flex gap-4 justify-self-end">
       <button @click="setTheme('system')">
         <Icon name="mdi:theme-light-dark" size="calc(var(--spacing) * 5)" />
@@ -47,6 +50,7 @@ const { setTheme } = useTheme();
     </div>
   </header>
 </template>
+
 <style scoped>
 .site-nav__link::after {
   content: '';
