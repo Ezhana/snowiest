@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "@snowiest/theme/theme.css";
+@import 'tailwindcss';
+@import '@snowiest/theme/theme.css';
 
 html {
   background-color: var(--color-background);

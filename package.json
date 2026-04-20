@@ -6,7 +6,6 @@
     "dev:web": "pnpm nx run web:dev"
   },
   "private": true,
-  "dependencies": {},
   "devDependencies": {
     "@nx/js": "22.6.5",
     "@swc-node/register": "1.11.1",
@@ -14,6 +13,7 @@
     "@swc/helpers": "0.5.18",
     "nx": "22.6.5",
     "prettier": "^3.8.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2"
   },

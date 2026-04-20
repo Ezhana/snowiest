@@ -1,4 +1,4 @@
-import type { MessageValue } from './types'
+import type { MessageValue } from './types';
 
 export default {
   site: {
@@ -22,7 +22,8 @@ export default {
   home: {
     hero: {
       title: '写得清晰，读得从容。',
-      description: '一个用于承载随笔、笔记与链接整理的博客系统。首页应该先表达立场，再自然地展示最新内容。',
+      description:
+        '一个用于承载随笔、笔记与链接整理的博客系统。首页应该先表达立场，再自然地展示最新内容。',
     },
     spotlight: {
       title: '更新节奏',
@@ -41,17 +42,20 @@ export default {
       editorialHomepage: {
         category: '设计',
         title: '把首页当作一张可阅读的编排前页',
-        excerpt: '首页首先应该是一块阅读界面，其次才是导航容器，信息层级要服务于阅读流。',
+        excerpt:
+          '首页首先应该是一块阅读界面，其次才是导航容器，信息层级要服务于阅读流。',
       },
       themeTokens: {
         category: '前端',
         title: '以 token 驱动主题，界面决策才会一致',
-        excerpt: '背景、表面、边框、文字和动作色应该由语义 token 驱动，而不是在组件里散写具体颜色。',
+        excerpt:
+          '背景、表面、边框、文字和动作色应该由语义 token 驱动，而不是在组件里散写具体颜色。',
       },
       scannableLayouts: {
         category: '写作',
         title: '博客列表页应先服务扫描，再服务点击',
-        excerpt: '标题、摘要和元信息要形成稳定节奏，读者才能快速判断哪篇值得深入阅读。',
+        excerpt:
+          '标题、摘要和元信息要形成稳定节奏，读者才能快速判断哪篇值得深入阅读。',
       },
     },
   },
@@ -66,4 +70,4 @@ export default {
       label: '语言',
     },
   },
-} as const satisfies MessageValue
+} as const satisfies MessageValue;

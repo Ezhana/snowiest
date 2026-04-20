@@ -21,26 +21,26 @@ const { setTheme } = useTheme();
 </script>
 <template>
   <header
-    class="border-b border-border grid min-h-16 grid-cols-[1fr_auto_1fr] items-center px-6"
+    class="grid min-h-16 grid-cols-[1fr_auto_1fr] items-center border-b border-border px-6"
   >
     <NuxtLink to="/" class="justify-self-start">
-      <p class="uppercase text-xl">Snowiest</p>
+      <p class="text-xl uppercase">Snowiest</p>
       <p class="text-sm">Notes on writing, systems, and the web.</p>
     </NuxtLink>
     <nav aria-label="Primary" class="site-nav">
-      <ul class="site-nav__list flex gap-4 list-none">
+      <ul class="site-nav__list flex list-none gap-4">
         <li v-for="item in navItems" :key="item.to" class="site-nav__item">
           <NuxtLink
             :to="item.to"
             :aria-current="isActive(item.to) ? 'page' : undefined"
-            class="site-nav__link relative inline-flex items-center px-1 py-2 text-md text-foreground no-underline transition-colors duration-150 ease-out"
+            class="site-nav__link text-md relative inline-flex items-center px-1 py-2 text-foreground no-underline transition-colors duration-150 ease-out"
           >
             {{ item.label }}
           </NuxtLink>
         </li>
       </ul>
     </nav>
-    <div class="flex justify-self-end gap-4">
+    <div class="flex gap-4 justify-self-end">
       <button @click="setTheme('system')">
         <Icon name="mdi:theme-light-dark" size="calc(var(--spacing) * 5)" />
       </button>

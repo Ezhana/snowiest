@@ -1,16 +1,14 @@
 <script setup lang="ts"></script>
 <template>
   <footer
-    class="border-t border-border flex justify-between px-6 min-h-16 items-center"
+    class="flex min-h-16 items-center justify-between border-t border-border px-6"
   >
     <p>© 2026 Snowiest. Notes on writing, systems, and the web.</p>
 
     <nav aria-label="Footer">
-      <ul class="flex gap-4 items-start">
+      <ul class="flex items-start gap-4">
         <li>
-          <NuxtLink to="/about">
-            About
-          </NuxtLink>
+          <NuxtLink to="/about"> About </NuxtLink>
         </li>
         <li>
           <NuxtLink to="/rss.xml">

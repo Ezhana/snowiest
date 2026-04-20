@@ -1,3 +1,12 @@
 {
-  "singleQuote": true
+  "singleQuote": true,
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "overrides": [
+    {
+      "files": "apps/web/**/*",
+      "options": {
+        "tailwindStylesheet": "./apps/web/app/assets/css/app.css"
+      }
+    }
+  ]
 }
