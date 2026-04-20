@@ -7,7 +7,6 @@ const navItems = [
   { label: 'Home', to: '/' },
   { label: 'Posts', to: '/posts' },
   { label: 'Tags', to: '/tags' },
-  { label: 'About', to: '/about' },
 ];
 
 const isActive = (to: string) => {
@@ -45,12 +44,6 @@ const { setTheme } = useTheme();
       <button @click="setTheme('system')">
         <Icon name="mdi:theme-light-dark" size="calc(var(--spacing) * 5)" />
       </button>
-      <a
-        ><Icon
-          name="mdi:rss"
-          style="color: orange"
-          size="calc(var(--spacing) * 5)"
-      /></a>
     </div>
   </header>
 </template>
