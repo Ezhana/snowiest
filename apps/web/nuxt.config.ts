@@ -1,6 +1,8 @@
 import { defaultThemeVariant } from '@snowiest/theme';
 import tailwindcss from '@tailwindcss/vite';
 
+const siteUrl = process.env.NUXT_PUBLIC_SITE_URL ?? 'https://snowiest.me';
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   app: {
@@ -13,6 +15,9 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   css: ['~/assets/css/app.css'],
   devtools: { enabled: true },
+  experimental: {
+    serverAppConfig: false,
+  },
   fonts: {
     defaults: {
       styles: ['normal'],
@@ -31,7 +36,7 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   site: {
-    url: 'https://snowiest.me',
+    url: siteUrl,
     name: 'Snowiest',
     description:
       'Nostalgia for the rustle of snow, there is plenty of pity to find.',
@@ -39,9 +44,9 @@ export default defineNuxtConfig({
   },
   ogImage: {
     enabled: true,
-    defaults: {
-      renderer: 'satori',
-    },
+  },
+  seo: {
+    treeShakeUseSeoMeta: false,
   },
   icon: {
     serverBundle: {
