@@ -37,6 +37,12 @@ export default defineNuxtConfig({
       'Nostalgia for the rustle of snow, there is plenty of pity to find.',
     defaultLocale: 'zh-CN',
   },
+  ogImage: {
+    enabled: true,
+    defaults: {
+      renderer: 'satori',
+    },
+  },
   icon: {
     serverBundle: {
       collections: ['mdi'],
