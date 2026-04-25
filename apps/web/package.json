@@ -21,9 +21,11 @@
     "@nuxt/icon": "2.2.1",
     "@nuxt/image": "2.0.0",
     "@nuxtjs/seo": "5.1.3",
+    "@resvg/resvg-js": "^2.6.2",
     "@snowiest/eslint-config": "workspace:*",
     "@snowiest/theme": "workspace:*",
     "nuxt": "^4.4.2",
+    "satori": "^0.26.0",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"
   },
