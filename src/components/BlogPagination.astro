@@ -2,17 +2,20 @@
 import { getLang, useTranslations } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
 import type { BlogOrder } from '../lib/blog'
+import type { TagId } from '../lib/tags'
 
 interface Props {
   currentPage: number
   totalPages: number
   order: BlogOrder
+  tag?: TagId
 }
 
-const { currentPage, totalPages, order } = Astro.props
+const { currentPage, totalPages, order, tag } = Astro.props
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
-const listBase = order === 'oldest' ? '/blog/oldest/' : '/blog/'
+const tagBase = tag ? `/blog/tag/${tag}/` : '/blog/'
+const listBase = order === 'oldest' ? `${tagBase}oldest/` : tagBase
 
 const pageHref = (page: number) =>
   localeUrl(lang, page === 1 ? listBase : `${listBase}page/${page}/`)

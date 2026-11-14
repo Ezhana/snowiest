@@ -1,0 +1,15 @@
+---
+import Layout from '../../layouts/BlogPost.astro'
+import { SITE_AUTHOR, SITE_GITHUB_URL, SITE_TITLE, SITE_URL } from '../../consts'
+---
+
+<Layout title="About" description={`About ${SITE_TITLE} and its author, ${SITE_AUTHOR}.`}>
+  <p>
+    <strong>{SITE_TITLE}</strong> (簌雪) is the personal site of {SITE_AUTHOR}.
+  </p>
+  <p>
+    The source code is available on <a href={SITE_GITHUB_URL}>GitHub</a>. The site is built with
+    <a href="https://astro.build/">Astro</a> and hosted on
+    <a href={SITE_URL}>GitHub Pages</a>.
+  </p>
+</Layout>

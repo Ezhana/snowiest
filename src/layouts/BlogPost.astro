@@ -23,7 +23,7 @@ const t = useTranslations(getLang(Astro.currentLocale))
 const titleTransitionName = slug ? `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g, '-')}` : undefined
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} image={heroImage}>
   <main class="mx-auto w-full max-w-[72rem] px-4 py-10 lg:py-14">
     <div class="relative mx-auto w-full max-w-[45rem]">
       <article class="ez-editorial">

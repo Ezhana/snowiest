@@ -10,8 +10,7 @@
 import HeaderLink from './HeaderLink.astro'
 import ThemeModeIcon from './ThemeModeIcon.astro'
 import { getLang, languages, useTranslations, type Lang } from '../i18n/ui'
-import { localeUrl, stripBase, stripLocale } from '../i18n/routing'
-import { withBase } from '../consts'
+import { localeUrl, rssUrl, stripBase, stripLocale } from '../i18n/routing'
 
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
@@ -142,7 +141,7 @@ const themeOptions = [
           </details>
 
           <a
-            href={withBase('/rss.xml')}
+            href={rssUrl(lang)}
             class="inline-flex size-9 items-center justify-center rounded-control text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg-strong"
             aria-label={t('rss.label')}
             title={t('rss.label')}

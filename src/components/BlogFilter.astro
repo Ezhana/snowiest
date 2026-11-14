@@ -1,19 +1,29 @@
 ---
 import type { BlogOrder } from '../lib/blog'
+import type { TagId } from '../lib/tags'
 import { getLang, useTranslations } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
 
 interface Props {
   order: BlogOrder
+  tag?: TagId
 }
 
-const { order } = Astro.props
+const { order, tag } = Astro.props
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
 
+const sortPath = (nextOrder: BlogOrder) => {
+  if (tag) {
+    return nextOrder === 'oldest' ? `/blog/tag/${tag}/oldest/` : `/blog/tag/${tag}/`
+  }
+
+  return nextOrder === 'oldest' ? '/blog/oldest/' : '/blog/'
+}
+
 const options: Array<{ order: BlogOrder; path: string; label: string }> = [
-  { order: 'newest', path: '/blog/', label: t('blog.sortNewest') },
-  { order: 'oldest', path: '/blog/oldest/', label: t('blog.sortOldest') },
+  { order: 'newest', path: sortPath('newest'), label: t('blog.sortNewest') },
+  { order: 'oldest', path: sortPath('oldest'), label: t('blog.sortOldest') },
 ]
 ---
 

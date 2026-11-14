@@ -12,7 +12,7 @@ export default defineConfig({
   base: '/snowiest',
   integrations: [mdx(), sitemap()],
   i18n: {
-    defaultLocale: 'en',
+    defaultLocale: 'zh',
     locales: ['en', 'zh'],
     routing: {
       prefixDefaultLocale: false,

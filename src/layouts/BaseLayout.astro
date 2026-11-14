@@ -1,4 +1,5 @@
 ---
+import type { ImageMetadata } from 'astro'
 import { ClientRouter } from 'astro:transitions'
 import BaseHead from '../components/BaseHead.astro'
 import Footer from '../components/Footer.astro'
@@ -8,9 +9,10 @@ import { getLang } from '../i18n/ui'
 interface Props {
   title: string
   description: string
+  image?: ImageMetadata
 }
 
-const { title, description } = Astro.props
+const { title, description, image } = Astro.props
 const lang = getLang(Astro.currentLocale)
 
 /**
@@ -26,7 +28,7 @@ const lang = getLang(Astro.currentLocale)
 
 <html lang={lang} data-theme="cerulean">
   <head>
-    <BaseHead title={title} description={description} />
+    <BaseHead title={title} description={description} image={image} />
     <ClientRouter />
     <script is:inline>
       // Mirror @ezhana/theme's persistence contract before the stylesheet paints.

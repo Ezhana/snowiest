@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
+import type { TagId } from './tags'
 
 export const BLOG_PAGE_SIZE = 5
 
@@ -6,10 +7,24 @@ export type BlogPost = CollectionEntry<'blog'>
 
 export type BlogOrder = 'newest' | 'oldest'
 
-/** All blog posts, newest first. */
-export async function getBlogPosts(): Promise<BlogPost[]> {
+interface GetBlogPostsOptions {
+  includeUnpublished?: boolean
+}
+
+/**
+ * Published blog posts, newest first. Drafts and future-dated posts are visible in the dev
+ * server for previewing, but excluded from production builds until their date arrives.
+ */
+export async function getBlogPosts(options: GetBlogPostsOptions = {}): Promise<BlogPost[]> {
+  const includeUnpublished = options.includeUnpublished ?? import.meta.env.DEV
+  const now = Date.now()
   const posts = await getCollection('blog')
-  return posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+
+  return posts
+    .filter(
+      (post) => includeUnpublished || (!post.data.draft && post.data.pubDate.valueOf() <= now),
+    )
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
 }
 
 export interface BlogPage {
@@ -39,6 +54,41 @@ export function getBlogPagePaths(postCount: number, pageSize = BLOG_PAGE_SIZE) {
     const page = index + 2
     return { params: { page: String(page) }, props: { page } }
   })
+}
+
+export interface TagPagePath {
+  params: { tag: TagId; parts?: string }
+  props: { tag: TagId; order: BlogOrder; page: number }
+}
+
+/** Static paths for a tag archive: both orders and every page of each order. */
+export function getTagPagePaths(
+  tag: TagId,
+  postCount: number,
+  pageSize = BLOG_PAGE_SIZE,
+): TagPagePath[] {
+  const totalPages = Math.max(1, Math.ceil(postCount / pageSize))
+  const paths: TagPagePath[] = []
+
+  for (const order of ['newest', 'oldest'] as const) {
+    for (let page = 1; page <= totalPages; page += 1) {
+      const segments = [
+        order === 'oldest' ? 'oldest' : null,
+        page > 1 ? 'page' : null,
+        page > 1 ? String(page) : null,
+      ].filter(Boolean)
+
+      paths.push({
+        params: {
+          tag,
+          parts: segments.length > 0 ? segments.join('/') : undefined,
+        },
+        props: { tag, order, page },
+      })
+    }
+  }
+
+  return paths
 }
 
 export interface BlogMonthGroup {

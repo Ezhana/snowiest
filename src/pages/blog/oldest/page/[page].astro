@@ -1,6 +1,5 @@
 ---
 import BlogIndex from '../../../../components/BlogIndex.astro'
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../../../consts'
 import { getBlogPagePaths, getBlogPosts } from '../../../../lib/blog'
 
 export async function getStaticPaths() {
@@ -15,4 +14,4 @@ interface Props {
 const { page } = Astro.props
 ---
 
-<BlogIndex page={page} order="oldest" title={SITE_TITLE} description={SITE_DESCRIPTION} />
+<BlogIndex page={page} order="oldest" />

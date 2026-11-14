@@ -1,13 +1,13 @@
 import { SITE_DESCRIPTION, SITE_DESCRIPTION_ZH, SITE_TITLE, SITE_TITLE_ZH } from '../consts'
 
 export const languages = {
-  en: { label: 'English', short: 'EN' },
   zh: { label: '中文', short: '中' },
+  en: { label: 'English', short: 'EN' },
 } as const
 
 export type Lang = keyof typeof languages
 
-export const defaultLang: Lang = 'en'
+export const defaultLang: Lang = 'zh'
 
 export function isLang(value: string | undefined): value is Lang {
   return value === 'en' || value === 'zh'
@@ -36,6 +36,9 @@ const en = {
   'blog.sortLabel': 'Sort by date',
   'blog.sortNewest': 'Newest first',
   'blog.sortOldest': 'Oldest first',
+  'blog.tagsLabel': 'Filter by tag',
+  'blog.allTags': 'All',
+  'blog.tagPrefix': 'Tag: ',
   'post.updated': 'Last updated on',
   'post.toc': 'On this page',
   'pagination.label': 'Pagination',
@@ -65,10 +68,13 @@ const zh: Record<UiKey, string> = {
   'theme.dark': '深色',
   'rss.label': 'RSS 订阅',
   'blog.title': '博客',
-  'blog.notice': '占位内容：文章正文目前仍为英文示例。',
+  'blog.notice': '',
   'blog.sortLabel': '按时间排序',
   'blog.sortNewest': '时间倒序',
   'blog.sortOldest': '时间顺序',
+  'blog.tagsLabel': '按标签筛选',
+  'blog.allTags': '全部',
+  'blog.tagPrefix': '标签：',
   'post.updated': '最后更新于',
   'post.toc': '本页目录',
   'pagination.label': '分页导航',

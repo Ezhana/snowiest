@@ -32,14 +32,18 @@ pnpm preview    # 预览构建结果
 │   ├── assets/                   # 参与构建优化的图片
 │   ├── components/               # 页头、页脚、文章列表等组件
 │   ├── content/blog/             # Markdown / MDX 文章
+│   ├── lib/                      # 文章查询、标签与分页逻辑
 │   ├── i18n/                     # 中英文案与路由
 │   ├── layouts/                  # 页面与文章布局
-│   ├── pages/                    # 路由（含 /zh 中文路由）
+│   ├── pages/                    # 路由（中文根路径 + /en 英文路由）
 │   ├── styles/                   # 全局样式与文章排版
 │   └── consts.ts                 # 站点信息（名称、作者、链接）
+├── docs/                         # 写作与内容管理文档
 ├── astro.config.mjs              # site / base 与集成配置
 └── package.json
 ```
+
+文章新建、frontmatter、标签、草稿和发布规则见 [docs/content-authoring.md](docs/content-authoring.md)。
 
 ## 部署
 

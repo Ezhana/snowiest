@@ -3,22 +3,35 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 import BlogListing from './BlogListing.astro'
 import BlogPagination from './BlogPagination.astro'
 import { getBlogPage, getBlogPosts, type BlogOrder } from '../lib/blog'
+import type { TagId } from '../lib/tags'
+import { getTagLabel } from '../lib/tags'
+import { getLang, useTranslations } from '../i18n/ui'
 
 interface Props {
   page: number
   order: BlogOrder
-  title: string
-  description: string
+  tag?: TagId
 }
 
-const { page, order, title, description } = Astro.props
+const { page, order, tag } = Astro.props
+const lang = getLang(Astro.currentLocale)
+const t = useTranslations(lang)
 const posts = await getBlogPosts()
-const orderedPosts = order === 'oldest' ? [...posts].reverse() : posts
+const filteredPosts = tag ? posts.filter((post) => post.data.tags.includes(tag)) : posts
+const orderedPosts = order === 'oldest' ? [...filteredPosts].reverse() : filteredPosts
 const { posts: pagePosts, currentPage, totalPages } = getBlogPage(orderedPosts, page)
+
+const siteTitle = t('site.title')
+const title = tag
+  ? `${t('blog.tagPrefix')}${getTagLabel(tag, lang)} · ${siteTitle}`
+  : `${t('blog.title')} · ${siteTitle}`
+const description = tag
+  ? `${t('blog.tagPrefix')}${getTagLabel(tag, lang)} · ${siteTitle}`
+  : t('site.description')
 ---
 
 <BaseLayout title={title} description={description}>
-  <BlogListing posts={pagePosts} order={order}>
-    <BlogPagination currentPage={currentPage} totalPages={totalPages} order={order} />
+  <BlogListing posts={pagePosts} order={order} tag={tag}>
+    <BlogPagination currentPage={currentPage} totalPages={totalPages} order={order} tag={tag} />
   </BlogListing>
 </BaseLayout>

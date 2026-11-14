@@ -1,0 +1,23 @@
+---
+import BlogIndex from '../../../../../components/BlogIndex.astro'
+import { getBlogPosts, getTagPagePaths, type BlogOrder } from '../../../../../lib/blog'
+import { TAG_DEFINITIONS, type TagId } from '../../../../../lib/tags'
+
+export async function getStaticPaths() {
+  const posts = await getBlogPosts()
+
+  return TAG_DEFINITIONS.flatMap((tag) =>
+    getTagPagePaths(tag.id, posts.filter((post) => post.data.tags.includes(tag.id)).length),
+  )
+}
+
+interface Props {
+  tag: TagId
+  order: BlogOrder
+  page: number
+}
+
+const { tag, order, page } = Astro.props
+---
+
+<BlogIndex page={page} order={order} tag={tag} />

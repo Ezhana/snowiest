@@ -14,8 +14,8 @@ export function stripBase(pathname: string): string {
 /**
  * Build a locale-aware URL from a locale-less path.
  *
- * - `localeUrl('en', '/blog/')` → `/blog/`
- * - `localeUrl('zh', '/blog/')` → `/zh/blog/`
+ * - `localeUrl('zh', '/blog/')` → `/blog/` (default locale)
+ * - `localeUrl('en', '/blog/')` → `/en/blog/`
  */
 export function localeUrl(lang: Lang, path = '/'): string {
   if (path === '/' || path === '') return getRelativeLocaleUrl(lang)
@@ -31,4 +31,9 @@ export function stripLocale(pathname: string, lang: Lang): string {
   if (pathname.startsWith(`${prefix}/`)) return pathname.slice(prefix.length)
 
   return pathname
+}
+
+/** Locale-aware RSS feed URL (file URL, so no trailing slash). */
+export function rssUrl(lang: Lang): string {
+  return localeUrl(lang, '/rss.xml').replace(/\/+$/, '')
 }
