@@ -1,63 +1,59 @@
-# Astro Starter Kit: Blog
+# Snowiest · 簌雪
+
+[Ezhana](https://github.com/Ezhana) 的个人站点，使用 [Astro](https://astro.build/) 构建。
+
+- 线上站点：<https://ezhana.github.io/snowiest/>
+- 源码仓库：<https://github.com/Ezhana/snowiest>
+- 托管：GitHub Pages（`main` 分支推送后由 GitHub Actions 自动构建并部署）
+
+## 本地开发
 
 ```sh
-pnpm create astro@latest -- --template blog
+pnpm install
+pnpm dev        # 启动开发服务器，默认 http://localhost:4321
+pnpm build      # 构建到 ./dist
+pnpm preview    # 预览构建结果
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+其他命令：
 
-Features:
+| 命令                | 作用                 |
+| :------------------ | :------------------- |
+| `pnpm lint`         | 运行 ESLint          |
+| `pnpm format`       | 使用 Prettier 格式化 |
+| `pnpm format:check` | 检查格式             |
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and Open Graph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## 项目结构
 
 ```text
-├── public/
+├── .github/workflows/deploy.yml  # GitHub Pages 部署流水线
+├── public/                       # 静态资源
 ├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+│   ├── assets/                   # 参与构建优化的图片
+│   ├── components/               # 页头、页脚、文章列表等组件
+│   ├── content/blog/             # Markdown / MDX 文章
+│   ├── i18n/                     # 中英文案与路由
+│   ├── layouts/                  # 页面与文章布局
+│   ├── pages/                    # 路由（含 /zh 中文路由）
+│   ├── styles/                   # 全局样式与文章排版
+│   └── consts.ts                 # 站点信息（名称、作者、链接）
+├── astro.config.mjs              # site / base 与集成配置
+└── package.json
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 部署
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+站点部署在 GitHub Pages 的项目子路径 `/snowiest/` 下，因此 `astro.config.mjs` 同时配置了：
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+```js
+site: 'https://ezhana.github.io',
+base: '/snowiest',
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+站内绝对路径统一通过 `withBase()`（`src/consts.ts`）拼接，保证资源与链接带上 `/snowiest` 前缀。
 
-## 🧞 Commands
+推送到 `main` 分支，或在 GitHub Actions 页面手动触发 **Deploy to GitHub Pages** 工作流即可发布。
 
-All commands are run from the root of the project, from a terminal:
+## 许可
 
-| Command                | Action                                           |
-| :--------------------- | :----------------------------------------------- |
-| `pnpm install`         | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-
-## Credit
-
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+© Ezhana. All rights reserved.

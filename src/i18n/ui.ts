@@ -1,4 +1,4 @@
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
+import { SITE_DESCRIPTION, SITE_DESCRIPTION_ZH, SITE_TITLE, SITE_TITLE_ZH } from '../consts'
 
 export const languages = {
   en: { label: 'English', short: 'EN' },
@@ -34,14 +34,16 @@ const en = {
   'blog.title': 'Blog',
   'blog.notice': '',
   'post.updated': 'Last updated on',
-  'footer.copyright': 'Your name here. All rights reserved.',
+  'footer.copyright': 'Ezhana. All rights reserved.',
+  'footer.source': 'Source on GitHub',
+  'footer.hosted': 'Hosted on GitHub Pages',
 } as const
 
 export type UiKey = keyof typeof en
 
 const zh: Record<UiKey, string> = {
-  'site.title': SITE_TITLE,
-  'site.description': '欢迎来到我的网站！',
+  'site.title': SITE_TITLE_ZH,
+  'site.description': SITE_DESCRIPTION_ZH,
   'nav.primary': '主导航',
   'nav.home': '首页',
   'nav.blog': '博客',
@@ -55,7 +57,9 @@ const zh: Record<UiKey, string> = {
   'blog.title': '博客',
   'blog.notice': '占位内容：文章正文目前仍为英文示例。',
   'post.updated': '最后更新于',
-  'footer.copyright': '你的名字。保留所有权利。',
+  'footer.copyright': 'Ezhana，保留所有权利。',
+  'footer.source': 'GitHub 源码',
+  'footer.hosted': '托管于 GitHub Pages',
 }
 
 const dictionaries: Record<Lang, Record<UiKey, string>> = { en, zh }

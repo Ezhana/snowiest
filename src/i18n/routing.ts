@@ -1,5 +1,15 @@
 import { getRelativeLocaleUrl } from 'astro:i18n'
+import { BASE_PATH } from '../consts'
 import { defaultLang, type Lang } from './ui'
+
+/** Strip the configured base path (e.g. `/snowiest`) from a pathname. */
+export function stripBase(pathname: string): string {
+  const base = BASE_PATH.replace(/\/+$/, '')
+  if (!base) return pathname
+  if (pathname === base) return '/'
+  if (pathname.startsWith(`${base}/`)) return pathname.slice(base.length)
+  return pathname
+}
 
 /**
  * Build a locale-aware URL from a locale-less path.

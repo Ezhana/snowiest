@@ -7,7 +7,9 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://example.com',
+  // GitHub Pages project site: https://ezhana.github.io/snowiest/
+  site: 'https://ezhana.github.io',
+  base: '/snowiest',
   integrations: [mdx(), sitemap()],
   i18n: {
     defaultLocale: 'en',

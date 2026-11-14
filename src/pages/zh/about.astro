@@ -1,19 +1,15 @@
 ---
-import AboutHeroImage from '../../assets/blog-placeholder-about.jpg'
 import Layout from '../../layouts/BlogPost.astro'
+import { SITE_AUTHOR, SITE_GITHUB_URL, SITE_TITLE_ZH, SITE_URL } from '../../consts'
 ---
 
-<Layout
-  title="关于我"
-  description="关于这个站点与它的作者"
-  pubDate={new Date('August 08 2021')}
-  heroImage={AboutHeroImage}
->
+<Layout title="关于" description={`关于${SITE_TITLE_ZH}与它的作者 ${SITE_AUTHOR}。`}>
   <p>
-    这里是中文「关于」页的占位内容。可以替换成你的自我介绍、写作方向、联系方式，或者任何你希望读者了解的事情。
+    <strong>{SITE_TITLE_ZH}</strong>（Snowiest）是 {SITE_AUTHOR} 的个人站点。
   </p>
   <p>
-    这份骨架复用了与英文页面相同的文章布局：标题、日期、正文排版和阅读宽度都由同一个 Blog
-    样式层控制，因此两种语言看起来保持一致。
+    源码托管在 <a href={SITE_GITHUB_URL}>GitHub</a>，站点使用
+    <a href="https://astro.build/">Astro</a> 构建，并通过
+    <a href={SITE_URL}>GitHub Pages</a> 发布。
   </p>
 </Layout>
