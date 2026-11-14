@@ -61,68 +61,68 @@
  * variables (`--color-bg`, `--font-size-body`, `--font-family-sans`, …).
  */
 @theme inline {
-	/* Type roles */
-	--font-sans: var(--font-family-sans);
-	--font-mono: var(--font-family-mono);
+  /* Type roles */
+  --font-sans: var(--font-family-sans);
+  --font-mono: var(--font-family-mono);
 
-	/* Type scale (size + leading pairs) */
-	--text-body: var(--font-size-body);
-	--text-body--line-height: var(--font-line-height-body);
-	--text-small: var(--font-size-small);
-	--text-small--line-height: var(--font-line-height-small);
-	--text-caption: var(--font-size-caption);
-	--text-caption--line-height: var(--font-line-height-caption);
-	--text-code: var(--font-size-code);
-	--text-code--line-height: var(--font-line-height-code);
-	--text-h1: var(--font-size-h1);
-	--text-h1--line-height: var(--font-line-height-h1);
-	--text-h2: var(--font-size-h2);
-	--text-h2--line-height: var(--font-line-height-h2);
-	--text-h3: var(--font-size-h3);
-	--text-h3--line-height: var(--font-line-height-h3);
-	--text-h4: var(--font-size-h4);
-	--text-h4--line-height: var(--font-line-height-h4);
+  /* Type scale (size + leading pairs) */
+  --text-body: var(--font-size-body);
+  --text-body--line-height: var(--font-line-height-body);
+  --text-small: var(--font-size-small);
+  --text-small--line-height: var(--font-line-height-small);
+  --text-caption: var(--font-size-caption);
+  --text-caption--line-height: var(--font-line-height-caption);
+  --text-code: var(--font-size-code);
+  --text-code--line-height: var(--font-line-height-code);
+  --text-h1: var(--font-size-h1);
+  --text-h1--line-height: var(--font-line-height-h1);
+  --text-h2: var(--font-size-h2);
+  --text-h2--line-height: var(--font-line-height-h2);
+  --text-h3: var(--font-size-h3);
+  --text-h3--line-height: var(--font-line-height-h3);
+  --text-h4: var(--font-size-h4);
+  --text-h4--line-height: var(--font-line-height-h4);
 
-	/* Surfaces, text and borders */
-	--color-bg: var(--color-bg);
-	--color-bg-subtle: var(--color-bg-subtle);
-	--color-surface: var(--color-surface);
-	--color-surface-elevated: var(--color-surface-elevated);
-	--color-fg: var(--color-fg);
-	--color-fg-muted: var(--color-fg-muted);
-	--color-fg-strong: var(--color-fg-strong);
-	--color-border: var(--color-border);
-	--color-border-subtle: var(--color-border-subtle);
+  /* Surfaces, text and borders */
+  --color-bg: var(--color-bg);
+  --color-bg-subtle: var(--color-bg-subtle);
+  --color-surface: var(--color-surface);
+  --color-surface-elevated: var(--color-surface-elevated);
+  --color-fg: var(--color-fg);
+  --color-fg-muted: var(--color-fg-muted);
+  --color-fg-strong: var(--color-fg-strong);
+  --color-border: var(--color-border);
+  --color-border-subtle: var(--color-border-subtle);
 
-	/* Accent and focus */
-	--color-accent: var(--color-accent);
-	--color-accent-hover: var(--color-accent-hover);
-	--color-accent-subtle: var(--color-accent-subtle);
-	--color-accent-border: var(--color-accent-border);
-	--color-on-accent: var(--color-on-accent);
-	--color-focus-ring: var(--color-focus-ring);
+  /* Accent and focus */
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-subtle: var(--color-accent-subtle);
+  --color-accent-border: var(--color-accent-border);
+  --color-on-accent: var(--color-on-accent);
+  --color-focus-ring: var(--color-focus-ring);
 
-	/* Feedback */
-	--color-info: var(--color-info);
-	--color-info-solid: var(--color-info-solid);
-	--color-info-subtle: var(--color-info-subtle);
-	--color-on-info: var(--color-on-info);
-	--color-danger: var(--color-danger);
-	--color-danger-solid: var(--color-danger-solid);
-	--color-on-danger: var(--color-on-danger);
-	--color-success: var(--color-success);
-	--color-warning: var(--color-warning);
+  /* Feedback */
+  --color-info: var(--color-info);
+  --color-info-solid: var(--color-info-solid);
+  --color-info-subtle: var(--color-info-subtle);
+  --color-on-info: var(--color-on-info);
+  --color-danger: var(--color-danger);
+  --color-danger-solid: var(--color-danger-solid);
+  --color-on-danger: var(--color-on-danger);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
 
-	/* Shape and elevation */
-	--radius-control: var(--radius-control);
-	--radius-small: var(--radius-small);
-	--radius-surface: var(--radius-surface);
-	--radius-panel: var(--radius-panel);
-	--radius-pill: var(--radius-pill);
-	--shadow-sm: var(--shadow-sm);
-	--shadow-md: var(--shadow-md);
-	--shadow-lg: var(--shadow-lg);
-	--shadow-xl: var(--shadow-xl);
+  /* Shape and elevation */
+  --radius-control: var(--radius-control);
+  --radius-small: var(--radius-small);
+  --radius-surface: var(--radius-surface);
+  --radius-panel: var(--radius-panel);
+  --radius-pill: var(--radius-pill);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
 }
 
 /*
@@ -132,32 +132,32 @@
  * utilities, and every value below is an Ezhana token.
  */
 @layer base {
-	html {
-		min-height: 100%;
-		background-color: var(--color-bg);
-	}
+  html {
+    min-height: 100%;
+    background-color: var(--color-bg);
+  }
 
-	body {
-		min-height: 100dvh;
-		margin: 0;
-		background-color: var(--color-bg);
-		color: var(--color-fg);
-		font-family: var(--font-family-sans);
-		font-size: var(--font-size-body);
-		font-weight: var(--font-weight-body);
-		line-height: var(--font-line-height-body);
-		text-rendering: optimizeLegibility;
-		-webkit-font-smoothing: antialiased;
-		overflow-wrap: break-word;
-	}
+  body {
+    min-height: 100dvh;
+    margin: 0;
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-body);
+    line-height: var(--font-line-height-body);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-wrap: break-word;
+  }
 
-	::selection {
-		background-color: var(--color-accent-subtle);
-		color: var(--color-fg-strong);
-	}
+  ::selection {
+    background-color: var(--color-accent-subtle);
+    color: var(--color-fg-strong);
+  }
 
-	:focus-visible {
-		outline: var(--border-width-strong) solid var(--color-focus-ring);
-		outline-offset: 2px;
-	}
+  :focus-visible {
+    outline: var(--border-width-strong) solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
 }
