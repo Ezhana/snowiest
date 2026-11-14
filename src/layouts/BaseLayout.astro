@@ -68,20 +68,47 @@ const lang = getLang(Astro.currentLocale)
 
       if (progressRoot && progressBar) {
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        const timers = new Set<number>()
         let finished = false
 
         const paint = (value: number) => {
           progressBar.style.transform = `scaleX(${value})`
         }
 
+        const schedule = (callback: () => void, delay: number) => {
+          const id = window.setTimeout(() => {
+            timers.delete(id)
+            callback()
+          }, delay)
+          timers.add(id)
+        }
+
+        const clearTimers = () => {
+          for (const id of timers) window.clearTimeout(id)
+          timers.clear()
+        }
+
+        /** Hide the bar and cancel pending progress work (page unload / bfcache restore). */
+        const reset = () => {
+          clearTimers()
+          progressRoot.style.transition = 'none'
+          progressBar.style.transition = 'none'
+          progressRoot.style.opacity = '0'
+          paint(0)
+          window.requestAnimationFrame(() => {
+            progressRoot.style.transition = ''
+            progressBar.style.transition = ''
+          })
+        }
+
         const finish = () => {
           if (finished) return
           finished = true
           paint(1)
-          window.setTimeout(
+          schedule(
             () => {
               progressRoot.style.opacity = '0'
-              window.setTimeout(() => paint(0), reduceMotion ? 0 : 300)
+              schedule(() => paint(0), reduceMotion ? 0 : 300)
             },
             reduceMotion ? 0 : 200,
           )
@@ -99,6 +126,13 @@ const lang = getLang(Astro.currentLocale)
         } else {
           window.addEventListener('load', finish, { once: true })
         }
+
+        // A page restored from the back/forward cache keeps its DOM snapshot: clear the progress
+        // state on both sides of the navigation so the bar cannot stay stuck mid-load.
+        window.addEventListener('pagehide', reset)
+        window.addEventListener('pageshow', (event) => {
+          if (event.persisted) reset()
+        })
 
         document.addEventListener('click', (event) => {
           if (
@@ -131,11 +165,12 @@ const lang = getLang(Astro.currentLocale)
             return
           }
 
+          clearTimers()
           progressRoot.style.opacity = '1'
           paint(reduceMotion ? 0.7 : 0.35)
 
           if (!reduceMotion) {
-            window.setTimeout(() => paint(0.8), 180)
+            schedule(() => paint(0.8), 180)
           }
         })
       }
