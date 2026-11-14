@@ -20,6 +20,9 @@ importers:
       '@ezhana/design-theme-cerulean':
         specifier: ^1.0.0
         version: 1.0.0
+      '@ezhana/theme':
+        specifier: ^1.0.0
+        version: 1.0.0
       '@ezhana/typography-editorial':
         specifier: ^0.1.0
         version: 0.1.0
@@ -360,6 +363,10 @@ packages:
     engines: {node: '>=24 <25'}
     peerDependencies:
       prettier: 3.9.8
+
+  '@ezhana/theme@1.0.0':
+    resolution: {integrity: sha512-k9WvBARHJbQaym7VKuIeP4w1jlGXj0RaZyTSjeFMazHfVeOWUX2/GF8+SgYP3guwnnI/t5bz02QrhXLOxrMa5w==}
+    engines: {node: '>=24 <25'}
 
   '@ezhana/typography-editorial@0.1.0':
     resolution: {integrity: sha512-HGGpHuShAtF7wgCfGPCwhlVW2ALvzPax1EtAc5ezbMU0oQI6NiHziRAC/1g9xJ9HeVXxQqQI1U5psgBiMDKyAA==}
@@ -2320,6 +2327,8 @@ snapshots:
   '@ezhana/prettier-config@0.2.0(prettier@3.10.1)':
     dependencies:
       prettier: 3.10.1
+
+  '@ezhana/theme@1.0.0': {}
 
   '@ezhana/typography-editorial@0.1.0': {}
 

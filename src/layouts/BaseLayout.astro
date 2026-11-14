@@ -2,6 +2,7 @@
 import BaseHead from '../components/BaseHead.astro'
 import Footer from '../components/Footer.astro'
 import Header from '../components/Header.astro'
+import { getLang } from '../i18n/ui'
 
 interface Props {
   title: string
@@ -9,21 +10,135 @@ interface Props {
 }
 
 const { title, description } = Astro.props
+const lang = getLang(Astro.currentLocale)
 
 /**
  * The document shell lives here exactly once: the Ezhana theme, the colour mode and the shared
- * chrome. No colour mode is pinned, so Ezhana follows the operating system. To force one, add
- * `data-color-mode="dark"` or `data-color-mode="light"` to the <html> element below.
+ * chrome. `data-theme` is server-rendered; the stored preference is replayed by the inline script
+ * below (using @ezhana/theme's storage contract) before first paint to avoid a flash.
  */
 ---
 
-<html lang="en" data-theme="cerulean">
+<html lang={lang} data-theme="cerulean">
   <head>
     <BaseHead title={title} description={description} />
+    <script is:inline>
+      // Mirror @ezhana/theme's persistence contract before the stylesheet paints.
+      try {
+        const stored = JSON.parse(localStorage.getItem('ezhana-theme') || 'null')
+        const legacyMode = localStorage.getItem('color-mode')
+
+        if (!stored && (legacyMode === 'light' || legacyMode === 'dark')) {
+          localStorage.setItem(
+            'ezhana-theme',
+            JSON.stringify({ theme: 'cerulean', mode: legacyMode }),
+          )
+          localStorage.removeItem('color-mode')
+          document.documentElement.dataset.colorMode = legacyMode
+        } else if (stored && typeof stored === 'object' && !Array.isArray(stored)) {
+          if (stored.mode === 'light' || stored.mode === 'dark') {
+            document.documentElement.dataset.colorMode = stored.mode
+          }
+        }
+      } catch {
+        // localStorage can be unavailable (private mode, blocked storage): follow the OS.
+      }
+    </script>
   </head>
   <body>
+    <div
+      class="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px] opacity-0 transition-opacity duration-300"
+      data-page-progress
+      aria-hidden="true"
+    >
+      <div
+        class="h-full origin-left bg-accent shadow-[0_0_10px_var(--color-accent)] transition-transform duration-300 ease-out"
+        style="transform: scaleX(0)"
+        data-page-progress-bar
+      ></div>
+    </div>
     <Header />
-    <slot />
+    <div class="animate-fade-up motion-reduce:animate-none">
+      <slot />
+    </div>
     <Footer />
+    <script>
+      const progressRoot = document.querySelector<HTMLElement>('[data-page-progress]')
+      const progressBar = document.querySelector<HTMLElement>('[data-page-progress-bar]')
+
+      if (progressRoot && progressBar) {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        let finished = false
+
+        const paint = (value: number) => {
+          progressBar.style.transform = `scaleX(${value})`
+        }
+
+        const finish = () => {
+          if (finished) return
+          finished = true
+          paint(1)
+          window.setTimeout(
+            () => {
+              progressRoot.style.opacity = '0'
+              window.setTimeout(() => paint(0), reduceMotion ? 0 : 300)
+            },
+            reduceMotion ? 0 : 200,
+          )
+        }
+
+        progressRoot.style.opacity = '1'
+        paint(reduceMotion ? 0.6 : 0.08)
+
+        if (!reduceMotion) {
+          window.requestAnimationFrame(() => paint(0.55))
+        }
+
+        if (document.readyState === 'complete') {
+          finish()
+        } else {
+          window.addEventListener('load', finish, { once: true })
+        }
+
+        document.addEventListener('click', (event) => {
+          if (
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey
+          ) {
+            return
+          }
+
+          const anchor = event.target instanceof Element ? event.target.closest('a') : null
+          if (!anchor) return
+
+          const href = anchor.getAttribute('href')
+          if (
+            !href ||
+            href.startsWith('#') ||
+            anchor.target === '_blank' ||
+            anchor.hasAttribute('download')
+          ) {
+            return
+          }
+
+          const url = new URL(anchor.href, window.location.href)
+          if (url.origin !== window.location.origin) return
+          if (url.pathname === window.location.pathname && url.search === window.location.search) {
+            return
+          }
+
+          progressRoot.style.opacity = '1'
+          paint(reduceMotion ? 0.7 : 0.35)
+
+          if (!reduceMotion) {
+            window.setTimeout(() => paint(0.8), 180)
+          }
+        })
+      }
+    </script>
   </body>
 </html>

@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { SITE_TITLE } from '../../consts'
+import { localeUrl } from '../../i18n/routing'
+---
+
+<BaseLayout title={SITE_TITLE} description="欢迎来到我的网站！">
+  <main class="reading-column ez-editorial">
+    <h1>你好，宇航员！</h1>
+    <p>
+      这里是中文首页的占位内容。站点骨架已经就绪：导航、文章列表、文章页和「关于」页都可以通过右上角的语言选择器在英文与中文之间切换。
+    </p>
+    <p>
+      接下来要做的是补上真正的中文内容：把这段占位文字替换成你的介绍，并为
+      <code>src/content/blog</code> 中的文章准备中文版本。
+    </p>
+    <p>
+      可以先看看 <a href={localeUrl('zh', '/blog/')}>博客</a>，或者
+      <a href={localeUrl('zh', '/about/')}>关于我</a>。
+    </p>
+  </main>
+</BaseLayout>

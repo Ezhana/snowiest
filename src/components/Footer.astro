@@ -1,9 +1,12 @@
 ---
+import { getLang, useTranslations } from '../i18n/ui'
+
 const today = new Date()
+const t = useTranslations(getLang(Astro.currentLocale))
 ---
 
 <footer class="border-t border-border px-4 pt-8 pb-24 text-center text-small text-fg-muted">
-  &copy; {today.getFullYear()} Your name here. All rights reserved.
+  &copy; {today.getFullYear()} {t('footer.copyright')}
   <div class="mt-2 flex justify-center gap-2">
     <a
       class="inline-flex items-center justify-center p-2 text-fg-muted transition-colors hover:text-fg-strong"

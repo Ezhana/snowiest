@@ -3,10 +3,12 @@ import { Image } from 'astro:assets'
 import type { CollectionEntry } from 'astro:content'
 import BaseLayout from './BaseLayout.astro'
 import FormattedDate from '../components/FormattedDate.astro'
+import { getLang, useTranslations } from '../i18n/ui'
 
 type Props = CollectionEntry<'blog'>['data']
 
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props
+const t = useTranslations(getLang(Astro.currentLocale))
 ---
 
 <BaseLayout title={title} description={description}>
@@ -18,7 +20,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props
           <FormattedDate date={pubDate} />
           {updatedDate && (
             <span class="article-updated">
-              Last updated on <FormattedDate date={updatedDate} />
+              {t('post.updated')} <FormattedDate date={updatedDate} />
             </span>
           )}
         </p>

@@ -126,6 +126,36 @@
 }
 
 /*
+ * Motion utilities used by the page shell: content fades up on load, the header fades in, and
+ * menus fade in/out. Kept as Tailwind animations so components can opt in with a class and
+ * `motion-reduce:animate-none`.
+ */
+@theme {
+  --animate-fade-in: fade-in 500ms cubic-bezier(0.2, 0, 0, 1) both;
+  --animate-fade-up: fade-up 600ms cubic-bezier(0.2, 0, 0, 1) both;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/*
  * 1b — Base reset on top of Preflight.
  *
  * Document shell only. Article typography lives in the blog layer, page layout comes from
@@ -151,6 +181,14 @@
     overflow-wrap: break-word;
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    body {
+      transition:
+        background-color 300ms ease,
+        color 300ms ease;
+    }
+  }
+
   ::selection {
     background-color: var(--color-accent-subtle);
     color: var(--color-fg-strong);
@@ -159,5 +197,79 @@
   :focus-visible {
     outline: var(--border-width-strong) solid var(--color-focus-ring);
     outline-offset: 2px;
+  }
+}
+
+/*
+ * App-level component motion that cannot be expressed as a single utility:
+ * - the theme-mode icon cross-fades between system / light / dark,
+ * - dropdown panels animate in and out (the header script keeps <details> open while closing).
+ */
+@layer components {
+  .theme-mode-icon {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: scale(0.85);
+    transition:
+      opacity 200ms ease,
+      transform 200ms ease;
+  }
+
+  :root:not([data-color-mode]) .theme-mode-icon[data-mode='system'],
+  :root[data-color-mode='light'] .theme-mode-icon[data-mode='light'],
+  :root[data-color-mode='dark'] .theme-mode-icon[data-mode='dark'] {
+    opacity: 1;
+    transform: none;
+  }
+
+  [data-theme-mode] [data-mode-check] {
+    opacity: 0;
+    transition: opacity 150ms ease;
+  }
+
+  [data-theme-mode][aria-pressed='true'] [data-mode-check] {
+    opacity: 1;
+  }
+
+  details[open] > [data-menu-panel] {
+    animation: menu-fade-in 180ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  details.is-closing > [data-menu-panel] {
+    animation: menu-fade-out 150ms ease-in both;
+  }
+
+  @keyframes menu-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes menu-fade-out {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-mode-icon,
+    [data-theme-mode] [data-mode-check] {
+      transition: none;
+    }
+
+    details[open] > [data-menu-panel],
+    details.is-closing > [data-menu-panel] {
+      animation: none;
+    }
   }
 }

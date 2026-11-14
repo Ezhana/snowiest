@@ -1,63 +1,311 @@
 ---
-import { SITE_TITLE } from '../consts'
+/**
+ * Morphing site header.
+ *
+ * At rest it floats as an inset, rounded glass bar over the page. Once the document scrolls,
+ * `data-scrolled` expands it smoothly to full width and strengthens the surface (more opaque,
+ * border + shadow). The colour-mode menu is driven by @ezhana/theme, which persists the
+ * `system` / `light` / `dark` preference and writes the Ezhana data attributes.
+ */
 import HeaderLink from './HeaderLink.astro'
+import ThemeModeIcon from './ThemeModeIcon.astro'
+import { getLang, languages, useTranslations, type Lang } from '../i18n/ui'
+import { localeUrl, stripLocale } from '../i18n/routing'
+
+const lang = getLang(Astro.currentLocale)
+const t = useTranslations(lang)
+const currentPath = stripLocale(Astro.url.pathname, lang)
+
+const navItems = [
+  { href: localeUrl(lang, '/'), label: t('nav.home') },
+  { href: localeUrl(lang, '/blog/'), label: t('nav.blog') },
+  { href: localeUrl(lang, '/about/'), label: t('nav.about') },
+]
+
+const languageOptions = (Object.keys(languages) as Lang[]).map((code) => ({
+  code,
+  label: languages[code].label,
+  href: localeUrl(code, currentPath),
+  isCurrent: code === lang,
+}))
+
+const themeOptions = [
+  { mode: 'system' as const, label: t('theme.system') },
+  { mode: 'light' as const, label: t('theme.light') },
+  { mode: 'dark' as const, label: t('theme.dark') },
+]
 ---
 
-<header class="border-b border-border bg-bg">
-  <nav class="flex items-center justify-between px-4">
-    <div class="m-0 text-body font-semibold">
-      <a class="text-fg-strong no-underline transition-colors hover:text-accent" href="/">
-        {SITE_TITLE}
-      </a>
+<header data-site-header data-scrolled="false" class="group sticky top-0 z-50">
+  <div class="px-3 pt-3 transition-[padding] duration-500 ease-out group-data-[scrolled=true]:p-0 motion-reduce:transition-none">
+    <div class="mx-auto w-full max-w-[72rem] animate-fade-in rounded-3xl border border-border/60 bg-bg/55 shadow-md backdrop-blur-xl transition-[max-width,border-radius,border-color,background-color,box-shadow] duration-500 ease-out motion-reduce:transition-none group-data-[scrolled=true]:max-w-full group-data-[scrolled=true]:rounded-none group-data-[scrolled=true]:border-x-0 group-data-[scrolled=true]:border-t-0 group-data-[scrolled=true]:border-border group-data-[scrolled=true]:bg-bg/85 group-data-[scrolled=true]:shadow-sm motion-reduce:animate-none">
+      <div class="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1.5 px-3 py-3 md:grid-cols-[1fr_auto_1fr] md:px-6 md:py-4">
+        <a
+          href={localeUrl(lang, '/')}
+          class="col-start-1 row-start-1 flex animate-fade-in items-center gap-2.5 justify-self-start text-fg-strong no-underline [animation-delay:60ms] motion-reduce:animate-none"
+        >
+          <span class="grid size-8 shrink-0 place-items-center rounded-control bg-accent-subtle text-accent md:size-10">
+            <svg class="size-4 md:size-5" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M50.4 78.5a75.1 75.1 0 0 0-28.5 6.9l24.2-65.7c.7-2 1.9-3.2 3.4-3.2h29c1.5 0 2.7 1.2 3.4 3.2l24.2 65.7s-11.6-7-28.5-7L67 45.5c-.4-1.7-1.6-2.8-2.9-2.8-1.3 0-2.5 1.1-2.9 2.7L50.4 78.5Zm-1.1 28.2Zm-4.2-20.2c-2 6.6-.6 15.8 4.2 20.2a17.5 17.5 0 0 1 .2-.7 5.5 5.5 0 0 1 5.7-4.5c2.8.1 4.3 1.5 4.7 4.7.2 1.1.2 2.3.2 3.5v.4c0 2.7.7 5.2 2.2 7.4a13 13 0 0 0 5.7 4.9v-.3l-.2-.3c-1.8-5.6-.5-9.5 4.4-12.8l1.5-1a73 73 0 0 0 3.2-2.2 16 16 0 0 0 6.8-11.4c.3-2 .1-4-.6-6l-.8.6-1.6 1a37 37 0 0 1-22.4 2.7c-5-.7-9.7-2-13.2-6.2Z"
+              />
+            </svg>
+          </span>
+          <span class="text-body font-bold tracking-tight md:text-h3">{t('site.title')}</span>
+        </a>
+
+        <nav
+          aria-label={t('nav.primary')}
+          class="col-span-2 row-start-2 flex animate-fade-in items-center justify-center justify-self-center gap-1 [animation-delay:120ms] motion-reduce:animate-none md:col-span-1 md:col-start-2 md:row-start-1 md:gap-1.5"
+        >
+          {navItems.map((item) => (
+            <HeaderLink href={item.href}>{item.label}</HeaderLink>
+          ))}
+        </nav>
+
+        <div class="col-start-2 row-start-1 flex animate-fade-in items-center justify-self-end gap-1 [animation-delay:180ms] motion-reduce:animate-none md:col-start-3 md:gap-1.5">
+          <details class="relative" data-menu data-language-menu>
+            <summary
+              class="inline-flex size-10 cursor-pointer list-none items-center justify-center gap-1.5 rounded-control text-small font-medium text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg-strong md:h-11 md:w-auto md:px-3 md:text-body [&::-webkit-details-marker]:hidden"
+              aria-label={t('language.label')}
+              title={t('language.label')}
+            >
+              <svg
+                class="size-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                <path d="M2 12h20"></path>
+              </svg>
+              <span class="hidden text-caption font-semibold uppercase md:inline">
+                {languages[lang].short}
+              </span>
+              <svg
+                class="hidden size-3.5 opacity-60 md:block"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+            </summary>
+            <div
+              data-menu-panel
+              role="group"
+              aria-label={t('language.label')}
+              class="absolute end-0 top-full z-50 mt-2 w-44 rounded-panel border border-border bg-surface-elevated p-1.5 shadow-lg"
+            >
+              {languageOptions.map((option) => (
+                <a
+                  href={option.href}
+                  hreflang={option.code}
+                  lang={option.code}
+                  aria-current={option.isCurrent ? 'true' : undefined}
+                  class:list={[
+                    'flex items-center justify-between gap-2 rounded-small px-3 py-2 text-body no-underline transition-colors',
+                    option.isCurrent
+                      ? 'bg-bg-subtle text-fg-strong'
+                      : 'text-fg hover:bg-bg-subtle hover:text-fg-strong',
+                  ]}
+                >
+                  <span>{option.label}</span>
+                  {option.isCurrent && (
+                    <svg
+                      class="size-4 text-accent"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6 9 17l-5-5"></path>
+                    </svg>
+                  )}
+                </a>
+              ))}
+            </div>
+          </details>
+
+          <a
+            href="/rss.xml"
+            class="inline-flex size-10 items-center justify-center rounded-control text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg-strong md:size-11"
+            aria-label={t('rss.label')}
+            title={t('rss.label')}
+          >
+            <svg
+              class="size-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M4 11a9 9 0 0 1 9 9"></path>
+              <path d="M4 4a16 16 0 0 1 16 16"></path>
+              <circle cx="5" cy="19" r="1"></circle>
+            </svg>
+          </a>
+
+          <details class="relative" data-menu data-theme-menu>
+            <summary
+              class="grid size-10 cursor-pointer list-none place-items-center rounded-control text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg-strong md:size-11 [&::-webkit-details-marker]:hidden"
+              aria-label={t('theme.label')}
+              title={t('theme.label')}
+            >
+              <span class="grid place-items-center">
+                <ThemeModeIcon mode="system" class="theme-mode-icon size-5" />
+                <ThemeModeIcon mode="light" class="theme-mode-icon size-5" />
+                <ThemeModeIcon mode="dark" class="theme-mode-icon size-5" />
+              </span>
+            </summary>
+            <div
+              data-menu-panel
+              role="group"
+              aria-label={t('theme.label')}
+              class="absolute end-0 top-full z-50 mt-2 w-52 rounded-panel border border-border bg-surface-elevated p-1.5 shadow-lg"
+            >
+              {themeOptions.map((option) => (
+                <button
+                  type="button"
+                  data-theme-mode={option.mode}
+                  aria-pressed={option.mode === 'system'}
+                  class="flex w-full items-center justify-between gap-2 rounded-small px-3 py-2 text-start text-body text-fg transition-colors hover:bg-bg-subtle hover:text-fg-strong aria-pressed:bg-bg-subtle aria-pressed:text-fg-strong"
+                >
+                  <span class="flex items-center gap-2.5 whitespace-nowrap">
+                    <ThemeModeIcon mode={option.mode} class="size-4" />
+                    {option.label}
+                  </span>
+                  <svg
+                    data-mode-check
+                    class="size-4 text-accent"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M20 6 9 17l-5-5"></path>
+                  </svg>
+                </button>
+              ))}
+            </div>
+          </details>
+        </div>
+      </div>
     </div>
-    <div class="flex items-center">
-      <HeaderLink href="/">Home</HeaderLink>
-      <HeaderLink href="/blog">Blog</HeaderLink>
-      <HeaderLink href="/about">About</HeaderLink>
-    </div>
-    <div class="hidden items-center gap-2 md:flex">
-      <a
-        class="text-fg-muted transition-colors hover:text-fg-strong"
-        href="https://m.webtoo.ls/@astro"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <span class="sr-only">Follow Astro on Mastodon</span>
-        <svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24">
-          <path
-            fill="currentColor"
-            d="M11.19 12.195c2.016-.24 3.77-1.475 3.99-2.603.348-1.778.32-4.339.32-4.339 0-3.47-2.286-4.488-2.286-4.488C12.062.238 10.083.017 8.027 0h-.05C5.92.017 3.942.238 2.79.765c0 0-2.285 1.017-2.285 4.488l-.002.662c-.004.64-.007 1.35.011 2.091.083 3.394.626 6.74 3.78 7.57 1.454.383 2.703.463 3.709.408 1.823-.1 2.847-.647 2.847-.647l-.06-1.317s-1.303.41-2.767.36c-1.45-.05-2.98-.156-3.215-1.928a3.614 3.614 0 0 1-.033-.496s1.424.346 3.228.428c1.103.05 2.137-.064 3.188-.189zm1.613-2.47H11.13v-4.08c0-.859-.364-1.295-1.091-1.295-.804 0-1.207.517-1.207 1.541v2.233H7.168V5.89c0-1.024-.403-1.541-1.207-1.541-.727 0-1.091.436-1.091 1.296v4.079H3.197V5.522c0-.859.22-1.541.66-2.046.456-.505 1.052-.764 1.793-.764.856 0 1.504.328 1.933.983L8 4.39l.417-.695c.429-.655 1.077-.983 1.934-.983.74 0 1.336.259 1.791.764.442.505.661 1.187.661 2.046v4.203z"
-          />
-        </svg>
-      </a>
-      <a
-        class="text-fg-muted transition-colors hover:text-fg-strong"
-        href="https://twitter.com/astrodotbuild"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <span class="sr-only">Follow Astro on Twitter</span>
-        <svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24">
-          <path
-            fill="currentColor"
-            d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"
-          />
-        </svg>
-      </a>
-      <a
-        class="text-fg-muted transition-colors hover:text-fg-strong"
-        href="https://github.com/withastro/astro"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <span class="sr-only">Go to Astro's GitHub repo</span>
-        <svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24">
-          <path
-            fill="currentColor"
-            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-          />
-        </svg>
-      </a>
-    </div>
-  </nav>
+  </div>
 </header>
+
+<script>
+  import { theme as cerulean } from '@ezhana/design-theme-cerulean'
+  import { createThemeManager } from '@ezhana/theme'
+
+  const header = document.querySelector<HTMLElement>('[data-site-header]')
+
+  if (header) {
+    const updateScrolledState = () => {
+      header.dataset.scrolled = String(window.scrollY > 8)
+    }
+
+    updateScrolledState()
+
+    let frame = 0
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (frame) return
+        frame = window.requestAnimationFrame(() => {
+          frame = 0
+          updateScrolledState()
+        })
+      },
+      { passive: true },
+    )
+  }
+
+  const menus = Array.from(document.querySelectorAll<HTMLDetailsElement>('[data-menu]'))
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const closeMenu = (menu: HTMLDetailsElement) => {
+    if (!menu.open || menu.classList.contains('is-closing')) return
+    menu.classList.add('is-closing')
+    window.setTimeout(
+      () => {
+        menu.open = false
+        menu.classList.remove('is-closing')
+      },
+      reduceMotion ? 0 : 150,
+    )
+  }
+
+  for (const menu of menus) {
+    menu.querySelector('summary')?.addEventListener('click', (event) => {
+      if (!menu.open) return
+      event.preventDefault()
+      closeMenu(menu)
+    })
+  }
+
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Node)) return
+    for (const menu of menus) {
+      if (menu.open && !menu.contains(event.target)) closeMenu(menu)
+    }
+  })
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return
+    for (const menu of menus) {
+      if (!menu.open) continue
+      closeMenu(menu)
+      menu.querySelector('summary')?.focus()
+    }
+  })
+
+  const themeMenu = document.querySelector<HTMLDetailsElement>('[data-theme-menu]')
+
+  if (themeMenu) {
+    const modeButtons = Array.from(
+      themeMenu.querySelectorAll<HTMLButtonElement>('[data-theme-mode]'),
+    )
+    const themeManager = createThemeManager({ themes: [cerulean] })
+
+    const syncThemeState = () => {
+      const { mode } = themeManager.getState()
+      for (const button of modeButtons) {
+        button.setAttribute('aria-pressed', String(button.dataset.themeMode === mode))
+      }
+    }
+
+    for (const button of modeButtons) {
+      button.addEventListener('click', () => {
+        const mode = button.dataset.themeMode
+        if (mode === 'system' || mode === 'light' || mode === 'dark') {
+          themeManager.setMode(mode)
+        }
+        closeMenu(themeMenu)
+      })
+    }
+
+    themeManager.subscribe(syncThemeState)
+    syncThemeState()
+  }
+</script>

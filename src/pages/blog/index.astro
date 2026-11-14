@@ -1,47 +1,9 @@
 ---
-import { Image } from 'astro:assets'
-import { getCollection } from 'astro:content'
-import FormattedDate from '../../components/FormattedDate.astro'
+import BlogListing from '../../components/BlogListing.astro'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts'
-
-const posts = (await getCollection('blog')).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-)
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-  <main class="mx-auto w-full max-w-[60rem] px-4 py-12">
-    <h1 class="m-0 mb-8 text-h1 font-bold text-fg-strong">Blog</h1>
-    <section>
-      <ul class="m-0 grid list-none grid-cols-1 gap-8 p-0 md:grid-cols-2">
-        {posts.map((post, index) => (
-          <li class:list={['min-w-0', index === 0 && 'md:col-span-2']}>
-            <a class="group block no-underline" href={`/blog/${post.id}/`}>
-              {post.data.heroImage && (
-                <Image
-                  class="mb-3 w-full rounded-surface transition-shadow group-hover:shadow-lg"
-                  width={720}
-                  height={360}
-                  src={post.data.heroImage}
-                  alt=""
-                />
-              )}
-              <h2
-                class:list={[
-                  'm-0 text-fg-strong transition-colors group-hover:text-accent',
-                  index === 0 ? 'text-h2 font-bold' : 'text-h3 font-semibold',
-                ]}
-              >
-                {post.data.title}
-              </h2>
-              <p class="m-0 text-small text-fg-muted transition-colors group-hover:text-accent">
-                <FormattedDate date={post.data.pubDate} />
-              </p>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  </main>
+  <BlogListing />
 </BaseLayout>

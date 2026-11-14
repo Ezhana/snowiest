@@ -1,0 +1,19 @@
+---
+import AboutHeroImage from '../../assets/blog-placeholder-about.jpg'
+import Layout from '../../layouts/BlogPost.astro'
+---
+
+<Layout
+  title="关于我"
+  description="关于这个站点与它的作者"
+  pubDate={new Date('August 08 2021')}
+  heroImage={AboutHeroImage}
+>
+  <p>
+    这里是中文「关于」页的占位内容。可以替换成你的自我介绍、写作方向、联系方式，或者任何你希望读者了解的事情。
+  </p>
+  <p>
+    这份骨架复用了与英文页面相同的文章布局：标题、日期、正文排版和阅读宽度都由同一个 Blog
+    样式层控制，因此两种语言看起来保持一致。
+  </p>
+</Layout>
