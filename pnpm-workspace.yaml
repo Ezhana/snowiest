@@ -7,3 +7,7 @@ minimumReleaseAgeExclude:
   - '@ezhana/typography-editorial@0.1.0'
   - '@ezhana/design-theme-cerulean@1.0.0'
   - '@ezhana/design-tokens@2.0.0'
+  - '@ezhana/eslint-config-astro@0.2.0'
+  - '@ezhana/eslint-config-base@0.2.0'
+  - '@ezhana/eslint-config-typescript@0.2.0'
+  - '@ezhana/prettier-config@0.2.0'
