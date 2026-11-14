@@ -219,31 +219,30 @@ const themeOptions = [
   import { theme as cerulean } from '@ezhana/design-theme-cerulean'
   import { createThemeManager } from '@ezhana/theme'
 
-  const header = document.querySelector<HTMLElement>('[data-site-header]')
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const themeManager = createThemeManager({ themes: [cerulean] })
 
-  if (header) {
-    const updateScrolledState = () => {
-      header.dataset.scrolled = String(window.scrollY > 8)
-    }
+  const getHeader = () => document.querySelector<HTMLElement>('[data-site-header]')
 
-    updateScrolledState()
-
-    let frame = 0
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (frame) return
-        frame = window.requestAnimationFrame(() => {
-          frame = 0
-          updateScrolledState()
-        })
-      },
-      { passive: true },
-    )
+  const updateScrolledState = () => {
+    const header = getHeader()
+    if (header) header.dataset.scrolled = String(window.scrollY > 8)
   }
 
-  const menus = Array.from(document.querySelectorAll<HTMLDetailsElement>('[data-menu]'))
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  updateScrolledState()
+
+  let frame = 0
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (frame) return
+      frame = window.requestAnimationFrame(() => {
+        frame = 0
+        updateScrolledState()
+      })
+    },
+    { passive: true },
+  )
 
   const closeMenu = (menu: HTMLDetailsElement) => {
     if (!menu.open || menu.classList.contains('is-closing')) return
@@ -257,56 +256,59 @@ const themeOptions = [
     )
   }
 
-  for (const menu of menus) {
-    menu.querySelector('summary')?.addEventListener('click', (event) => {
-      if (!menu.open) return
-      event.preventDefault()
-      closeMenu(menu)
-    })
+  const syncThemeButtons = () => {
+    const { mode } = themeManager.getState()
+    for (const button of document.querySelectorAll<HTMLButtonElement>('[data-theme-mode]')) {
+      button.setAttribute('aria-pressed', String(button.dataset.themeMode === mode))
+    }
   }
 
+  themeManager.subscribe(syncThemeButtons)
+  syncThemeButtons()
+
   document.addEventListener('click', (event) => {
-    if (!(event.target instanceof Node)) return
-    for (const menu of menus) {
-      if (menu.open && !menu.contains(event.target)) closeMenu(menu)
+    if (!(event.target instanceof Element)) return
+
+    const summary = event.target.closest('summary')
+    const menu = summary?.closest<HTMLDetailsElement>('[data-menu]')
+
+    if (menu && summary) {
+      if (menu.open) {
+        event.preventDefault()
+        closeMenu(menu)
+      }
+      return
+    }
+
+    const modeButton = event.target.closest<HTMLElement>('[data-theme-mode]')
+    if (modeButton) {
+      const mode = modeButton.dataset.themeMode
+      if (mode === 'system' || mode === 'light' || mode === 'dark') {
+        themeManager.setMode(mode)
+      }
+      const themeMenu = modeButton.closest<HTMLDetailsElement>('[data-theme-menu]')
+      if (themeMenu) closeMenu(themeMenu)
+      return
+    }
+
+    for (const openMenu of document.querySelectorAll<HTMLDetailsElement>('[data-menu]')) {
+      if (openMenu.open && !openMenu.contains(event.target)) closeMenu(openMenu)
     }
   })
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return
-    for (const menu of menus) {
+    for (const menu of document.querySelectorAll<HTMLDetailsElement>('[data-menu]')) {
       if (!menu.open) continue
       closeMenu(menu)
       menu.querySelector('summary')?.focus()
     }
   })
 
-  const themeMenu = document.querySelector<HTMLDetailsElement>('[data-theme-menu]')
-
-  if (themeMenu) {
-    const modeButtons = Array.from(
-      themeMenu.querySelectorAll<HTMLButtonElement>('[data-theme-mode]'),
-    )
-    const themeManager = createThemeManager({ themes: [cerulean] })
-
-    const syncThemeState = () => {
-      const { mode } = themeManager.getState()
-      for (const button of modeButtons) {
-        button.setAttribute('aria-pressed', String(button.dataset.themeMode === mode))
-      }
-    }
-
-    for (const button of modeButtons) {
-      button.addEventListener('click', () => {
-        const mode = button.dataset.themeMode
-        if (mode === 'system' || mode === 'light' || mode === 'dark') {
-          themeManager.setMode(mode)
-        }
-        closeMenu(themeMenu)
-      })
-    }
-
-    themeManager.subscribe(syncThemeState)
-    syncThemeState()
-  }
+  // <ClientRouter /> keeps the document alive across navigations, so re-query the new header and
+  // re-sync the mode buttons after every page load.
+  document.addEventListener('astro:page-load', () => {
+    updateScrolledState()
+    syncThemeButtons()
+  })
 </script>

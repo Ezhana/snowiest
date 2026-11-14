@@ -1,0 +1,97 @@
+---
+import { getLang, useTranslations } from '../i18n/ui'
+import { localeUrl } from '../i18n/routing'
+
+interface Props {
+  currentPage: number
+  totalPages: number
+}
+
+const { currentPage, totalPages } = Astro.props
+const lang = getLang(Astro.currentLocale)
+const t = useTranslations(lang)
+
+const pageHref = (page: number) => localeUrl(lang, page === 1 ? '/blog/' : `/blog/page/${page}/`)
+
+/** Keep the pagination compact for long archives: first, last, and neighbours of the current page. */
+const pageItems: Array<number | 'ellipsis'> = []
+for (let page = 1; page <= totalPages; page += 1) {
+  const isEdge = page === 1 || page === totalPages
+  const isNearCurrent = Math.abs(page - currentPage) <= 1
+  if (isEdge || isNearCurrent) {
+    pageItems.push(page)
+  } else if (pageItems.at(-1) !== 'ellipsis') {
+    pageItems.push('ellipsis')
+  }
+}
+
+const previousHref = currentPage > 1 ? pageHref(currentPage - 1) : null
+const nextHref = currentPage < totalPages ? pageHref(currentPage + 1) : null
+
+const controlClass =
+  'inline-flex h-9 items-center justify-center rounded-control px-3 text-small no-underline transition-colors'
+---
+
+{totalPages > 1 && (
+  <nav aria-label={t('pagination.label')} class="mt-6 flex items-center justify-center gap-1.5">
+    {previousHref ? (
+      <a
+        href={previousHref}
+        rel="prev"
+        class:list={[controlClass, 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong']}
+      >
+        {t('pagination.previous')}
+      </a>
+    ) : (
+      <span
+        aria-disabled="true"
+        class:list={[controlClass, 'cursor-default text-fg-muted opacity-40']}
+      >
+        {t('pagination.previous')}
+      </span>
+    )}
+
+    <ul class="m-0 flex list-none items-center gap-1 p-0">
+      {pageItems.map((item) =>
+        item === 'ellipsis' ? (
+          <li aria-hidden="true" class="px-1 text-small text-fg-muted">
+            …
+          </li>
+        ) : (
+          <li>
+            <a
+              href={pageHref(item)}
+              aria-current={item === currentPage ? 'page' : undefined}
+              aria-label={`${t('pagination.page')} ${item}`}
+              class:list={[
+                'inline-flex h-9 min-w-9 items-center justify-center rounded-control px-2 text-small no-underline transition-colors',
+                item === currentPage
+                  ? 'bg-accent-subtle font-semibold text-accent'
+                  : 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong',
+              ]}
+            >
+              {item}
+            </a>
+          </li>
+        ),
+      )}
+    </ul>
+
+    {nextHref ? (
+      <a
+        href={nextHref}
+        rel="next"
+        class:list={[controlClass, 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong']}
+      >
+        {t('pagination.next')}
+      </a>
+    ) : (
+      <span
+        aria-disabled="true"
+        class:list={[controlClass, 'cursor-default text-fg-muted opacity-40']}
+      >
+        {t('pagination.next')}
+      </span>
+    )}
+  </nav>
+)}

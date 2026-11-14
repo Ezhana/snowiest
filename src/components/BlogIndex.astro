@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import BlogListing from './BlogListing.astro'
+import BlogPagination from './BlogPagination.astro'
+import { getBlogPage, getBlogPosts } from '../lib/blog'
+
+interface Props {
+  page: number
+  title: string
+  description: string
+}
+
+const { page, title, description } = Astro.props
+const posts = await getBlogPosts()
+const { posts: pagePosts, currentPage, totalPages } = getBlogPage(posts, page)
+---
+
+<BaseLayout title={title} description={description}>
+  <BlogListing posts={pagePosts}>
+    <BlogPagination currentPage={currentPage} totalPages={totalPages} />
+  </BlogListing>
+</BaseLayout>

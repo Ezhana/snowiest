@@ -1,9 +1,6 @@
 ---
-import BlogListing from '../../../components/BlogListing.astro'
-import BaseLayout from '../../../layouts/BaseLayout.astro'
+import BlogIndex from '../../../components/BlogIndex.astro'
 import { SITE_TITLE } from '../../../consts'
 ---
 
-<BaseLayout title={`博客 · ${SITE_TITLE}`} description="中文博客（占位页面）">
-  <BlogListing />
-</BaseLayout>
+<BlogIndex page={1} title={`博客 · ${SITE_TITLE}`} description="中文博客（占位页面）" />

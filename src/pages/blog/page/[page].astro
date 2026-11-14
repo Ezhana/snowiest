@@ -1,0 +1,23 @@
+---
+import BlogIndex from '../../../components/BlogIndex.astro'
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../../consts'
+import { BLOG_PAGE_SIZE, getBlogPosts } from '../../../lib/blog'
+
+export async function getStaticPaths() {
+  const posts = await getBlogPosts()
+  const totalPages = Math.ceil(posts.length / BLOG_PAGE_SIZE)
+
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
+    const page = index + 2
+    return { params: { page: String(page) }, props: { page } }
+  })
+}
+
+interface Props {
+  page: number
+}
+
+const { page } = Astro.props
+---
+
+<BlogIndex page={page} title={SITE_TITLE} description={SITE_DESCRIPTION} />
