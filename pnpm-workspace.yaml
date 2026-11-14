@@ -4,3 +4,6 @@ minimumReleaseAgeExclude:
   - '@astrojs/sitemap@3.7.5'
   - '@astrojs/vite-plugin-astro@0.1.3'
   - astro@7.4.12
+  - '@ezhana/typography-editorial@0.1.0'
+  - '@ezhana/design-theme-cerulean@1.0.0'
+  - '@ezhana/design-tokens@2.0.0'
