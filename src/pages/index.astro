@@ -2,19 +2,13 @@
 import BaseLayout from '../layouts/BaseLayout.astro'
 import BlogTimeline from '../components/BlogTimeline.astro'
 import { localeUrl, rssUrl } from '../i18n/routing'
-import {
-  SITE_DESCRIPTION_ZH,
-  SITE_GITHUB_PROFILE_URL,
-  SITE_TITLE_ZH,
-} from '../consts'
+import { SITE_DESCRIPTION_ZH, SITE_GITHUB_PROFILE_URL, SITE_TITLE_ZH } from '../consts'
 ---
 
 <BaseLayout title={SITE_TITLE_ZH} description={SITE_DESCRIPTION_ZH}>
   <main class="mx-auto w-full max-w-[72rem] px-4 py-12">
     <section class="ez-editorial mx-auto w-full max-w-[45rem]">
-      <p
-        class="mb-4 flex items-center gap-2 text-caption font-semibold uppercase tracking-[0.18em] text-accent"
-      >
+      <p class="mb-4 flex items-center gap-2 text-caption font-semibold uppercase tracking-[0.18em] text-accent">
         <span class="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
         Snowiest · 簌雪
       </p>
@@ -26,11 +20,9 @@ import {
         我是 <strong>Ezhana</strong>。这个站点会分享技术文章，也会收留一些牢骚、逸闻、ACGN
         资讯和没头没尾的感想。
       </p>
-      <p>
-        不求篇篇有用，但求偶尔有趣。欢迎互动、日常交流，或者只是路过坐坐。想安静地看，可以订阅
-        <a href={rssUrl('zh')}>RSS</a>；想说话，来
-        <a href={SITE_GITHUB_PROFILE_URL}>GitHub</a> 找我。
-      </p>
+      <p
+        set:html={`不求篇篇有用，但求偶尔有趣。欢迎互动、日常交流，或者只是路过坐坐。想安静地看，可以订阅 <a href="${rssUrl('zh')}">RSS</a>；想说话，来 <a href="${SITE_GITHUB_PROFILE_URL}">GitHub</a> 找我。`}
+      />
       <p class="text-small text-fg-muted">
         想先认识一下？<a href={localeUrl('zh', '/about/')}>关于作者</a>。
       </p>

@@ -6,6 +6,7 @@ export const SITE_TITLE_ZH = '簌雪'
 export const SITE_DESCRIPTION = 'Snowiest (簌雪) — the personal site of Ezhana.'
 export const SITE_DESCRIPTION_ZH = '簌雪（Snowiest）—— Ezhana 的个人站点。'
 export const SITE_AUTHOR = 'Ezhana'
+export const SITE_GITHUB_PROFILE_URL = 'https://github.com/Ezhana'
 export const SITE_GITHUB_URL = 'https://github.com/Ezhana/snowiest'
 export const SITE_URL = 'https://ezhana.github.io/snowiest/'
 

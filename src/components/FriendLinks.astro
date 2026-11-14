@@ -1,0 +1,67 @@
+---
+import type { Lang } from '../i18n/ui'
+import { FRIEND_LINKS } from '../lib/friends'
+import { SITE_GITHUB_PROFILE_URL } from '../consts'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+
+const copy = {
+  zh: {
+    heading: '友情链接',
+    intro: '一些常去、也愿意推荐的地方。友链还在慢慢长，欢迎来换。',
+    exchange: '想交换友链？来',
+    exchangeLink: 'GitHub',
+    exchangeTail: '找我，带上你的站点和一句介绍。',
+  },
+  en: {
+    heading: 'Friends',
+    intro:
+      'A few places I keep coming back to. The list is still growing — feel free to trade links.',
+    exchange: 'Want to trade links? Find me on',
+    exchangeLink: 'GitHub',
+    exchangeTail: 'with your site and a one-line intro.',
+  },
+}[lang]
+---
+
+<section class="mt-14" aria-labelledby="friends-heading">
+  <h2 id="friends-heading">{copy.heading}</h2>
+  <p>{copy.intro}</p>
+  <ul class="m-0 grid list-none gap-3 p-0 sm:grid-cols-2">
+    {FRIEND_LINKS.map((friend) => (
+      <li class="m-0">
+        <a
+          href={friend.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group flex h-full flex-col rounded-surface border border-border bg-surface p-4 no-underline transition-colors hover:border-accent-border hover:bg-bg-subtle"
+        >
+          <span class="flex items-center justify-between gap-3">
+            <span class="flex min-w-0 items-center gap-2.5">
+              <span
+                class="grid size-8 shrink-0 place-items-center rounded-control bg-accent-subtle text-small font-semibold text-accent"
+                aria-hidden="true"
+              >
+                {friend.name.slice(0, 1)}
+              </span>
+              <span class="truncate font-semibold text-fg-strong transition-colors group-hover:text-accent">
+                {friend.name}
+              </span>
+            </span>
+            <span class="shrink-0 text-caption text-fg-muted">{friend.tag[lang]}</span>
+          </span>
+          <span class="mt-2 text-small leading-relaxed text-fg-muted">
+            {friend.description[lang]}
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+  <p class="mt-5 text-small text-fg-muted">
+    {copy.exchange} <a href={SITE_GITHUB_PROFILE_URL}>{copy.exchangeLink}</a> {copy.exchangeTail}
+  </p>
+</section>

@@ -82,6 +82,12 @@ draft: false # 可选，默认 false
 - `pubDate` 晚于当前时间的文章同样只在开发服务器中可见。生产构建会过滤未来文章，GitHub Actions 每天 00:00 UTC 定时重建一次，因此文章会在到达日期后的下一次构建中自动上线。
 - 删除文章等于下线，旧链接会 404；重命名 slug 也会改变 URL，发布后应尽量保持 slug 稳定。
 
+## 首页与关于页
+
+- 首页开场白与站点介绍：`src/pages/index.astro`、`src/pages/en/index.astro`。
+- 关于页自我介绍：`src/pages/about.astro`、`src/pages/en/about.astro`。
+- 友链列表：`src/lib/friends.ts`。每条包含 `name`、`url`、`description`（中/英）和 `tag`（中/英），中英文描述都需要填写。
+
 ## 本地检查
 
 ```sh

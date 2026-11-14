@@ -12,41 +12,49 @@ import {
 } from '../consts'
 
 const lang = getLang(Astro.currentLocale)
+
+// The prose below is authored as HTML strings so the whitespace around inline links and
+// corrections is explicit. Template line breaks would otherwise insert stray spaces.
 ---
 
 <Layout title="关于" description={`关于${SITE_TITLE_ZH}与它的作者 ${SITE_AUTHOR}。`}>
-  <p>
-    我是 <strong>{SITE_AUTHOR}</strong>，<strong>{SITE_TITLE_ZH}</strong> 的维护者。
-    平时写代码，也写点别的；喜欢把复杂的东西理顺，<del class="text-fg-muted decoration-danger"
-      >然后制造新的复杂</del
-    ><ins class="text-accent decoration-accent decoration-wavy">然后发现新的麻烦</ins>。
-  </p>
+  <p
+    set:html={`我是 <strong>${SITE_AUTHOR}</strong>，<strong>${SITE_TITLE_ZH}</strong>的维护者。平时写代码，也写点别的；喜欢把复杂的东西理顺，<del class="text-fg-muted decoration-danger">然后制造新的复杂</del>，<ins class="text-accent decoration-accent decoration-wavy">然后发现新的麻烦。</ins>`}
+  />
 
-  <p>如果只能用三个词介绍自己，我会选：<strong>有趣、秩序、和谐</strong>。</p>
+  <p>
+    如果只能用三个词介绍自己，我会选：<strong>有趣、秩序、和谐</strong>。
+  </p>
 
   <h2 class="mt-12">有趣、秩序、和谐</h2>
 
   <p>
-    <strong>有趣</strong>是入口。喜欢琢磨一件事还能不能更好玩一点，也喜欢在正经的讨论里突然拐个弯。<del
-      class="text-fg-muted decoration-danger">包括这段自我介绍。</del
-    >
+    <strong>有趣</strong>是入口。喜欢琢磨一件事还能不能更好玩一点，也喜欢在正经的讨论里突然拐个弯。
+    <del class="text-fg-muted decoration-danger">包括这段自我介绍。</del>
   </p>
 
   <p>
-    <strong>秩序</strong>是底盘。文件夹要分类，标签页要收敛，句子最好一口气读完不用回头。<del
-      class="text-fg-muted decoration-danger">虽然经常做不到</del
-    ><ins class="text-accent decoration-accent decoration-wavy">虽然经常做不到，但一直在努力。</ins>
-    如果你也喜欢这一类东西，可能会喜欢<a href={localeUrl(lang, '/blog/tag/design/')}>设计分类</a>里的几篇。
+    <strong>秩序</strong>是底盘。文件夹要分类，标签页要收敛，句子最好一口气读完不用回头。
+    <del class="text-fg-muted decoration-danger">虽然经常做不到</del>，
+    <ins class="text-accent decoration-accent decoration-wavy">但一直在努力。</ins>
   </p>
 
   <p>
-    <strong>和谐</strong>是目标。希望人与人、人与工具、人与自己之间，都少一点摩擦。
-    这也是这个站点看上去比较安静的原因——<span
+    如果你也喜欢这一类东西，可能会喜欢
+    <a href={localeUrl(lang, '/blog/tag/design/')}>设计分类里的几篇</a>。
+  </p>
+
+  <p>
+    <strong>和谐</strong>
+    是目标。希望人与人、人与工具、人与自己之间，都少一点摩擦。这也是这个站点看上去比较安静的原因——
+    <span
       class="ink-redacted"
       tabindex="0"
       role="note"
-      aria-label="被涂掉的一句话：其实是因为我懒得吵架">其实是因为我懒得吵架</span
-    >。
+      aria-label="被涂掉的一句话：其实是因为我懒得吵架。"
+    >
+      其实是因为我懒得吵架。
+    </span>
   </p>
 
   <p>
@@ -55,27 +63,24 @@ const lang = getLang(Astro.currentLocale)
 
   <h2 class="mt-12">这个站点</h2>
 
-  <p>
-    {SITE_TITLE_ZH}（Snowiest）是 {SITE_AUTHOR} 的个人站点。它用
-    <a href="https://astro.build/">Astro</a> 搭成，代码放在
-    <a href={SITE_GITHUB_URL}>GitHub</a>，通过 <a href={SITE_URL}>GitHub Pages</a> 发布。
-    这里会写技术文章，也会发牢骚、记逸闻、聊 ACGN 资讯和感想。<del
-      class="text-fg-muted decoration-danger">每周更新</del
-    ><ins class="text-accent decoration-accent decoration-wavy">不定期更新，但不会消失。</ins>
-  </p>
+  <p
+    set:html={`${SITE_TITLE_ZH}（Snowiest）是 ${SITE_AUTHOR} 的个人站点。它用 <a href="https://astro.build/">Astro</a> 搭成，代码放在 <a href="${SITE_GITHUB_URL}">GitHub</a>，通过 <a href="${SITE_URL}">GitHub Pages</a> 发布。`}
+  />
+
+  <p
+    set:html={`这里会写技术文章，也会发牢骚、记逸闻、聊 ACGN 资讯和感想。<del class="text-fg-muted decoration-danger">每周更新</del>，<ins class="text-accent decoration-accent decoration-wavy">不定期更新，但不会消失。</ins>`}
+  />
 
   <FriendLinks lang={lang} />
 
   <h2 class="mt-12">找到我</h2>
 
-  <p>
-    最直接的地方是 <a href={SITE_GITHUB_PROFILE_URL}>GitHub</a>。想安静地看更新，可以订阅
-    <a href={rssUrl(lang)}>RSS</a>；想从头读起，<a href={localeUrl(lang, '/blog/')}>博客</a
-    >一直开着。
-  </p>
+  <p
+    set:html={`最直接的地方是 <a href="${SITE_GITHUB_PROFILE_URL}">GitHub</a>；想安静地看更新，可以订阅 <a href="${rssUrl(lang)}">RSS</a>；想从头读起，直接去<a href="${localeUrl(lang, '/blog/')}">博客</a>。`}
+  />
 
   <p class="text-small text-fg-muted">
-    <strong>P.S.</strong> 这篇自我介绍<del class="decoration-danger">写于一个很清醒的下午</del
-    >其实改了四遍。
+    <strong>P.S.</strong> 这篇自我介绍<del class="decoration-danger">写于一个很清醒的下午</del>，
+    <ins class="text-accent decoration-accent decoration-wavy">其实改了四遍。</ins>
   </p>
 </Layout>
