@@ -28,3 +28,33 @@ export function getBlogPage(posts: BlogPost[], page: number): BlogPage {
     totalPages,
   }
 }
+
+export interface BlogMonthGroup {
+  key: string
+  /** First day of the month, used for the localized month label. */
+  date: Date
+  posts: BlogPost[]
+}
+
+/** Group posts (already newest-first) by calendar month, newest month first. */
+export function groupBlogPostsByMonth(posts: BlogPost[]): BlogMonthGroup[] {
+  const groups = new Map<string, BlogMonthGroup>()
+
+  for (const post of posts) {
+    const date = post.data.pubDate
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+    const existing = groups.get(key)
+
+    if (existing) {
+      existing.posts.push(post)
+    } else {
+      groups.set(key, {
+        key,
+        date: new Date(date.getFullYear(), date.getMonth(), 1),
+        posts: [post],
+      })
+    }
+  }
+
+  return Array.from(groups.values()).sort((a, b) => b.date.getTime() - a.date.getTime())
+}

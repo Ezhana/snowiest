@@ -1,19 +1,23 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
+import BlogTimeline from '../components/BlogTimeline.astro'
 import { localeUrl } from '../i18n/routing'
 import { SITE_DESCRIPTION, SITE_GITHUB_URL, SITE_TITLE } from '../consts'
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-  <main class="reading-column ez-editorial">
-    <h1>{SITE_TITLE}</h1>
-    <p>
-      The personal site of <strong>Ezhana</strong>.
-    </p>
-    <p>
-      Read the <a href={localeUrl('en', '/blog/')}>blog</a>, learn more
-      <a href={localeUrl('en', '/about/')}>about the author</a>, or browse the
-      <a href={SITE_GITHUB_URL}>source code on GitHub</a>.
-    </p>
+  <main class="mx-auto w-full max-w-[72rem] px-4 py-12">
+    <section class="ez-editorial mx-auto w-full max-w-[45rem]">
+      <h1>{SITE_TITLE}</h1>
+      <p>
+        The personal site of <strong>Ezhana</strong>.
+      </p>
+      <p>
+        Read the <a href={localeUrl('en', '/blog/')}>blog</a>, learn more{' '}
+        <a href={localeUrl('en', '/about/')}>about the author</a>, or browse the{' '}
+        <a href={SITE_GITHUB_URL}>source code on GitHub</a>.
+      </p>
+    </section>
+    <BlogTimeline />
   </main>
 </BaseLayout>

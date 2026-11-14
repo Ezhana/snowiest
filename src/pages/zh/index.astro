@@ -1,19 +1,23 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro'
+import BlogTimeline from '../../components/BlogTimeline.astro'
 import { localeUrl } from '../../i18n/routing'
 import { SITE_DESCRIPTION_ZH, SITE_GITHUB_URL, SITE_TITLE_ZH } from '../../consts'
 ---
 
 <BaseLayout title={SITE_TITLE_ZH} description={SITE_DESCRIPTION_ZH}>
-  <main class="reading-column ez-editorial">
-    <h1>{SITE_TITLE_ZH}</h1>
-    <p>
-      簌雪（Snowiest）是 <strong>Ezhana</strong> 的个人站点。
-    </p>
-    <p>
-      可以阅读<a href={localeUrl('zh', '/blog/')}>博客</a>，了解
-      <a href={localeUrl('zh', '/about/')}>关于作者</a>，或者查看
-      <a href={SITE_GITHUB_URL}>GitHub 源码</a>。
-    </p>
+  <main class="mx-auto w-full max-w-[72rem] px-4 py-12">
+    <section class="ez-editorial mx-auto w-full max-w-[45rem]">
+      <h1>{SITE_TITLE_ZH}</h1>
+      <p>
+        簌雪（Snowiest）是 <strong>Ezhana</strong> 的个人站点。
+      </p>
+      <p>
+        可以阅读<a href={localeUrl('zh', '/blog/')}>博客</a>，了解
+        <a href={localeUrl('zh', '/about/')}>关于作者</a>，或者查看
+        <a href={SITE_GITHUB_URL}>GitHub 源码</a>。
+      </p>
+    </section>
+    <BlogTimeline />
   </main>
 </BaseLayout>
