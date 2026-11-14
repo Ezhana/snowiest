@@ -1,0 +1,29 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+
+/**
+ * The document shell lives here exactly once: the Ezhana theme, the colour mode and the shared
+ * chrome. No colour mode is pinned, so Ezhana follows the operating system. To force one, add
+ * `data-color-mode="dark"` or `data-color-mode="light"` to the <html> element below.
+ */
+---
+
+<html lang="en" data-theme="cerulean">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body>
+		<Header />
+		<slot />
+		<Footer />
+	</body>
+</html>

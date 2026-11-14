@@ -1,0 +1,87 @@
+/**
+ * Layer 3 — Blog styles.
+ *
+ * These rules decide how an article *reads*. They are application styles, not design tokens:
+ * the reading measure, the article header rhythm and page-level article layout belong to this
+ * blog. Colours, type roles, shape and elevation always come from Ezhana semantic tokens.
+ *
+ * Markdown element typography (headings, paragraphs, lists, links, quotes, inline code, code
+ * blocks, tables, figures, rules) is provided by @ezhana/typography-editorial through the
+ * `.ez-editorial` scope, which global.css imports into this same `blog` layer.
+ */
+
+/* A comfortable long-form measure (~45rem of text), independent of the page shell. */
+.reading-column {
+	width: min(45rem, calc(100% - 2rem));
+	margin-inline: auto;
+	padding-block: 3rem 4rem;
+}
+
+/* Article hero: part of the reading column, not a full-bleed banner. */
+.article-hero {
+	display: block;
+	width: 100%;
+	height: auto;
+	margin-block-end: 2rem;
+}
+
+/* The hero is app markup, so it uses the Ezhana surface radius, not the preset's image radius. */
+.ez-editorial .article-hero {
+	border-radius: var(--radius-surface);
+}
+
+/* Article header: date + title. Spacing here is editorial rhythm, not a design token. */
+.article-header {
+	margin-block-end: 2rem;
+	text-align: center;
+}
+
+.article-header .article-meta {
+	margin-block: 0 0.5rem;
+	color: var(--color-fg-muted);
+	font-size: var(--font-size-small);
+	line-height: var(--font-line-height-small);
+}
+
+.article-meta .article-updated {
+	display: block;
+	font-style: italic;
+}
+
+@media (max-width: 720px) {
+	.reading-column {
+		padding-block: 1.5rem 3rem;
+	}
+}
+
+/*
+ * Markdown code blocks use Astro/Shiki's dual-theme output (`defaultColor: false`): the syntax
+ * colours arrive as CSS variables and the blog layer maps them to the active Ezhana colour mode.
+ * The block surface stays the editorial preset's semantic `--color-bg-subtle`, so code blocks
+ * are part of the theme rather than a second, hard-coded palette.
+ */
+.ez-editorial .astro-code,
+.ez-editorial .astro-code span {
+	color: var(--shiki-light);
+	font-style: var(--shiki-light-font-style, inherit);
+	font-weight: var(--shiki-light-font-weight, inherit);
+	text-decoration: var(--shiki-light-text-decoration, inherit);
+}
+
+:root[data-color-mode='dark'] .ez-editorial .astro-code,
+:root[data-color-mode='dark'] .ez-editorial .astro-code span {
+	color: var(--shiki-dark);
+	font-style: var(--shiki-dark-font-style, inherit);
+	font-weight: var(--shiki-dark-font-weight, inherit);
+	text-decoration: var(--shiki-dark-text-decoration, inherit);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-color-mode]) .ez-editorial .astro-code,
+	:root:not([data-color-mode]) .ez-editorial .astro-code span {
+		color: var(--shiki-dark);
+		font-style: var(--shiki-dark-font-style, inherit);
+		font-weight: var(--shiki-dark-font-weight, inherit);
+		text-decoration: var(--shiki-dark-text-decoration, inherit);
+	}
+}

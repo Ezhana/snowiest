@@ -1,144 +1,163 @@
-@import "tailwindcss";
-@import '@ezhana/design-theme-cerulean/style.css';
-@import '@ezhana/typography-editorial/style.css';
-/*
-  The CSS in this style tag is based off of Bear Blog's default CSS.
-  https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
-  License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
+/**
+ * Global stylesheet.
+ *
+ * The site is composed from three style sources, each with one job:
+ *
+ *   1. Tailwind CSS       Preflight reset + utility classes (site layout and quick composition).
+ *   2. Ezhana             Design tokens + the Cerulean theme: colour, type, shape, elevation and
+ *                         the light/dark colour mode. This is what makes the site look like the
+ *                         site; product CSS only reads semantic tokens.
+ *   3. Blog styles        How long-form articles read: reading measure, article rhythm and
+ *                         Markdown typography (see ./blog.css and @ezhana/typography-editorial).
+ *
+ * Layer order is declared before any @import so it wins over Tailwind's own declaration.
+ * `design-tokens` comes after `theme` on purpose: Ezhana then overrides the placeholder values
+ * Tailwind emits for the token bridge below, and the *runtime* theme value (including the colour
+ * mode) is the one that applies.
+ *
+ * Do not add hard-coded colours, font stacks, radii or shadows here: use an Ezhana semantic token.
+ * Article reading rules do not belong here either — they are application styles, not design tokens.
+ *
+ * Two deliberate conventions:
+ * - Astro scoped <style> blocks are unlayered, so they would outrank all declared layers,
+ *   including `utilities`. Keep page/component presentation in the layers below instead.
+ * - @ezhana/typography-editorial ships deliberately unlayered so Preflight cannot beat it. It is
+ *   imported into `blog` instead, which still sorts after Preflight but lets Tailwind utilities win.
+ *   Re-check its selectors when upgrading the preset.
  */
 
-:root {
-	--accent: #2337ff;
-	--accent-dark: #000d8a;
-	--black: 15, 18, 25;
-	--gray: 96, 115, 159;
-	--gray-light: 229, 233, 240;
-	--gray-dark: 34, 41, 57;
-	--gray-gradient: rgba(var(--gray-light), 50%), #fff;
-	--box-shadow:
-		0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
-		0 16px 32px rgba(var(--gray), 33%);
-}
-body {
-	font-family: var(--font-atkinson);
-	margin: 0;
-	padding: 0;
-	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
-	background-size: 100% 600px;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	color: rgb(var(--gray-dark));
-	font-size: 20px;
-	line-height: 1.7;
-}
-main {
-	width: 720px;
-	max-width: calc(100% - 2em);
-	margin: auto;
-	padding: 3em 1em;
-}
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-	margin: 0 0 0.5rem 0;
-	color: rgb(var(--black));
-	line-height: 1.2;
-}
-h1 {
-	font-size: 3.052em;
-}
-h2 {
-	font-size: 2.441em;
-}
-h3 {
-	font-size: 1.953em;
-}
-h4 {
-	font-size: 1.563em;
-}
-h5 {
-	font-size: 1.25em;
-}
-strong,
-b {
-	font-weight: 700;
-}
-a {
-	color: var(--accent);
-}
-a:hover {
-	color: var(--accent);
-}
-p {
-	margin-bottom: 1em;
-}
-.prose p {
-	margin-bottom: 2em;
-}
-textarea {
-	width: 100%;
-	font-size: 16px;
-}
-input {
-	font-size: 16px;
-}
-table {
-	width: 100%;
-}
-img {
-	max-width: 100%;
-	height: auto;
-	border-radius: 8px;
-}
-code {
-	padding: 2px 5px;
-	background-color: rgb(var(--gray-light));
-	border-radius: 2px;
-}
-pre {
-	padding: 1.5em;
-	border-radius: 8px;
-}
-pre > code {
-	all: unset;
-}
-blockquote {
-	border-left: 4px solid var(--accent);
-	padding: 0 0 0 20px;
-	margin: 0;
-	font-size: 1.333em;
-}
-hr {
-	border: none;
-	border-top: 1px solid rgb(var(--gray-light));
-}
-@media (max-width: 720px) {
-	body {
-		font-size: 18px;
-	}
-	main {
-		padding: 1em;
-	}
+@layer theme, base, design-tokens, components, blog, utilities;
+
+/* 1 — Tailwind: Preflight (reset) + utility classes. */
+@import 'tailwindcss';
+
+/* 2 — Ezhana: design tokens + Cerulean theme, including the self-hosted Public Sans fonts. */
+@import '@ezhana/design-theme-cerulean/style.css';
+
+/* 3 — Blog styles: the editorial Markdown preset plus this blog's reading layout. */
+@import '@ezhana/typography-editorial/style.css' layer(blog);
+@import './blog.css' layer(blog);
+
+/*
+ * Tailwind utility-name bridge.
+ *
+ * This is a *utility-name mapping*, not an export of live custom properties: Ezhana's tokens stay
+ * the only values. It makes the semantic roles addressable from markup, so utilities speak the
+ * same language as the design system:
+ *
+ *   text-fg, text-fg-muted, bg-surface, border-border, text-accent,
+ *   rounded-surface, shadow-md, font-sans …
+ *
+ * Because the names are identical to Ezhana's, the `theme` layer only gets inert placeholders
+ * (`--color-bg: var(--color-bg)`) while the utilities inline Ezhana's variables. Ezhana's
+ * `design-tokens` layer is declared after `theme`, so its runtime values always win and follow
+ * `data-theme` / `data-color-mode`. The load-bearing invariant is that Ezhana keeps declaring
+ * these token names inside its `design-tokens` layer; if that changes, drop or rename the bridge
+ * entry instead of duplicating values here.
+ *
+ * The `--text-*` and `--font-*` names exist only to name utilities; they are not real custom
+ * properties. The `--color-*`, `--radius-*` and `--shadow-*` names happen to coincide with
+ * Ezhana's tokens and only resolve because Ezhana declares them. From custom CSS, use Ezhana's
+ * variables (`--color-bg`, `--font-size-body`, `--font-family-sans`, …).
+ */
+@theme inline {
+	/* Type roles */
+	--font-sans: var(--font-family-sans);
+	--font-mono: var(--font-family-mono);
+
+	/* Type scale (size + leading pairs) */
+	--text-body: var(--font-size-body);
+	--text-body--line-height: var(--font-line-height-body);
+	--text-small: var(--font-size-small);
+	--text-small--line-height: var(--font-line-height-small);
+	--text-caption: var(--font-size-caption);
+	--text-caption--line-height: var(--font-line-height-caption);
+	--text-code: var(--font-size-code);
+	--text-code--line-height: var(--font-line-height-code);
+	--text-h1: var(--font-size-h1);
+	--text-h1--line-height: var(--font-line-height-h1);
+	--text-h2: var(--font-size-h2);
+	--text-h2--line-height: var(--font-line-height-h2);
+	--text-h3: var(--font-size-h3);
+	--text-h3--line-height: var(--font-line-height-h3);
+	--text-h4: var(--font-size-h4);
+	--text-h4--line-height: var(--font-line-height-h4);
+
+	/* Surfaces, text and borders */
+	--color-bg: var(--color-bg);
+	--color-bg-subtle: var(--color-bg-subtle);
+	--color-surface: var(--color-surface);
+	--color-surface-elevated: var(--color-surface-elevated);
+	--color-fg: var(--color-fg);
+	--color-fg-muted: var(--color-fg-muted);
+	--color-fg-strong: var(--color-fg-strong);
+	--color-border: var(--color-border);
+	--color-border-subtle: var(--color-border-subtle);
+
+	/* Accent and focus */
+	--color-accent: var(--color-accent);
+	--color-accent-hover: var(--color-accent-hover);
+	--color-accent-subtle: var(--color-accent-subtle);
+	--color-accent-border: var(--color-accent-border);
+	--color-on-accent: var(--color-on-accent);
+	--color-focus-ring: var(--color-focus-ring);
+
+	/* Feedback */
+	--color-info: var(--color-info);
+	--color-info-solid: var(--color-info-solid);
+	--color-info-subtle: var(--color-info-subtle);
+	--color-on-info: var(--color-on-info);
+	--color-danger: var(--color-danger);
+	--color-danger-solid: var(--color-danger-solid);
+	--color-on-danger: var(--color-on-danger);
+	--color-success: var(--color-success);
+	--color-warning: var(--color-warning);
+
+	/* Shape and elevation */
+	--radius-control: var(--radius-control);
+	--radius-small: var(--radius-small);
+	--radius-surface: var(--radius-surface);
+	--radius-panel: var(--radius-panel);
+	--radius-pill: var(--radius-pill);
+	--shadow-sm: var(--shadow-sm);
+	--shadow-md: var(--shadow-md);
+	--shadow-lg: var(--shadow-lg);
+	--shadow-xl: var(--shadow-xl);
 }
 
-.sr-only {
-	border: 0;
-	padding: 0;
-	margin: 0;
-	position: absolute !important;
-	height: 1px;
-	width: 1px;
-	overflow: hidden;
-	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
-	clip: rect(1px 1px 1px 1px);
-	/* maybe deprecated but we need to support legacy browsers */
-	clip: rect(1px, 1px, 1px, 1px);
-	/* modern browsers, clip-path works inwards from each corner */
-	clip-path: inset(50%);
-	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
-	white-space: nowrap;
+/*
+ * 1b — Base reset on top of Preflight.
+ *
+ * Document shell only. Article typography lives in the blog layer, page layout comes from
+ * utilities, and every value below is an Ezhana token.
+ */
+@layer base {
+	html {
+		min-height: 100%;
+		background-color: var(--color-bg);
+	}
+
+	body {
+		min-height: 100dvh;
+		margin: 0;
+		background-color: var(--color-bg);
+		color: var(--color-fg);
+		font-family: var(--font-family-sans);
+		font-size: var(--font-size-body);
+		font-weight: var(--font-weight-body);
+		line-height: var(--font-line-height-body);
+		text-rendering: optimizeLegibility;
+		-webkit-font-smoothing: antialiased;
+		overflow-wrap: break-word;
+	}
+
+	::selection {
+		background-color: var(--color-accent-subtle);
+		color: var(--color-fg-strong);
+	}
+
+	:focus-visible {
+		outline: var(--border-width-strong) solid var(--color-focus-ring);
+		outline-offset: 2px;
+	}
 }
