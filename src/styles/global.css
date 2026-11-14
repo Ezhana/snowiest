@@ -70,6 +70,7 @@
   --text-body--line-height: var(--font-line-height-body);
   --text-small: var(--font-size-small);
   --text-small--line-height: var(--font-line-height-small);
+  --text-control: var(--font-size-control);
   --text-caption: var(--font-size-caption);
   --text-caption--line-height: var(--font-line-height-caption);
   --text-code: var(--font-size-code);
