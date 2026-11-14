@@ -2,21 +2,23 @@
 import BaseLayout from '../layouts/BaseLayout.astro'
 import BlogListing from './BlogListing.astro'
 import BlogPagination from './BlogPagination.astro'
-import { getBlogPage, getBlogPosts } from '../lib/blog'
+import { getBlogPage, getBlogPosts, type BlogOrder } from '../lib/blog'
 
 interface Props {
   page: number
+  order: BlogOrder
   title: string
   description: string
 }
 
-const { page, title, description } = Astro.props
+const { page, order, title, description } = Astro.props
 const posts = await getBlogPosts()
-const { posts: pagePosts, currentPage, totalPages } = getBlogPage(posts, page)
+const orderedPosts = order === 'oldest' ? [...posts].reverse() : posts
+const { posts: pagePosts, currentPage, totalPages } = getBlogPage(orderedPosts, page)
 ---
 
 <BaseLayout title={title} description={description}>
-  <BlogListing posts={pagePosts}>
-    <BlogPagination currentPage={currentPage} totalPages={totalPages} />
+  <BlogListing posts={pagePosts} order={order}>
+    <BlogPagination currentPage={currentPage} totalPages={totalPages} order={order} />
   </BlogListing>
 </BaseLayout>

@@ -1,0 +1,23 @@
+---
+import BlogIndex from '../../../../../components/BlogIndex.astro'
+import { SITE_TITLE } from '../../../../../consts'
+import { getBlogPagePaths, getBlogPosts } from '../../../../../lib/blog'
+
+export async function getStaticPaths() {
+  const posts = await getBlogPosts()
+  return getBlogPagePaths(posts.length)
+}
+
+interface Props {
+  page: number
+}
+
+const { page } = Astro.props
+---
+
+<BlogIndex
+  page={page}
+  order="oldest"
+  title={`博客 · ${SITE_TITLE}`}
+  description="中文博客（占位页面）"
+/>

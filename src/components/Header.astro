@@ -224,9 +224,21 @@ const themeOptions = [
 
   const getHeader = () => document.querySelector<HTMLElement>('[data-site-header]')
 
+  const SCROLL_ENTER_THRESHOLD = 120
+  const SCROLL_EXIT_THRESHOLD = 24
+
   const updateScrolledState = () => {
     const header = getHeader()
-    if (header) header.dataset.scrolled = String(window.scrollY > 8)
+    if (!header) return
+
+    // Hysteresis: wait for a real scroll before morphing, but collapse again only near the top.
+    // The wide gap between enter/exit prevents the header from flickering around a single pixel.
+    const isScrolled = header.dataset.scrolled === 'true'
+    const nextState = isScrolled
+      ? window.scrollY > SCROLL_EXIT_THRESHOLD
+      : window.scrollY > SCROLL_ENTER_THRESHOLD
+
+    header.dataset.scrolled = String(nextState)
   }
 
   updateScrolledState()

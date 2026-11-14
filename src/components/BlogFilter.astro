@@ -1,0 +1,38 @@
+---
+import type { BlogOrder } from '../lib/blog'
+import { getLang, useTranslations } from '../i18n/ui'
+import { localeUrl } from '../i18n/routing'
+
+interface Props {
+  order: BlogOrder
+}
+
+const { order } = Astro.props
+const lang = getLang(Astro.currentLocale)
+const t = useTranslations(lang)
+
+const options: Array<{ order: BlogOrder; path: string; label: string }> = [
+  { order: 'newest', path: '/blog/', label: t('blog.sortNewest') },
+  { order: 'oldest', path: '/blog/oldest/', label: t('blog.sortOldest') },
+]
+---
+
+<nav
+  aria-label={t('blog.sortLabel')}
+  class="inline-flex shrink-0 items-center gap-0.5 rounded-control border border-border p-0.5"
+>
+  {options.map((option) => (
+    <a
+      href={localeUrl(lang, option.path)}
+      aria-current={option.order === order ? 'page' : undefined}
+      class:list={[
+        'rounded-small px-2.5 py-1.5 text-small no-underline transition-colors',
+        option.order === order
+          ? 'bg-accent-subtle font-medium text-accent'
+          : 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong',
+      ]}
+    >
+      {option.label}
+    </a>
+  ))}
+</nav>

@@ -1,8 +1,10 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
 
-export const BLOG_PAGE_SIZE = 4
+export const BLOG_PAGE_SIZE = 5
 
 export type BlogPost = CollectionEntry<'blog'>
+
+export type BlogOrder = 'newest' | 'oldest'
 
 /** All blog posts, newest first. */
 export async function getBlogPosts(): Promise<BlogPost[]> {
@@ -16,17 +18,27 @@ export interface BlogPage {
   totalPages: number
 }
 
-/** Slice the collection for a 1-based page number. */
-export function getBlogPage(posts: BlogPost[], page: number): BlogPage {
-  const totalPages = Math.max(1, Math.ceil(posts.length / BLOG_PAGE_SIZE))
+/** Slice a date-ordered collection for a 1-based page number. */
+export function getBlogPage(posts: BlogPost[], page: number, pageSize = BLOG_PAGE_SIZE): BlogPage {
+  const totalPages = Math.max(1, Math.ceil(posts.length / pageSize))
   const currentPage = Math.min(Math.max(page, 1), totalPages)
-  const start = (currentPage - 1) * BLOG_PAGE_SIZE
+  const start = (currentPage - 1) * pageSize
 
   return {
-    posts: posts.slice(start, start + BLOG_PAGE_SIZE),
+    posts: posts.slice(start, start + pageSize),
     currentPage,
     totalPages,
   }
+}
+
+/** Static paths for pages 2..N of the blog index (page 1 is the route entry itself). */
+export function getBlogPagePaths(postCount: number, pageSize = BLOG_PAGE_SIZE) {
+  const totalPages = Math.max(1, Math.ceil(postCount / pageSize))
+
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
+    const page = index + 2
+    return { params: { page: String(page) }, props: { page } }
+  })
 }
 
 export interface BlogMonthGroup {

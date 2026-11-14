@@ -1,17 +1,21 @@
 ---
 import { getLang, useTranslations } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
+import type { BlogOrder } from '../lib/blog'
 
 interface Props {
   currentPage: number
   totalPages: number
+  order: BlogOrder
 }
 
-const { currentPage, totalPages } = Astro.props
+const { currentPage, totalPages, order } = Astro.props
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
+const listBase = order === 'oldest' ? '/blog/oldest/' : '/blog/'
 
-const pageHref = (page: number) => localeUrl(lang, page === 1 ? '/blog/' : `/blog/page/${page}/`)
+const pageHref = (page: number) =>
+  localeUrl(lang, page === 1 ? listBase : `${listBase}page/${page}/`)
 
 /** Keep the pagination compact for long archives: first, last, and neighbours of the current page. */
 const pageItems: Array<number | 'ellipsis'> = []
