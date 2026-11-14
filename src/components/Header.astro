@@ -263,6 +263,34 @@ const themeOptions = [
     }
   }
 
+  /**
+   * <ClientRouter /> replaces the <html> attributes with the incoming document's attributes
+   * (`swapRootAttributes`), which drops the runtime `data-color-mode`. Re-apply the manager state
+   * after every swap so an explicit light/dark choice survives client-side navigation.
+   */
+  const applyThemeToDocument = (doc: Document) => {
+    const { theme, mode, resolvedMode } = themeManager.getState()
+    const root = doc.documentElement
+
+    root.setAttribute('data-theme', theme)
+
+    if (mode === 'system') {
+      root.removeAttribute('data-color-mode')
+    } else {
+      root.setAttribute('data-color-mode', resolvedMode)
+    }
+  }
+
+  // Copy the live theme state onto the incoming document before its <html> attributes are swapped
+  // in, then re-apply afterwards as a safety net. Without this, ClientRouter's swapRootAttributes
+  // drops data-color-mode and every navigation falls back to the OS colour mode.
+  document.addEventListener('astro:before-swap', (event) => {
+    applyThemeToDocument(event.newDocument)
+  })
+  document.addEventListener('astro:after-swap', () => {
+    applyThemeToDocument(document)
+  })
+
   themeManager.subscribe(syncThemeButtons)
   syncThemeButtons()
 
