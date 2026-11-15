@@ -1,29 +1,26 @@
 ---
-import type { BlogOrder } from '../lib/blog'
 import type { TagId } from '../lib/tags'
 import { TAG_DEFINITIONS, getTagLabel } from '../lib/tags'
 import { getLang, useTranslations } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
 
 interface Props {
-  order: BlogOrder
   activeTag?: TagId
 }
 
-const { order, activeTag } = Astro.props
+const { activeTag } = Astro.props
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
 
-const tagPath = (tag: TagId) =>
-  order === 'oldest' ? `/blog/tag/${tag}/oldest/` : `/blog/tag/${tag}/`
-const allPath = order === 'oldest' ? '/blog/oldest/' : '/blog/'
+const allHref = localeUrl(lang, '/blog/')
+const tagHref = (tag: TagId) => localeUrl(lang, `/tag/${tag}/`)
 
 const chipClass = 'rounded-pill border px-3 py-1 text-small no-underline transition-colors'
 ---
 
-<nav aria-label={t('blog.tagsLabel')} class="flex flex-wrap items-center gap-2">
+<nav data-tag-filter aria-label={t('blog.tagsLabel')} class="flex flex-wrap items-center gap-2">
   <a
-    href={localeUrl(lang, allPath)}
+    href={allHref}
     aria-current={activeTag ? undefined : 'page'}
     class:list={[
       chipClass,
@@ -36,7 +33,7 @@ const chipClass = 'rounded-pill border px-3 py-1 text-small no-underline transit
   </a>
   {TAG_DEFINITIONS.map((tag) => (
     <a
-      href={localeUrl(lang, tagPath(tag.id))}
+      href={tagHref(tag.id)}
       aria-current={activeTag === tag.id ? 'page' : undefined}
       class:list={[
         chipClass,

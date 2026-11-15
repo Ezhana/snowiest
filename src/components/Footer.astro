@@ -17,7 +17,7 @@ const t = useTranslations(lang)
     {TAG_DEFINITIONS.map((tag) => (
       <a
         class="text-fg-muted no-underline transition-colors hover:text-accent"
-        href={localeUrl(lang, `/blog/tag/${tag.id}/`)}
+        href={localeUrl(lang, `/tag/${tag.id}/`)}
       >
         #{getTagLabel(tag.id, lang)}
       </a>

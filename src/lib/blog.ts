@@ -1,7 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
 import type { Lang } from '../i18n/ui'
 import { BLOG_CONTENT_DIR } from './content-paths'
-import type { TagId } from './tags'
 
 export const BLOG_PAGE_SIZE = 5
 
@@ -13,9 +12,6 @@ const BLOG_DIR_PREFIX = `${BLOG_CONTENT_DIR}/`
 
 /** A post folder is a URL: lowercase ASCII words joined by single hyphens. */
 const SLUG_SEGMENT = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
-
-/** First folder segments already used by the blog's routes: `/blog/oldest/`, `/blog/page/2/`, `/blog/tag/design/`. */
-const RESERVED_SLUGS = new Set(['oldest', 'page', 'tag'])
 
 interface GetBlogPostsOptions {
   includeUnpublished?: boolean
@@ -47,9 +43,8 @@ export function postSlug(post: BlogPost): string {
 
 /**
  * Guard the structure the routing relies on: a post lives in its own folder, the folder is a
- * valid URL segment, it does not shadow a built-in blog route, and each language has at most one
- * post per folder. Violations fail the build instead of silently producing duplicate or
- * unreachable pages.
+ * valid URL segment, and each language has at most one post per folder. Violations fail the build
+ * instead of silently producing duplicate or unreachable pages.
  */
 function assertPostConventions(posts: BlogPost[]): void {
   const seen = new Set<string>()
@@ -69,13 +64,6 @@ function assertPostConventions(posts: BlogPost[]): void {
           `Post folder "${slug}" contains the invalid URL segment "${segment}". Folder names become URLs: use lowercase ASCII words joined by hyphens.`,
         )
       }
-    }
-
-    const [firstSegment] = slug.split('/')
-    if (RESERVED_SLUGS.has(firstSegment)) {
-      throw new Error(
-        `Post folder "${slug}" collides with the built-in blog route /blog/${firstSegment}/. Rename the folder.`,
-      )
     }
 
     const lang = postLang(post)
@@ -138,70 +126,6 @@ export async function getPostVariants(
 
   for (const post of posts) variants[postLang(post)] = post
   return variants
-}
-
-export interface BlogPage {
-  posts: BlogPost[]
-  currentPage: number
-  totalPages: number
-}
-
-/** Slice a date-ordered collection for a 1-based page number. */
-export function getBlogPage(posts: BlogPost[], page: number, pageSize = BLOG_PAGE_SIZE): BlogPage {
-  const totalPages = Math.max(1, Math.ceil(posts.length / pageSize))
-  const currentPage = Math.min(Math.max(page, 1), totalPages)
-  const start = (currentPage - 1) * pageSize
-
-  return {
-    posts: posts.slice(start, start + pageSize),
-    currentPage,
-    totalPages,
-  }
-}
-
-/** Static paths for pages 2..N of the blog index (page 1 is the route entry itself). */
-export function getBlogPagePaths(postCount: number, pageSize = BLOG_PAGE_SIZE) {
-  const totalPages = Math.max(1, Math.ceil(postCount / pageSize))
-
-  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
-    const page = index + 2
-    return { params: { page: String(page) }, props: { page } }
-  })
-}
-
-export interface TagPagePath {
-  params: { tag: TagId; parts?: string }
-  props: { tag: TagId; order: BlogOrder; page: number }
-}
-
-/** Static paths for a tag archive: both orders and every page of each order. */
-export function getTagPagePaths(
-  tag: TagId,
-  postCount: number,
-  pageSize = BLOG_PAGE_SIZE,
-): TagPagePath[] {
-  const totalPages = Math.max(1, Math.ceil(postCount / pageSize))
-  const paths: TagPagePath[] = []
-
-  for (const order of ['newest', 'oldest'] as const) {
-    for (let page = 1; page <= totalPages; page += 1) {
-      const segments = [
-        order === 'oldest' ? 'oldest' : null,
-        page > 1 ? 'page' : null,
-        page > 1 ? String(page) : null,
-      ].filter(Boolean)
-
-      paths.push({
-        params: {
-          tag,
-          parts: segments.length > 0 ? segments.join('/') : undefined,
-        },
-        props: { tag, order, page },
-      })
-    }
-  }
-
-  return paths
 }
 
 export interface BlogMonthGroup {

@@ -10,7 +10,7 @@
 - 语言由 frontmatter 的 `lang` 决定：`zh`（默认）或 `en`。文件名不决定语言。
 - 英文译文与中文原文放在同一个目录里，共享目录名和 URL：`hello-astro/zh.md` 与 `hello-astro/en.md`。
 - 同一个目录在同一种语言下只能有一篇，重复会让构建失败。
-- 目录名会直接进入 URL 和 sitemap，必须是 URL 安全的：小写 ASCII，单词之间用 `-` 连接（`^[a-z0-9]+(-[a-z0-9]+)*$`）。`oldest`、`page`、`tag` 是保留名（博客自己的路由在用），不能作为一级目录。
+- 目录名会直接进入 URL 和 sitemap，必须是 URL 安全的：小写 ASCII，单词之间用 `-` 连接（`^[a-z0-9]+(-[a-z0-9]+)*$`）。没有保留名，`page`、`oldest`、`tag` 都可以用作目录名。
 - 没有译文的文章不会从另一种语言的站点消失：英文站会展示中文原文（反之亦然），列表里带语言标记，详情页顶部提示原文语言，canonical 指向原文真正所在的 URL。
 - 只要中文文章有对应译文，`/en` 下就会自动换成英文版本，URL 不变。
 
@@ -82,19 +82,25 @@ lang: zh # 可选，默认 zh；英文译文写 en
 
 新增标签需要同时修改注册表和文章 frontmatter，否则 schema 校验失败。标签会自动获得：
 
-- `/blog/tag/<tag>/` 标签页；
-- `/blog/tag/<tag>/oldest/` 时间顺序标签页；
-- 标签页的 `page/2/` 等分页路径；
+- `/tag/<tag>/` 标签页（全站命名空间，将来其他内容类型可以并入同一个标签页）；
+- `/tag/<tag>/?order=oldest` 时间顺序标签页；
+- `/tag/<tag>/?page=2` 等分页状态；
 - 博客列表的标签链接；
 - Footer 的完整标签列表。
 
 ## URL 与排序
 
-- 默认时间倒序：`/blog/`、`/blog/page/2/`。
-- 时间顺序：`/blog/oldest/`、`/blog/oldest/page/2/`。
-- 标签：`/blog/tag/design/`、`/blog/tag/design/oldest/`、`/blog/tag/design/page/2/`。
-- 英文对应路径加 `/en` 前缀，slug 与中文相同：`/en/blog/`、`/en/blog/page/2/`、`/en/blog/tag/design/`。
+- 文章列表：`/blog/`，默认时间倒序。
+- 分页：`/blog/?page=2`；时间顺序：`/blog/?order=oldest`；两者组合：`/blog/?page=2&order=oldest`。
+- 标签：`/tag/design/`、`/tag/design/?order=oldest`、`/tag/design/?page=2`。
+- 英文对应路径加 `/en` 前缀：`/en/blog/?page=2`、`/en/tag/design/`。
 - 每页 5 篇，由 `src/lib/blog.ts` 的 `BLOG_PAGE_SIZE` 控制。
+
+分页和排序是 querystring，不是独立页面。GitHub Pages 是静态托管，构建时读不到 query，所以列表页会一次性渲染全部文章的元数据（标题、摘要、日期、标签、封面），由脚本按 query 只显示当前页；无 JavaScript 时所有文章都显示，分页控件隐藏。正文仍然只在 `/blog/<slug>/` 渲染。
+
+所有 query 状态的 canonical 都是各自的基础路径（`/blog/`、`/tag/<tag>/`），`?page=2` 不会作为独立页面被索引；文章本身仍通过列表 HTML、标签页、RSS 和 sitemap 被发现。
+
+旧的分页和标签路径（`/blog/page/…`、`/blog/oldest/…`、`/blog/tag/…` 及英文对应路径）已移除，访问会 404。
 
 ## 正文规则
 
@@ -127,9 +133,10 @@ pnpm lint:check
 pnpm format:check
 ```
 
-构建会校验 frontmatter、标签 id、封面图片路径、目录名的 URL 规则与保留名，以及同一目录下同一语言只有一篇。发布前建议检查：
+构建会校验 frontmatter、标签 id、封面图片路径、目录名的 URL 规则，以及同一目录下同一语言只有一篇。发布前建议检查：
 
-- `/blog/`、`/blog/oldest/`、`/blog/tag/<tag>/`；
+- `/blog/`、`/blog/?page=2`、`/blog/?order=oldest`；
+- `/tag/<tag>/` 与 `/tag/<tag>/?order=oldest`；
 - `/en/blog/` 的英文界面；
 - 已翻译文章的 `/en/blog/<slug>/` 是否为英文，未翻译文章是否带原文提示；
 - 文章页的 canonical 与 hreflang 是否指向正确语言；
@@ -142,6 +149,7 @@ pnpm format:check
 
 - 中文首页：`/`
 - 英文首页：`/en/`
+- 标签页：`/tag/<tag>/`、`/en/tag/<tag>/`
 - 中文文章：`/blog/<slug>/`
 - 英文文章：`/en/blog/<slug>/`
 - 中文 RSS：`/rss.xml`

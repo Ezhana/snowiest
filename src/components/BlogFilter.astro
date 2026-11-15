@@ -1,29 +1,21 @@
 ---
-import type { BlogOrder } from '../lib/blog'
-import type { TagId } from '../lib/tags'
 import { getLang, useTranslations } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
 
 interface Props {
-  order: BlogOrder
-  tag?: TagId
+  basePath: string
 }
 
-const { order, tag } = Astro.props
+const { basePath } = Astro.props
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
+const base = localeUrl(lang, basePath)
 
-const sortPath = (nextOrder: BlogOrder) => {
-  if (tag) {
-    return nextOrder === 'oldest' ? `/blog/tag/${tag}/oldest/` : `/blog/tag/${tag}/`
-  }
-
-  return nextOrder === 'oldest' ? '/blog/oldest/' : '/blog/'
-}
-
-const options: Array<{ order: BlogOrder; path: string; label: string }> = [
-  { order: 'newest', path: sortPath('newest'), label: t('blog.sortNewest') },
-  { order: 'oldest', path: sortPath('oldest'), label: t('blog.sortOldest') },
+const activeClass = 'bg-accent-subtle font-medium text-accent'
+const inactiveClass = 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong active:text-accent'
+const options = [
+  { order: 'newest', href: base, label: t('blog.sortNewest') },
+  { order: 'oldest', href: `${base}?order=oldest`, label: t('blog.sortOldest') },
 ]
 ---
 
@@ -33,13 +25,14 @@ const options: Array<{ order: BlogOrder; path: string; label: string }> = [
 >
   {options.map((option) => (
     <a
-      href={localeUrl(lang, option.path)}
-      aria-current={option.order === order ? 'page' : undefined}
+      href={option.href}
+      data-order-link={option.order}
+      data-state-active={activeClass}
+      data-state-inactive={inactiveClass}
+      aria-current={option.order === 'newest' ? 'page' : undefined}
       class:list={[
         'rounded-lg px-2.5 py-1.5 text-small no-underline transition-colors',
-        option.order === order
-          ? 'bg-accent-subtle font-medium text-accent'
-          : 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong active:text-accent',
+        option.order === 'newest' ? activeClass : inactiveClass,
       ]}
     >
       {option.label}

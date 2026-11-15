@@ -1,0 +1,16 @@
+---
+import BlogIndex from '../../components/BlogIndex.astro'
+import { TAG_DEFINITIONS, type TagId } from '../../lib/tags'
+
+export function getStaticPaths() {
+  return TAG_DEFINITIONS.map((tag) => ({ params: { tag: tag.id }, props: { tag: tag.id } }))
+}
+
+interface Props {
+  tag: TagId
+}
+
+const { tag } = Astro.props
+---
+
+<BlogIndex tag={tag} />
