@@ -14,6 +14,17 @@
  * how a page is composed.
  */
 
+/*
+ * Site tuning of the preset's compact heading ladder.
+ *
+ * The default compact ratio (1.15) leaves h2 at about twice the body size on a phone, which is
+ * still heavy for a 358px measure. 1.10 puts it near 1.7× there; because the ladder interpolates
+ * continuously, the full 1.25 ratio is simply reached later (around 1700px instead of 1200px).
+ */
+.ez-editorial {
+  --ez-editorial-heading-scale-compact: 1.05;
+}
+
 /* A comfortable long-form measure (~45rem of text), independent of the page shell. */
 .reading-column {
   width: min(45rem, calc(100% - 2rem));
