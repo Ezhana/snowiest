@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
+import type { Lang } from '../i18n/ui'
 import type { TagId } from './tags'
 
 export const BLOG_PAGE_SIZE = 5
@@ -11,20 +12,100 @@ interface GetBlogPostsOptions {
   includeUnpublished?: boolean
 }
 
+/** Language declared in the post frontmatter. */
+export function postLang(post: BlogPost): Lang {
+  return post.data.lang
+}
+
 /**
- * Published blog posts, newest first. Drafts and future-dated posts are visible in the dev
- * server for previewing, but excluded from production builds until their date arrives.
+ * URL slug and translation key. Posts are stored as `<slug>.md` / `<slug>-en.md`, so the language
+ * suffix is stripped here and both versions of a post share one slug.
  */
-export async function getBlogPosts(options: GetBlogPostsOptions = {}): Promise<BlogPost[]> {
+export function postSlug(post: BlogPost): string {
+  return post.id.replace(/-en$/, '')
+}
+
+/**
+ * Guard the naming rules the routing relies on: English posts use the `-en` suffix, Chinese posts
+ * must not (it would be stripped from their URL), and no slug has two posts in one language.
+ * Violations fail the build instead of silently producing duplicate or unreachable pages.
+ */
+function assertPostConventions(posts: BlogPost[]): void {
+  const seen = new Set<string>()
+
+  for (const post of posts) {
+    const lang = postLang(post)
+    const hasEnglishSuffix = post.id.endsWith('-en')
+
+    if (lang === 'en' && !hasEnglishSuffix) {
+      throw new Error(`English post "${post.id}" must use the "-en" filename suffix.`)
+    }
+
+    if (lang !== 'en' && hasEnglishSuffix) {
+      throw new Error(
+        `Post "${post.id}" ends with "-en" but its lang is "${lang}". Rename it or set lang: en.`,
+      )
+    }
+
+    const key = `${postSlug(post)}:${lang}`
+    if (seen.has(key)) {
+      throw new Error(`Duplicate ${lang} post for slug "${postSlug(post)}": ${post.id}`)
+    }
+    seen.add(key)
+  }
+}
+
+/** Posts that pass the draft / publish-date rules, in no particular order. */
+async function getVisiblePosts(options: GetBlogPostsOptions = {}): Promise<BlogPost[]> {
   const includeUnpublished = options.includeUnpublished ?? import.meta.env.DEV
   const now = Date.now()
   const posts = await getCollection('blog')
 
-  return posts
-    .filter(
-      (post) => includeUnpublished || (!post.data.draft && post.data.pubDate.valueOf() <= now),
-    )
+  const visible = posts.filter(
+    (post) => includeUnpublished || (!post.data.draft && post.data.pubDate.valueOf() <= now),
+  )
+  assertPostConventions(visible)
+  return visible
+}
+
+/**
+ * Posts for one language, newest first. Each slug yields exactly one post: its translation in
+ * `lang` when one exists, otherwise the version in the other language, so a language never shows
+ * an empty archive just because translations lag behind. Detect the fallback with
+ * `postLang(post) !== lang`.
+ */
+export async function getBlogPosts(
+  lang: Lang,
+  options: GetBlogPostsOptions = {},
+): Promise<BlogPost[]> {
+  const visible = await getVisiblePosts(options)
+  const groups = new Map<string, BlogPost[]>()
+
+  for (const post of visible) {
+    const slug = postSlug(post)
+    const group = groups.get(slug)
+    if (group) {
+      group.push(post)
+    } else {
+      groups.set(slug, [post])
+    }
+  }
+
+  return [...groups.values()]
+    .map((group) => group.find((post) => postLang(post) === lang) ?? group[0])
     .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+}
+
+/** All language versions of one slug, keyed by language. Missing languages are absent. */
+export async function getPostVariants(
+  slug: string,
+  options: GetBlogPostsOptions = {},
+): Promise<Partial<Record<Lang, BlogPost>>> {
+  const posts = (await getVisiblePosts(options)).filter((post) => postSlug(post) === slug)
+  const variants: Partial<Record<Lang, BlogPost>> = {}
+
+  for (const post of posts) variants[postLang(post)] = post
+  return variants
 }
 
 export interface BlogPage {

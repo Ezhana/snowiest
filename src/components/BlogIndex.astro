@@ -16,7 +16,7 @@ interface Props {
 const { page, order, tag } = Astro.props
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
-const posts = await getBlogPosts()
+const posts = await getBlogPosts(lang)
 const filteredPosts = tag ? posts.filter((post) => post.data.tags.includes(tag)) : posts
 const orderedPosts = order === 'oldest' ? [...filteredPosts].reverse() : filteredPosts
 const { posts: pagePosts, currentPage, totalPages } = getBlogPage(orderedPosts, page)

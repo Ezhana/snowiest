@@ -4,7 +4,9 @@ import { Image } from 'astro:assets'
 import BaseLayout from './BaseLayout.astro'
 import FormattedDate from '../components/FormattedDate.astro'
 import TableOfContents from '../components/TableOfContents.astro'
-import { getLang, useTranslations } from '../i18n/ui'
+import { getLang, useTranslations, type Lang } from '../i18n/ui'
+import { localeUrl } from '../i18n/routing'
+import type { BlogPost as BlogPostEntry } from '../lib/blog'
 
 interface Props {
   title: string
@@ -12,21 +14,57 @@ interface Props {
   pubDate?: Date
   updatedDate?: Date
   heroImage?: ImageMetadata
-  /** Blog post id, used as the shared view-transition name with the listing title. */
+  /** Shared post slug, used for the view-transition name and the canonical URLs. */
   slug?: string
+  /** Language of the rendered body (may differ from the page locale when untranslated). */
+  langOfPost?: Lang
+  /** Existing language versions of this slug, when the caller resolved them. */
+  variants?: Partial<Record<Lang, BlogPostEntry>>
   headings?: MarkdownHeading[]
 }
 
-const { title, description, pubDate, updatedDate, heroImage, slug, headings = [] } = Astro.props
-const t = useTranslations(getLang(Astro.currentLocale))
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  heroImage,
+  slug,
+  langOfPost,
+  variants,
+  headings = [],
+} = Astro.props
+const currentLang = getLang(Astro.currentLocale)
+const sourceLang = langOfPost ?? currentLang
+const isFallback = sourceLang !== currentLang
+const t = useTranslations(currentLang)
+
+const postPath = slug ? `/blog/${slug}/` : null
+const postUrl = (lang: Lang) => new URL(localeUrl(lang, postPath ?? '/'), Astro.site).toString()
+const hasTranslation = Boolean(variants?.zh && variants?.en)
+
+// A fallback page shows the other language's body, so point search engines at the URL where that
+// body actually lives instead of declaring two equivalents.
+const canonical = postPath ? postUrl(isFallback ? sourceLang : currentLang) : undefined
+const alternates: Partial<Record<Lang, string>> | undefined = !postPath
+  ? undefined
+  : hasTranslation
+    ? { zh: postUrl('zh'), en: postUrl('en') }
+    : {}
 
 const titleTransitionName = slug ? `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g, '-')}` : undefined
 ---
 
-<BaseLayout title={title} description={description} image={heroImage}>
+<BaseLayout
+  title={title}
+  description={description}
+  image={heroImage}
+  canonical={canonical}
+  alternates={alternates}
+>
   <main class="mx-auto w-full max-w-[72rem] px-4 py-10 lg:py-14">
     <div class="relative mx-auto w-full max-w-[45rem]">
-      <article>
+      <article lang={sourceLang}>
         {heroImage && (
           <Image class="article-hero" width={1020} height={510} src={heroImage} alt="" />
         )}
@@ -49,6 +87,11 @@ const titleTransitionName = slug ? `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g,
             <h1 class="text-h1 font-bold text-fg-strong">{title}</h1>
           )}
         </header>
+        {isFallback && (
+          <p class="mb-6 rounded-panel border border-border bg-bg-subtle px-4 py-3 text-small text-fg-muted">
+            {t(sourceLang === 'zh' ? 'post.fallbackFromZh' : 'post.fallbackFromEn')}
+          </p>
+        )}
         {/* The editorial preset owns rendered prose only; the article shell above is app markup. */}
         <div class="ez-editorial">
           <slot />

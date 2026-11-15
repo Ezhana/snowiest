@@ -4,9 +4,9 @@ import type { CollectionEntry } from 'astro:content'
 import FormattedDate from './FormattedDate.astro'
 import BlogFilter from './BlogFilter.astro'
 import BlogTagFilter from './BlogTagFilter.astro'
-import { getLang, useTranslations } from '../i18n/ui'
+import { getLang, languages, useTranslations } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
-import type { BlogOrder } from '../lib/blog'
+import { postLang, postSlug, type BlogOrder } from '../lib/blog'
 import type { TagId } from '../lib/tags'
 import { getTagLabel } from '../lib/tags'
 
@@ -22,9 +22,9 @@ const t = useTranslations(lang)
 const notice = t('blog.notice')
 
 /** Shared view-transition name for the list title → article title morph. */
-const titleTransitionName = (id: string) => `post-title-${id.replace(/[^a-zA-Z0-9_-]/g, '-')}`
+const titleTransitionName = (slug: string) => `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g, '-')}`
 
-const postHref = (id: string) => localeUrl(lang, `/blog/${id}/`)
+const postHref = (post: CollectionEntry<'blog'>) => localeUrl(lang, `/blog/${postSlug(post)}/`)
 const tagHref = (id: TagId) =>
   localeUrl(lang, order === 'oldest' ? `/blog/tag/${id}/oldest/` : `/blog/tag/${id}/`)
 ---
@@ -47,12 +47,12 @@ const tagHref = (id: TagId) =>
           <div class="flex items-start justify-between gap-6">
             <div class="min-w-0 flex-1">
               <h2
-                transition:name={titleTransitionName(post.id)}
+                transition:name={titleTransitionName(postSlug(post))}
                 class="m-0 text-h3 font-semibold text-fg-strong"
               >
                 <a
                   class="text-fg-strong no-underline transition-colors hover:text-accent"
-                  href={postHref(post.id)}
+                  href={postHref(post)}
                 >
                   {post.data.title}
                 </a>
@@ -60,6 +60,14 @@ const tagHref = (id: TagId) =>
               <p class="mt-2 line-clamp-2 text-body text-fg-muted">{post.data.description}</p>
               <div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-small text-fg-muted">
                 <FormattedDate date={post.data.pubDate} />
+                {postLang(post) !== lang && (
+                  <span
+                    class="rounded-pill border border-border px-2 py-0.5 text-caption text-fg-muted"
+                    title={t('blog.originalLanguage')}
+                  >
+                    {languages[postLang(post)].label}
+                  </span>
+                )}
                 {post.data.tags.length > 0 && <span aria-hidden="true">·</span>}
                 {post.data.tags.map((tagId) => (
                   <a
@@ -73,7 +81,7 @@ const tagHref = (id: TagId) =>
             </div>
             {post.data.heroImage && (
               <a
-                href={postHref(post.id)}
+                href={postHref(post)}
                 tabindex="-1"
                 aria-hidden="true"
                 class="hidden shrink-0 sm:block"

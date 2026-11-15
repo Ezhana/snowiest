@@ -17,6 +17,9 @@ const blog = defineCollection({
       heroImage: z.optional(image()),
       tags: z.array(z.enum(TAG_IDS)).default([]),
       draft: z.boolean().default(false),
+      // Language of the post body. English translations live beside the Chinese original as
+      // `<slug>-en.md` and share its slug; see docs/content-authoring.md.
+      lang: z.enum(['zh', 'en']).default('zh'),
     }),
 })
 

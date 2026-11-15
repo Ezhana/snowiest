@@ -1,18 +1,18 @@
 ---
 import FormattedDate from './FormattedDate.astro'
-import { getLang, useTranslations } from '../i18n/ui'
+import { getLang, languages, useTranslations } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
-import { getBlogPosts, groupBlogPostsByMonth } from '../lib/blog'
+import { getBlogPosts, groupBlogPostsByMonth, postLang, postSlug } from '../lib/blog'
 
-const posts = await getBlogPosts()
-const months = groupBlogPostsByMonth(posts)
 const lang = getLang(Astro.currentLocale)
+const posts = await getBlogPosts(lang)
+const months = groupBlogPostsByMonth(posts)
 const t = useTranslations(lang)
 const locale = lang === 'zh' ? 'zh-CN' : 'en-US'
 const monthFormatter = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long' })
 
 /** Shared view-transition name for the timeline title → article title morph. */
-const titleTransitionName = (id: string) => `post-title-${id.replace(/[^a-zA-Z0-9_-]/g, '-')}`
+const titleTransitionName = (slug: string) => `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g, '-')}`
 ---
 
 <section class="mt-20" aria-labelledby="timeline-heading">
@@ -43,15 +43,23 @@ const titleTransitionName = (id: string) => `post-title-${id.replace(/[^a-zA-Z0-
             <ul class="m-0 mt-3 list-none p-0">
               {month.posts.map((post) => (
                 <li class="mt-4 first:mt-0">
-                  <a class="group block no-underline" href={localeUrl(lang, `/blog/${post.id}/`)}>
+                  <a
+                    class="group block no-underline"
+                    href={localeUrl(lang, `/blog/${postSlug(post)}/`)}
+                  >
                     <h3
-                      transition:name={titleTransitionName(post.id)}
+                      transition:name={titleTransitionName(postSlug(post))}
                       class="m-0 text-body font-medium text-fg-strong transition-colors group-hover:text-accent"
                     >
                       {post.data.title}
                     </h3>
                     <p class="mt-1 text-small text-fg-muted">
                       <FormattedDate date={post.data.pubDate} />
+                      {postLang(post) !== lang && (
+                        <span title={t('blog.originalLanguage')}>
+                          · {languages[postLang(post)].label}
+                        </span>
+                      )}
                     </p>
                   </a>
                 </li>

@@ -1,9 +1,9 @@
 import rss from '@astrojs/rss'
 import { SITE_DESCRIPTION_ZH, SITE_TITLE_ZH, withBase } from '../consts'
-import { getBlogPosts } from '../lib/blog'
+import { getBlogPosts, postSlug } from '../lib/blog'
 
 export async function GET(context) {
-  const posts = await getBlogPosts()
+  const posts = await getBlogPosts('zh')
 
   return rss({
     title: SITE_TITLE_ZH,
@@ -11,7 +11,7 @@ export async function GET(context) {
     site: new URL(withBase('/'), context.site),
     items: posts.map((post) => ({
       ...post.data,
-      link: withBase(`/blog/${post.id}/`),
+      link: withBase(`/blog/${postSlug(post)}/`),
     })),
   })
 }

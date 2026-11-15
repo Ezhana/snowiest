@@ -4,7 +4,7 @@ import { getBlogPosts, getTagPagePaths, type BlogOrder } from '../../../../../li
 import { TAG_DEFINITIONS, type TagId } from '../../../../../lib/tags'
 
 export async function getStaticPaths() {
-  const posts = await getBlogPosts()
+  const posts = await getBlogPosts('en')
 
   return TAG_DEFINITIONS.flatMap((tag) =>
     getTagPagePaths(tag.id, posts.filter((post) => post.data.tags.includes(tag.id)).length),

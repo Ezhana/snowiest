@@ -4,10 +4,12 @@
 
 ## 语言约定
 
-- 中文是默认语言：中文页面在 `/`、`/blog/`、`/about/`。
-- 英文界面固定文案在 `/en/`、`/en/blog/`、`/en/about/`。
-- 文章目前只有一套内容，默认使用中文；中英文路由展示同一篇中文文章。界面固定文案（导航、筛选、标签、页脚等）会按语言本地化。
-- 暂不支持逐篇文章翻译；不要再新增 `.zh.md` 之类的约定。
+- 中文是默认语言：中文页面在 `/`、`/blog/`、`/about/`，英文界面在 `/en` 前缀下。
+- 所有文章都放在 `src/content/blog/` 这一个平铺目录里，**语言由 frontmatter 的 `lang` 决定**：`zh`（默认）或 `en`。
+- 英文译文与中文原文共享同一个 slug：原文 `hello-astro.md`，译文 `hello-astro-en.md`。英文文件名必须以 `-en` 结尾，构建会校验这一约定。
+- 同一个 slug 在同一种语言下只能有一篇，重复会让构建失败。
+- 没有译文的文章不会从另一种语言的站点消失：英文站会展示中文原文（反之亦然），列表里带语言标记，详情页顶部提示原文语言，canonical 指向原文真正所在的 URL。
+- 只要中文文章有对应译文，`/en` 下就会自动换成英文版本，URL 不变。
 
 ## 新建文章
 
@@ -24,6 +26,7 @@ tags:
   - engineering
 heroImage: '../../assets/blog-placeholder-1.jpg' # 可选
 draft: false # 可选，默认 false
+lang: zh # 可选，默认 zh；英文译文写 en
 ---
 ## 小节标题
 
@@ -31,6 +34,13 @@ draft: false # 可选，默认 false
 ```
 
 字段定义在 `src/content.config.ts`。
+
+## 添加英文译文
+
+1. 在原文旁新建文件并加 `-en` 后缀：`hello-astro.md` → `hello-astro-en.md`。
+2. frontmatter 写 `lang: en`；`pubDate`、`tags`、`heroImage` 与原文保持一致，标题、摘要、正文写英文。
+3. 不需要改路由或查询：构建会按 slug 把两个版本配成一对，`/en/blog/hello-astro/` 自动使用英文版本，`/blog/hello-astro/` 保持中文。
+4. 没有译文的文章仍会出现在另一种语言的站点：列表标注原文语言，详情页提示“暂无英文版/中文版”，canonical 指向原文真正所在的 URL。补上 `-en.md` 后这些回退行为自动消失。
 
 ## 字段规则
 
@@ -43,6 +53,7 @@ draft: false # 可选，默认 false
 | `tags`        | 否   | 标签 id 数组，必须是 `src/lib/tags.ts` 中已定义的 id                    |
 | `heroImage`   | 否   | 本地封面图，路径相对于当前文件；同时用于列表缩略图、详情大图和 OG image |
 | `draft`       | 否   | `true` 时只在开发服务器可见，生产构建排除                               |
+| `lang`        | 否   | `zh`（默认）或 `en`；英文译文文件还必须以 `-en` 结尾                    |
 
 ## 标签
 
@@ -65,7 +76,7 @@ draft: false # 可选，默认 false
 - 默认时间倒序：`/blog/`、`/blog/page/2/`。
 - 时间顺序：`/blog/oldest/`、`/blog/oldest/page/2/`。
 - 标签：`/blog/tag/design/`、`/blog/tag/design/oldest/`、`/blog/tag/design/page/2/`。
-- 英文对应路径加 `/en` 前缀。
+- 英文对应路径加 `/en` 前缀，slug 与中文相同：`/en/blog/`、`/en/blog/page/2/`、`/en/blog/tag/design/`。
 - 每页 5 篇，由 `src/lib/blog.ts` 的 `BLOG_PAGE_SIZE` 控制。
 
 ## 正文规则
@@ -97,10 +108,12 @@ pnpm lint:check
 pnpm format:check
 ```
 
-构建会校验 frontmatter、标签 id 和封面图片路径。发布前建议检查：
+构建会校验 frontmatter、标签 id、封面图片路径，以及译文文件命名和同语言 slug 唯一性。发布前建议检查：
 
 - `/blog/`、`/blog/oldest/`、`/blog/tag/<tag>/`；
 - `/en/blog/` 的英文界面；
+- 已翻译文章的 `/en/blog/<slug>/` 是否为英文，未翻译文章是否带原文提示；
+- 文章页的 canonical 与 hreflang 是否指向正确语言；
 - 首页时间轴；
 - `/rss.xml` 与 `/en/rss.xml`；
 - 文章详情页右侧目录和移动端布局。
