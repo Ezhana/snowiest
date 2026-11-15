@@ -29,7 +29,7 @@ const tagHref = (id: TagId) =>
   localeUrl(lang, order === 'oldest' ? `/blog/tag/${id}/oldest/` : `/blog/tag/${id}/`)
 ---
 
-<main class="mx-auto w-full max-w-[45rem] px-4 py-12">
+<main class="mx-auto w-full max-w-180 px-4 py-12">
   <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
     <h1 class="m-0 text-h1 font-bold text-fg-strong">
       {tag ? `${t('blog.tagPrefix')}${getTagLabel(tag, lang)}` : t('blog.title')}
@@ -43,8 +43,8 @@ const tagHref = (id: TagId) =>
   <section>
     <ul class="m-0 list-none p-0">
       {posts.map((post) => (
-        <li class="group py-4">
-          <div class="flex items-start justify-between gap-6">
+        <li class="group py-3">
+          <div class="flex items-start justify-between gap-4">
             <div class="min-w-0 flex-1">
               <h2
                 transition:name={titleTransitionName(postSlug(post))}
@@ -71,7 +71,7 @@ const tagHref = (id: TagId) =>
                 {post.data.tags.length > 0 && <span aria-hidden="true">·</span>}
                 {post.data.tags.map((tagId) => (
                   <a
-                    class="text-fg-muted no-underline transition-colors hover:text-accent"
+                    class="text-fg-muted transition-colors hover:text-accent hover:underline"
                     href={tagHref(tagId)}
                   >
                     #{getTagLabel(tagId, lang)}

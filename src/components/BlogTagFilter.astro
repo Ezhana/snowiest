@@ -42,7 +42,7 @@ const chipClass = 'rounded-pill border px-3 py-1 text-small no-underline transit
         chipClass,
         activeTag === tag.id
           ? 'border-accent/40 bg-accent-subtle font-medium text-accent'
-          : 'border-border text-fg-muted hover:bg-bg-subtle hover:text-fg-strong',
+          : 'border-border text-fg-muted hover:bg-bg-subtle hover:text-fg-strong active:text-accent',
       ]}
     >
       {getTagLabel(tag.id, lang)}
