@@ -205,9 +205,10 @@
 }
 
 /*
- * App-level component motion that cannot be expressed as a single utility:
+ * App-level component presentation that utilities alone cannot express:
  * - the theme-mode icon cross-fades between system / light / dark,
- * - dropdown panels animate in and out (the header script keeps <details> open while closing).
+ * - dropdown panels animate in and out (the header script keeps <details> open while closing),
+ * - the about page redaction hides a sentence visually but keeps it in the accessibility tree.
  */
 @layer components {
   .theme-mode-icon {
@@ -265,9 +266,51 @@
     }
   }
 
+  /*
+   * About page: a deliberately playful redaction. The sentence stays in the accessibility tree
+   * through the element's aria-label, while sighted readers get it back on hover or keyboard focus.
+   */
+  .ink-redacted {
+    display: inline-block;
+    padding-inline: 0.15em;
+    white-space: nowrap;
+    border-radius: 0.15em;
+    background-color: var(--color-fg-strong);
+    color: transparent;
+    cursor: help;
+    transition:
+      color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .ink-redacted:hover,
+  .ink-redacted:focus {
+    background-color: var(--color-danger-subtle);
+    color: var(--color-danger);
+  }
+
+  /*
+   * Inline links in page copy (home, about). Article bodies get their links from the editorial
+   * preset, so this class exists only for copy that is not rendered Markdown.
+   */
+  .copy-link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
+    transition: color 150ms ease;
+  }
+
+  .copy-link:hover {
+    color: var(--color-accent-hover);
+    text-decoration-thickness: 2px;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .theme-mode-icon,
-    [data-theme-mode] [data-mode-check] {
+    [data-theme-mode] [data-mode-check],
+    .ink-redacted,
+    .copy-link {
       transition: none;
     }
 

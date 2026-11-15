@@ -53,24 +53,6 @@
   .reading-column {
     padding-block: 1.5rem 3rem;
   }
-
-  /*
-   * The preset scales headings from the body size with one fixed modular ratio, so on a phone the
-   * measure halves while h2 keeps ~2.44× the body size. Flatten the scale on narrow viewports: a
-   * single knob rescales h1–h5 proportionally instead of overriding each level.
-   *
-   * This is a site-level correction of a preset that does not yet size headings responsively;
-   * delete it once @ezhana/typography-editorial does.
-   */
-  .ez-editorial {
-    --ez-editorial-heading-scale: 1.18;
-  }
-}
-
-@media (max-width: 480px) {
-  .ez-editorial {
-    --ez-editorial-heading-scale: 1.14;
-  }
 }
 
 /*
@@ -102,34 +84,5 @@
     font-style: var(--shiki-dark-font-style, inherit);
     font-weight: var(--shiki-dark-font-weight, inherit);
     text-decoration: var(--shiki-dark-text-decoration, inherit);
-  }
-}
-
-/*
- * About page: a deliberately playful redaction. The sentence stays in the accessibility tree
- * through the element's aria-label, while sighted readers get it back on hover or keyboard focus.
- */
-.ez-editorial .ink-redacted {
-  display: inline-block;
-  padding-inline: 0.15em;
-  white-space: nowrap;
-  border-radius: 0.15em;
-  background-color: var(--color-fg-strong);
-  color: transparent;
-  cursor: help;
-  transition:
-    color 180ms ease,
-    background-color 180ms ease;
-}
-
-.ez-editorial .ink-redacted:hover,
-.ez-editorial .ink-redacted:focus {
-  background-color: var(--color-danger-subtle);
-  color: var(--color-danger);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ez-editorial .ink-redacted {
-    transition: none;
   }
 }

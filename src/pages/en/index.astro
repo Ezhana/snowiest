@@ -7,7 +7,7 @@ import { SITE_DESCRIPTION, SITE_GITHUB_PROFILE_URL, SITE_TITLE } from '../../con
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
   <main class="mx-auto w-full max-w-6xl px-4 py-12">
-    <section class="mx-auto w-full max-w-180 space-y-4 [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-accent-hover">
+    <section class="mx-auto w-full max-w-180 space-y-4">
       <p class="flex items-center gap-2 text-caption font-semibold uppercase tracking-[0.18em] text-accent">
         <span class="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
         Snowiest
@@ -25,11 +25,15 @@ import { SITE_DESCRIPTION, SITE_GITHUB_PROFILE_URL, SITE_TITLE } from '../../con
         </p>
         <p
           class="leading-relaxed"
-          set:html={`No promise of a schedule, but plenty of room for conversation. Come talk, or just sit by the window for a while. For quiet reading, subscribe to the <a href="${rssUrl('en')}">RSS feed</a>; to say hello, find me on <a href="${SITE_GITHUB_PROFILE_URL}">GitHub</a>.`}
+          set:html={`No promise of a schedule, but plenty of room for conversation. Come talk, or just sit by the window for a while. For quiet reading, subscribe to the <a class="copy-link" href="${rssUrl('en')}">RSS feed</a>; to say hello, find me on <a class="copy-link" href="${SITE_GITHUB_PROFILE_URL}">GitHub</a>.`}
         />
       </div>
       <p class="text-small text-fg-muted">
-        Want to know who's behind this? <a href={localeUrl('en', '/about/')}>About the author</a>.
+        Want to know who's behind this?{' '}
+        <a class="copy-link" href={localeUrl('en', '/about/')}>
+          About the author
+        </a>
+        .
       </p>
     </section>
     <BlogTimeline />

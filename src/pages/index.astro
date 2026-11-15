@@ -7,7 +7,7 @@ import { SITE_DESCRIPTION_ZH, SITE_GITHUB_PROFILE_URL, SITE_TITLE_ZH } from '../
 
 <BaseLayout title={SITE_TITLE_ZH} description={SITE_DESCRIPTION_ZH}>
   <main class="mx-auto w-full max-w-6xl px-4 py-12">
-    <section class="mx-auto w-full max-w-180 space-y-4 [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-accent-hover">
+    <section class="mx-auto w-full max-w-180 space-y-4">
       <p class="flex items-center gap-2 text-caption font-semibold uppercase tracking-[0.18em] text-accent">
         <span class="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
         Snowiest · 簌雪
@@ -25,11 +25,15 @@ import { SITE_DESCRIPTION_ZH, SITE_GITHUB_PROFILE_URL, SITE_TITLE_ZH } from '../
         </p>
         <p
           class="leading-relaxed"
-          set:html={`不求篇篇有用，但求偶尔有趣。欢迎互动、日常交流，或者只是路过坐坐。想安静地看，可以订阅 <a href="${rssUrl('zh')}">RSS</a>；想说话，来 <a href="${SITE_GITHUB_PROFILE_URL}">GitHub</a> 找我。`}
+          set:html={`不求篇篇有用，但求偶尔有趣。欢迎互动、日常交流，或者只是路过坐坐。想安静地看，可以订阅 <a class="copy-link" href="${rssUrl('zh')}">RSS</a>；想说话，来 <a class="copy-link" href="${SITE_GITHUB_PROFILE_URL}">GitHub</a> 找我。`}
         />
       </div>
       <p class="text-small text-fg-muted">
-        想先认识一下？<a href={localeUrl('zh', '/about/')}>关于作者</a>。
+        想先认识一下？
+        <a class="copy-link" href={localeUrl('zh', '/about/')}>
+          关于作者
+        </a>
+        。
       </p>
     </section>
     <BlogTimeline />
