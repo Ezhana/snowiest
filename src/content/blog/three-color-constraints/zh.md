@@ -4,7 +4,7 @@ description: '颜色不是越丰富越好；约束越清楚，界面越容易保
 pubDate: '2026-08-07'
 tags:
   - design
-heroImage: '../../assets/blog-placeholder-3.jpg'
+heroImage: '../../../assets/blog-placeholder-3.jpg'
 ---
 
 做配色方案时，我通常先写下三条约束，再开始选颜色。

@@ -6,7 +6,7 @@ tags:
   - astro
   - engineering
   - design
-heroImage: '../../assets/blog-placeholder-1.jpg'
+heroImage: '../../../assets/blog-placeholder-1.jpg'
 ---
 
 迁移博客时最容易高估的是“新框架能解决一切”，最容易低估的是内容结构本身。Astro 带来的改变，主要发生在内容、路由和构建这三个边界上。
@@ -17,9 +17,9 @@ heroImage: '../../assets/blog-placeholder-1.jpg'
 
 这样一来，列表、标签页、RSS 和首页时间轴读的是同一份数据源，不会出现“列表更新了但 RSS 没更新”的情况。
 
-## 路由由文件决定
+## 路由由目录决定
 
-文章文件名就是 URL 的一部分。好处是心智负担很低，代价是改名等于改链接，所以发布之后应当尽量保持 slug 稳定。
+文章目录名就是 URL 的一部分。好处是心智负担很低，代价是改目录名等于改链接，所以发布之后应当尽量保持目录名稳定；目录里的 Markdown 文件名则可以随时改。
 
 ## 图片交给构建处理
 

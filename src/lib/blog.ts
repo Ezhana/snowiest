@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
 import type { Lang } from '../i18n/ui'
+import { BLOG_CONTENT_DIR } from './content-paths'
 import type { TagId } from './tags'
 
 export const BLOG_PAGE_SIZE = 5
@@ -7,6 +8,14 @@ export const BLOG_PAGE_SIZE = 5
 export type BlogPost = CollectionEntry<'blog'>
 
 export type BlogOrder = 'newest' | 'oldest'
+
+const BLOG_DIR_PREFIX = `${BLOG_CONTENT_DIR}/`
+
+/** A post folder is a URL: lowercase ASCII words joined by single hyphens. */
+const SLUG_SEGMENT = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+/** First folder segments already used by the blog's routes: `/blog/oldest/`, `/blog/page/2/`, `/blog/tag/design/`. */
+const RESERVED_SLUGS = new Set(['oldest', 'page', 'tag'])
 
 interface GetBlogPostsOptions {
   includeUnpublished?: boolean
@@ -17,39 +26,62 @@ export function postLang(post: BlogPost): Lang {
   return post.data.lang
 }
 
-/**
- * URL slug and translation key. Posts are stored as `<slug>.md` / `<slug>-en.md`, so the language
- * suffix is stripped here and both versions of a post share one slug.
- */
-export function postSlug(post: BlogPost): string {
-  return post.id.replace(/-en$/, '')
+/** Folder of a post relative to the blog collection, without the Markdown filename. */
+function postFolder(post: BlogPost): string | undefined {
+  const filePath = post.filePath
+  if (!filePath?.startsWith(BLOG_DIR_PREFIX)) return undefined
+
+  const relativePath = filePath.slice(BLOG_DIR_PREFIX.length)
+  if (!relativePath.includes('/')) return ''
+  return relativePath.replace(/\/[^/]+$/, '')
 }
 
 /**
- * Guard the naming rules the routing relies on: English posts use the `-en` suffix, Chinese posts
- * must not (it would be stripped from their URL), and no slug has two posts in one language.
- * Violations fail the build instead of silently producing duplicate or unreachable pages.
+ * URL slug and translation key: the post's folder inside `src/content/blog/`. Every language
+ * version lives in the same folder (e.g. `hello-astro/zh.md` and `hello-astro/en.md`), so the
+ * folder pairs translations and becomes the URL; Markdown filenames carry no meaning.
+ */
+export function postSlug(post: BlogPost): string {
+  return postFolder(post) ?? post.id.split('/').slice(0, -1).join('/')
+}
+
+/**
+ * Guard the structure the routing relies on: a post lives in its own folder, the folder is a
+ * valid URL segment, it does not shadow a built-in blog route, and each language has at most one
+ * post per folder. Violations fail the build instead of silently producing duplicate or
+ * unreachable pages.
  */
 function assertPostConventions(posts: BlogPost[]): void {
   const seen = new Set<string>()
 
   for (const post of posts) {
-    const lang = postLang(post)
-    const hasEnglishSuffix = post.id.endsWith('-en')
+    const slug = postSlug(post)
 
-    if (lang === 'en' && !hasEnglishSuffix) {
-      throw new Error(`English post "${post.id}" must use the "-en" filename suffix.`)
-    }
-
-    if (lang !== 'en' && hasEnglishSuffix) {
+    if (!slug) {
       throw new Error(
-        `Post "${post.id}" ends with "-en" but its lang is "${lang}". Rename it or set lang: en.`,
+        `Post "${post.filePath ?? post.id}" must live in its own folder, e.g. src/content/blog/hello-astro/zh.md.`,
       )
     }
 
-    const key = `${postSlug(post)}:${lang}`
+    for (const segment of slug.split('/')) {
+      if (!SLUG_SEGMENT.test(segment)) {
+        throw new Error(
+          `Post folder "${slug}" contains the invalid URL segment "${segment}". Folder names become URLs: use lowercase ASCII words joined by hyphens.`,
+        )
+      }
+    }
+
+    const [firstSegment] = slug.split('/')
+    if (RESERVED_SLUGS.has(firstSegment)) {
+      throw new Error(
+        `Post folder "${slug}" collides with the built-in blog route /blog/${firstSegment}/. Rename the folder.`,
+      )
+    }
+
+    const lang = postLang(post)
+    const key = `${slug}:${lang}`
     if (seen.has(key)) {
-      throw new Error(`Duplicate ${lang} post for slug "${postSlug(post)}": ${post.id}`)
+      throw new Error(`Duplicate ${lang} post for slug "${slug}": ${post.id}`)
     }
     seen.add(key)
   }

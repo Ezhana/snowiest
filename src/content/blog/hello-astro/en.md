@@ -6,7 +6,7 @@ tags:
   - astro
   - engineering
   - design
-heroImage: '../../assets/blog-placeholder-1.jpg'
+heroImage: '../../../assets/blog-placeholder-1.jpg'
 lang: en
 ---
 
@@ -18,9 +18,9 @@ Posts no longer have to be welded to a page template. They live as a set of file
 
 As a result, the listing, tag pages, RSS, and the homepage timeline all read from the same source, so you never get a listing that updated while the RSS feed didn't.
 
-## Routing comes from files
+## Routing comes from folders
 
-A post's filename is part of its URL. The upside is a very low mental load; the cost is that renaming a file renames the link, so once something is published, keep the slug stable.
+A post's folder name is part of its URL. The upside is a very low mental load; the cost is that renaming a folder renames the link, so once something is published, keep the folder name stable. The Markdown filename inside can change freely.
 
 ## Images are the build's job
 

@@ -1,11 +1,12 @@
 import { defineCollection } from 'astro:content'
 import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
+import { BLOG_CONTENT_DIR } from './lib/content-paths'
 import { TAG_IDS } from './lib/tags'
 
 const blog = defineCollection({
   // Load Markdown and MDX files in the `src/content/blog/` directory.
-  loader: glob({ base: './src/content/blog', pattern: '**/*.{md,mdx}' }),
+  loader: glob({ base: `./${BLOG_CONTENT_DIR}`, pattern: '**/*.{md,mdx}' }),
   // Type-check frontmatter using a schema
   schema: ({ image }) =>
     z.object({
@@ -17,8 +18,8 @@ const blog = defineCollection({
       heroImage: z.optional(image()),
       tags: z.array(z.enum(TAG_IDS)).default([]),
       draft: z.boolean().default(false),
-      // Language of the post body. English translations live beside the Chinese original as
-      // `<slug>-en.md` and share its slug; see docs/content-authoring.md.
+      // Language of the post body. Every language version lives in the post's folder, e.g.
+      // `hello-astro/zh.md` and `hello-astro/en.md`; see docs/content-authoring.md.
       lang: z.enum(['zh', 'en']).default('zh'),
     }),
 })
