@@ -75,6 +75,8 @@
   --text-caption--line-height: var(--font-line-height-caption);
   --text-code: var(--font-size-code);
   --text-code--line-height: var(--font-line-height-code);
+  --text-display: var(--font-size-display);
+  --text-display--line-height: var(--font-line-height-display);
   --text-h1: var(--font-size-h1);
   --text-h1--line-height: var(--font-line-height-h1);
   --text-h2: var(--font-size-h2);

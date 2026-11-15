@@ -80,11 +80,11 @@ const titleTransitionName = slug ? `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g,
             </p>
           )}
           {titleTransitionName ? (
-            <h1 class="text-h1 font-bold text-fg-strong" transition:name={titleTransitionName}>
+            <h1 class="text-display font-bold text-fg-strong" transition:name={titleTransitionName}>
               {title}
             </h1>
           ) : (
-            <h1 class="text-h1 font-bold text-fg-strong">{title}</h1>
+            <h1 class="text-display font-bold text-fg-strong">{title}</h1>
           )}
         </header>
         {isFallback && (
