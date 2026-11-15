@@ -6,23 +6,28 @@ import { SITE_DESCRIPTION_ZH, SITE_GITHUB_PROFILE_URL, SITE_TITLE_ZH } from '../
 ---
 
 <BaseLayout title={SITE_TITLE_ZH} description={SITE_DESCRIPTION_ZH}>
-  <main class="mx-auto w-full max-w-[72rem] px-4 py-12">
-    <section class="ez-editorial mx-auto w-full max-w-[45rem]">
-      <p class="mb-4 flex items-center gap-2 text-caption font-semibold uppercase tracking-[0.18em] text-accent">
+  <main class="mx-auto w-full max-w-6xl px-4 py-12">
+    <section class="mx-auto w-full max-w-180 space-y-4 [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:text-accent-hover">
+      <p class="flex items-center gap-2 text-caption font-semibold uppercase tracking-[0.18em] text-accent">
         <span class="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
         Snowiest · 簌雪
       </p>
-      <h1>{SITE_TITLE_ZH}</h1>
-      <p class="text-h2 text-fg-muted">
-        雪落下来的时候，世界会安静一点。这里是我在安静里写下的字。
-      </p>
-      <p>
-        我是 <strong>Ezhana</strong>。这个站点会分享技术文章，也会收留一些牢骚、逸闻、ACGN
-        资讯和没头没尾的感想。
-      </p>
-      <p
-        set:html={`不求篇篇有用，但求偶尔有趣。欢迎互动、日常交流，或者只是路过坐坐。想安静地看，可以订阅 <a href="${rssUrl('zh')}">RSS</a>；想说话，来 <a href="${SITE_GITHUB_PROFILE_URL}">GitHub</a> 找我。`}
-      />
+      <div class="space-y-2">
+        <h1 class="text-h1 font-bold text-fg-strong">{SITE_TITLE_ZH}</h1>
+        <p class="font-normal text-fg-muted">
+          雪落下来的时候，世界会安静一点。这里是我在安静里写下的字。
+        </p>
+      </div>
+      <div class="space-y-2">
+        <p class="leading-relaxed">
+          我是 <strong>Ezhana</strong>。这个站点会分享技术文章，也会收留一些牢骚、逸闻、ACGN
+          资讯和没头没尾的感想。
+        </p>
+        <p
+          class="leading-relaxed"
+          set:html={`不求篇篇有用，但求偶尔有趣。欢迎互动、日常交流，或者只是路过坐坐。想安静地看，可以订阅 <a href="${rssUrl('zh')}">RSS</a>；想说话，来 <a href="${SITE_GITHUB_PROFILE_URL}">GitHub</a> 找我。`}
+        />
+      </div>
       <p class="text-small text-fg-muted">
         想先认识一下？<a href={localeUrl('zh', '/about/')}>关于作者</a>。
       </p>

@@ -8,6 +8,10 @@
  * Markdown element typography (headings, paragraphs, lists, links, quotes, inline code, code
  * blocks, tables, figures, rules) is provided by @ezhana/typography-editorial through the
  * `.ez-editorial` scope, which global.css imports into this same `blog` layer.
+ *
+ * That scope wraps rendered prose only: the article shell (hero, title, metadata) is app markup and
+ * takes its type roles from Ezhana tokens, so the preset decides how an article *body* reads, not
+ * how a page is composed.
  */
 
 /* A comfortable long-form measure (~45rem of text), independent of the page shell. */
@@ -17,16 +21,13 @@
   padding-block: 3rem 4rem;
 }
 
-/* Article hero: part of the reading column, not a full-bleed banner. */
+/* Article hero: part of the reading column, not a full-bleed banner. The radius is Ezhana's
+ * surface radius because this is app markup, not Markdown. */
 .article-hero {
   display: block;
   width: 100%;
   height: auto;
   margin-block-end: 2rem;
-}
-
-/* The hero is app markup, so it uses the Ezhana surface radius, not the preset's image radius. */
-.ez-editorial .article-hero {
   border-radius: var(--radius-surface);
 }
 
@@ -51,6 +52,24 @@
 @media (max-width: 720px) {
   .reading-column {
     padding-block: 1.5rem 3rem;
+  }
+
+  /*
+   * The preset scales headings from the body size with one fixed modular ratio, so on a phone the
+   * measure halves while h2 keeps ~2.44× the body size. Flatten the scale on narrow viewports: a
+   * single knob rescales h1–h5 proportionally instead of overriding each level.
+   *
+   * This is a site-level correction of a preset that does not yet size headings responsively;
+   * delete it once @ezhana/typography-editorial does.
+   */
+  .ez-editorial {
+    --ez-editorial-heading-scale: 1.18;
+  }
+}
+
+@media (max-width: 480px) {
+  .ez-editorial {
+    --ez-editorial-heading-scale: 1.14;
   }
 }
 

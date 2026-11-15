@@ -26,7 +26,7 @@ const titleTransitionName = slug ? `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g,
 <BaseLayout title={title} description={description} image={heroImage}>
   <main class="mx-auto w-full max-w-[72rem] px-4 py-10 lg:py-14">
     <div class="relative mx-auto w-full max-w-[45rem]">
-      <article class="ez-editorial">
+      <article>
         {heroImage && (
           <Image class="article-hero" width={1020} height={510} src={heroImage} alt="" />
         )}
@@ -42,12 +42,17 @@ const titleTransitionName = slug ? `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g,
             </p>
           )}
           {titleTransitionName ? (
-            <h1 transition:name={titleTransitionName}>{title}</h1>
+            <h1 class="text-h1 font-bold text-fg-strong" transition:name={titleTransitionName}>
+              {title}
+            </h1>
           ) : (
-            <h1>{title}</h1>
+            <h1 class="text-h1 font-bold text-fg-strong">{title}</h1>
           )}
         </header>
-        <slot />
+        {/* The editorial preset owns rendered prose only; the article shell above is app markup. */}
+        <div class="ez-editorial">
+          <slot />
+        </div>
       </article>
       <TableOfContents headings={headings} label={t('post.toc')} />
     </div>
