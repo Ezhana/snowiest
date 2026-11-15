@@ -36,7 +36,7 @@ const options: Array<{ order: BlogOrder; path: string; label: string }> = [
       href={localeUrl(lang, option.path)}
       aria-current={option.order === order ? 'page' : undefined}
       class:list={[
-        'rounded-md px-2.5 py-1.5 text-small no-underline transition-colors',
+        'rounded-lg px-2.5 py-1.5 text-small no-underline transition-colors',
         option.order === order
           ? 'bg-accent-subtle font-medium text-accent'
           : 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong active:text-accent',

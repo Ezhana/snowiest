@@ -28,12 +28,12 @@ const copy = {
 }[lang]
 ---
 
-<section class="mt-14" aria-labelledby="friends-heading">
+<section class="space-y-4" aria-labelledby="friends-heading">
   <h2 id="friends-heading" class="text-h2 font-bold text-fg-strong">
     {copy.heading}
   </h2>
-  <p class="mt-2">{copy.intro}</p>
-  <ul class="mt-5 grid gap-3 sm:grid-cols-2">
+  <p>{copy.intro}</p>
+  <ul class="grid gap-3 sm:grid-cols-2">
     {FRIEND_LINKS.map((friend) => (
       <li>
         <a
@@ -63,7 +63,7 @@ const copy = {
       </li>
     ))}
   </ul>
-  <p class="mt-5 text-small text-fg-muted">
+  <p class="text-small text-fg-muted">
     {copy.exchange} <a href={SITE_GITHUB_PROFILE_URL}>{copy.exchangeLink}</a> {copy.exchangeTail}
   </p>
 </section>
