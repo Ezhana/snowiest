@@ -4,7 +4,7 @@ import type { CollectionEntry } from 'astro:content'
 import FormattedDate from './FormattedDate.astro'
 import BlogFilter from './BlogFilter.astro'
 import BlogTagFilter from './BlogTagFilter.astro'
-import { getLang, languages, useTranslations } from '../i18n/ui'
+import { getLang, languageName, useTranslations } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
 import { postLang, postSlug, type BlogOrder } from '../lib/blog'
 import type { TagId } from '../lib/tags'
@@ -65,7 +65,7 @@ const tagHref = (id: TagId) =>
                     class="rounded-pill border border-border px-2 py-0.5 text-caption text-fg-muted"
                     title={t('blog.originalLanguage')}
                   >
-                    {languages[postLang(post)].label}
+                    {languageName(postLang(post), lang)}
                   </span>
                 )}
                 {post.data.tags.length > 0 && <span aria-hidden="true">·</span>}

@@ -7,6 +7,23 @@ export const languages = {
 
 export type Lang = keyof typeof languages
 
+/**
+ * Language names written in each UI language, for labels that describe the language of a piece of
+ * content (e.g. a Chinese page tagging an English-only post with "英文"). `languages[code].label` is
+ * the language's own name and is only correct where the reader picks a language, such as the
+ * switcher. Typing this as `Record<Lang, Record<Lang, string>>` makes a new language fail the build
+ * until its name is supplied in every UI language.
+ */
+const languageNames: Record<Lang, Record<Lang, string>> = {
+  en: { en: 'English', zh: 'Chinese' },
+  zh: { en: '英文', zh: '中文' },
+}
+
+/** Name of language `code` written in `lang`, e.g. `languageName('en', 'zh') === '英文'`. */
+export function languageName(code: Lang, lang: Lang): string {
+  return languageNames[lang][code]
+}
+
 export const defaultLang: Lang = 'zh'
 
 export function isLang(value: string | undefined): value is Lang {

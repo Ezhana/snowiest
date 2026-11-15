@@ -1,6 +1,6 @@
 ---
 import FormattedDate from './FormattedDate.astro'
-import { getLang, languages, useTranslations } from '../i18n/ui'
+import { getLang, languageName, useTranslations } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
 import { getBlogPosts, groupBlogPostsByMonth, postLang, postSlug } from '../lib/blog'
 
@@ -57,7 +57,7 @@ const titleTransitionName = (slug: string) => `post-title-${slug.replace(/[^a-zA
                       <FormattedDate date={post.data.pubDate} />
                       {postLang(post) !== lang && (
                         <span title={t('blog.originalLanguage')}>
-                          · {languages[postLang(post)].label}
+                          · {languageName(postLang(post), lang)}
                         </span>
                       )}
                     </p>
