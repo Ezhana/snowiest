@@ -171,9 +171,13 @@
     scroll-padding-top: 6rem;
   }
 
+  /*
+   * Plain document flow: the footer follows the content instead of being pinned to the viewport
+   * bottom, so a tall screen keeps the reading column and the footer together. `min-height` is not
+   * a sticky-footer scaffold; it only keeps the background (and its colour-mode cross-fade) covering
+   * the viewport on short pages.
+   */
   body {
-    display: flex;
-    flex-direction: column;
     min-height: 100dvh;
     margin: 0;
     background-color: var(--color-bg);

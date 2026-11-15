@@ -1,0 +1,110 @@
+---
+/**
+ * Round "back to top" button, pinned to the bottom of the article outline column.
+ *
+ * The outline column is a fixed-height sticky flex column with `justify-between`: the outline sits
+ * at its top, this button at its bottom. The button stays in the flow even while hidden, so the
+ * outline's scroll area does not resize when it appears.
+ *
+ * It is an anchor (`#page-top`) so it still works without JavaScript; the script reveals it after
+ * the reader scrolls past a threshold and turns the jump into a smooth scroll. Both behaviours
+ * honour `prefers-reduced-motion`.
+ */
+interface Props {
+  label: string
+}
+
+const { label } = Astro.props
+---
+
+<a
+  href="#page-top"
+  data-back-to-top
+  data-scroll-to-top
+  data-visible="false"
+  inert
+  aria-label={label}
+  title={label}
+  class="pointer-events-none inline-flex size-11 shrink-0 translate-y-1 self-end items-center justify-center rounded-pill border border-border bg-surface text-fg-muted opacity-0 shadow-sm transition duration-300 ease-out hover:border-accent-border hover:bg-accent-subtle hover:text-accent motion-reduce:transition-none data-[visible=true]:pointer-events-auto data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100"
+>
+  <svg
+    class="size-5"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 19V5M5 12l7-7 7 7"></path>
+  </svg>
+</a>
+
+<script>
+  /** Scroll offsets (px) with a hysteresis gap so the button does not flicker near the threshold. */
+  const SHOW_AFTER = 480
+  const HIDE_BEFORE = 360
+
+  const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
+  }
+
+  // Delegated and in the capture phase on purpose: <ClientRouter /> listens on `document` in the
+  // bubble phase and turns same-page anchors into a fragment navigation, which would jump instantly
+  // and leave the hash behind. Marking the click handled first makes the router skip it, so a
+  // second click still scrolls.
+  document.addEventListener(
+    'click',
+    (event) => {
+      if (!(event.target instanceof Element)) return
+      if (!event.target.closest('[data-scroll-to-top]')) return
+
+      event.preventDefault()
+      scrollToTop()
+    },
+    { capture: true },
+  )
+
+  let controller: AbortController | null = null
+
+  const setupBackToTop = () => {
+    controller?.abort()
+    controller = null
+
+    const trigger = document.querySelector<HTMLElement>('[data-back-to-top]')
+    if (!trigger) return
+
+    controller = new AbortController()
+    const { signal } = controller
+    let frame = 0
+
+    const update = () => {
+      frame = 0
+      const isVisible = trigger.dataset.visible === 'true'
+      const nextVisible = window.scrollY > (isVisible ? HIDE_BEFORE : SHOW_AFTER)
+      if (nextVisible === isVisible) return
+
+      trigger.dataset.visible = String(nextVisible)
+      // `inert` keeps the hidden control out of the tab order and the accessibility tree.
+      trigger.toggleAttribute('inert', !nextVisible)
+    }
+
+    update()
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (frame) return
+        frame = window.requestAnimationFrame(update)
+      },
+      { passive: true, signal },
+    )
+    window.addEventListener('resize', update, { passive: true, signal })
+  }
+
+  setupBackToTop()
+  document.addEventListener('astro:page-load', setupBackToTop)
+</script>

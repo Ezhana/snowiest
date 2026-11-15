@@ -42,6 +42,7 @@ const en = {
   'blog.originalLanguage': 'Original language',
   'post.updated': 'Last updated on',
   'post.toc': 'On this page',
+  'post.backToTop': 'Back to top',
   'post.fallbackFromZh':
     'This post is not available in English yet. Showing the original Chinese version.',
   'post.fallbackFromEn':
@@ -83,6 +84,7 @@ const zh: Record<UiKey, string> = {
   'blog.originalLanguage': '原文语言',
   'post.updated': '最后更新于',
   'post.toc': '本页目录',
+  'post.backToTop': '回到顶部',
   'post.fallbackFromZh': '本文暂无英文版，以下为中文原文。',
   'post.fallbackFromEn': '本文暂无中文版，以下为英文原文。',
   'pagination.label': '分页导航',

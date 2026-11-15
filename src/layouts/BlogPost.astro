@@ -7,6 +7,7 @@ import TableOfContents from '../components/TableOfContents.astro'
 import { getLang, useTranslations, type Lang } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
 import type { BlogPost as BlogPostEntry } from '../lib/blog'
+import BackToTop from '../components/BackToTop.astro'
 
 interface Props {
   title: string
@@ -62,7 +63,7 @@ const titleTransitionName = slug ? `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g,
   canonical={canonical}
   alternates={alternates}
 >
-  <main class="mx-auto w-full max-w-[72rem] px-4 py-10 lg:py-14">
+  <main id="page-top" class="mx-auto w-full max-w-[72rem] px-4 py-10 lg:py-14">
     <div class="relative mx-auto w-full max-w-[45rem]">
       <article lang={sourceLang}>
         {heroImage && (
@@ -97,7 +98,16 @@ const titleTransitionName = slug ? `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g,
           <slot />
         </div>
       </article>
-      <TableOfContents headings={headings} label={t('post.toc')} />
+      <aside class="absolute left-full top-0 ms-8 hidden h-full w-52 xl:block">
+        <div class="sticky top-24 flex h-[calc(100dvh-9rem)] max-h-full flex-col justify-between">
+          <TableOfContents
+            headings={headings}
+            label={t('post.toc')}
+            topLabel={t('post.backToTop')}
+          />
+          <BackToTop label={t('post.backToTop')} />
+        </div>
+      </aside>
     </div>
   </main>
 </BaseLayout>

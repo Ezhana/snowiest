@@ -4,28 +4,37 @@ import type { MarkdownHeading } from 'astro'
 interface Props {
   headings: MarkdownHeading[]
   label: string
+  /** Label for the "back to top" entry inside the outline and the button below it. */
+  topLabel: string
 }
 
-const { headings, label } = Astro.props
+const { headings, label, topLabel } = Astro.props
 const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3)
 ---
 
 {toc.length > 0 && (
-  <aside class="absolute left-full top-0 ms-8 hidden h-full w-52 xl:block">
-    <nav aria-label={label} class="sticky top-24 max-h-[calc(100dvh-8rem)] overflow-y-auto pe-1">
-      <p class="m-0 mb-3 text-small font-semibold text-fg-strong">{label}</p>
-      <ul class="m-0 list-none space-y-2 border-s border-border p-0 ps-4">
-        {toc.map((heading) => (
-          <li class:list={[heading.depth === 3 && 'ps-3']}>
-            <a
-              href={`#${heading.slug}`}
-              class="block text-small leading-snug text-fg-muted no-underline transition-colors hover:text-accent"
-            >
-              {heading.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  </aside>
+  <nav aria-label={label} class="flex min-h-0 flex-col">
+    <p class="m-0 mb-3 shrink-0 text-small font-semibold text-fg-strong">{label}</p>
+    <ul class="m-0 min-h-0 flex-1 list-none space-y-2 overflow-y-auto overscroll-contain border-s border-border p-0 ps-4 pe-1 [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin]">
+      {toc.map((heading) => (
+        <li class:list={[heading.depth === 3 && 'ps-3']}>
+          <a
+            href={`#${heading.slug}`}
+            class="block text-small leading-snug text-fg-muted no-underline transition-colors hover:text-accent"
+          >
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="mt-3 shrink-0">
+      <a
+        href="#page-top"
+        data-scroll-to-top
+        class="inline-flex items-center gap-1.5 text-small text-fg-muted no-underline transition-colors hover:text-accent"
+      >
+        {topLabel}
+      </a>
+    </div>
+  </nav>
 )}
