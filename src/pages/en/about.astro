@@ -18,14 +18,10 @@ const lang = getLang(Astro.currentLocale)
 ---
 
 <BaseLayout title="About" description={`About ${SITE_TITLE} and its author, ${SITE_AUTHOR}.`}>
-  <main class="mx-auto w-full max-w-[72rem] px-4 py-10 lg:py-14">
-    <div class="mx-auto w-full max-w-[45rem]">
+  <main class="mx-auto w-full max-w-6xl px-4 py-10 lg:py-14">
+    <div class="mx-auto w-full max-w-180">
       <h1 class="text-center text-h1 font-bold text-fg-strong">About</h1>
-      {/*
-        Page copy, not article content: type roles come from Ezhana tokens and utilities, so the
-        editorial preset stays scoped to rendered article bodies.
-      */}
-      <div class="mt-8 space-y-6 leading-relaxed">
+      <div class="mt-8 space-y-4 leading-relaxed">
         <p
           set:html={`I'm <strong>${SITE_AUTHOR}</strong>, the person behind <strong>${SITE_TITLE}</strong>. I write code, and I write other things too. I like untangling complicated things, <del class="text-fg-muted decoration-danger">then making them complicated again</del>, <ins class="text-accent decoration-accent decoration-wavy">then finding new trouble in them.</ins>`}
         />
@@ -35,15 +31,22 @@ const lang = getLang(Astro.currentLocale)
           <strong>fun, order, harmony</strong>.
         </p>
 
-        <h2 class="mt-12 text-h2 font-bold text-fg-strong">Fun, order, harmony</h2>
+        <br/>
+        <h2 class="text-h2 font-bold text-fg-strong">Fun, order, harmony</h2>
+        <br/>
 
         <p
           set:html={`<strong>Fun</strong> is the doorway. I like asking whether something could be a little more playful, and taking a sudden turn in the middle of a serious conversation. <del class="text-fg-muted decoration-danger">Including this introduction.</del>`}
         />
 
-        <p
-          set:html={`<strong>Order</strong> is the floor. Folders should be sorted, tabs should be tamed, and a sentence should read in one breath. <del class="text-fg-muted decoration-danger">I don't always manage it</del>, <ins class="text-accent decoration-accent decoration-wavy">but I keep trying.</ins> If that sounds like your kind of thing, you might enjoy the <a class="copy-link" href="${localeUrl(lang, '/blog/tag/design/')}">design posts</a>.`}
-        />
+        <div>
+          <p
+            set:html={`<strong>Order</strong> is the floor. Folders should be sorted, tabs should be tamed, and a sentence should read in one breath. <del class="text-fg-muted decoration-danger">I don't always manage it</del>, <ins class="text-accent decoration-accent decoration-wavy">but I keep trying.</ins>`}
+          />
+          <p class="text-small">
+            If that sounds like your kind of thing, you might enjoy the <a class="copy-link" href="${localeUrl(lang, '/blog/tag/design/')}">design posts</a>.
+          </p>
+        </div>
 
         <p
           set:html={`<strong>Harmony</strong> is the goal. Less friction between people, between people and their tools, and between people and themselves. That's also why this site seems quiet — <span class="ink-redacted" tabindex="0" role="note" aria-label="Redacted: I'm just too lazy to argue.">I'm just too lazy to argue.</span>`}
@@ -53,7 +56,7 @@ const lang = getLang(Astro.currentLocale)
           set:html={`In the end, the three are one thing: make life <strong>interesting</strong>, and keep it <strong>livable</strong>.`}
         />
 
-        <h2 class="mt-12 text-h2 font-bold text-fg-strong">This site</h2>
+        <h2 class="text-h2 font-bold text-fg-strong">This site</h2>
 
         <p
           set:html={`${SITE_TITLE} is the personal site of ${SITE_AUTHOR}. It's built with <a class="copy-link" href="https://astro.build/">Astro</a>, the source lives on <a class="copy-link" href="${SITE_GITHUB_URL}">GitHub</a>, and it's published through <a class="copy-link" href="${SITE_URL}">GitHub Pages</a>. Expect tech articles, rants, anecdotes, ACGN news, and reflections. <del class="text-fg-muted decoration-danger">Weekly updates.</del> <ins class="text-accent decoration-accent decoration-wavy">Irregular updates, but it isn't going away.</ins>`}
@@ -61,7 +64,9 @@ const lang = getLang(Astro.currentLocale)
 
         <FriendLinks lang={lang} />
 
-        <h2 class="mt-12 text-h2 font-bold text-fg-strong">Find me</h2>
+        <hr/>
+
+        <h2 class="text-h2 font-bold text-fg-strong">Find me</h2>
 
         <p
           set:html={`The most direct place is <a class="copy-link" href="${SITE_GITHUB_PROFILE_URL}">GitHub</a>. If you'd rather read quietly, subscribe to the <a class="copy-link" href="${rssUrl(lang)}">RSS feed</a>; if you want to start from the beginning, the <a class="copy-link" href="${localeUrl(lang, '/blog/')}">blog</a> is always open.`}
