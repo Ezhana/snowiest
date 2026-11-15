@@ -10,11 +10,11 @@
 - 语言由 frontmatter 的 `lang` 决定：`zh`（默认）或 `en`。文件名不决定语言。
 - 英文译文与中文原文放在同一个目录里，共享目录名和 URL：`hello-astro/zh.md` 与 `hello-astro/en.md`。
 - 同一个目录在同一种语言下只能有一篇，重复会让构建失败。
-- 目录名会直接进入 URL 和 sitemap，必须是 URL 安全的：小写 ASCII，单词之间用 `-` 连接（`^[a-z0-9]+(-[a-z0-9]+)*$`）。没有保留名，`page`、`oldest`、`tag` 都可以用作目录名。
+- 目录名会直接进入 URL 和 sitemap，必须是 URL 安全的：小写 ASCII，单词之间用 `-` 连接（`^[a-z0-9]+(-[a-z0-9]+)*$`）。
 - 没有译文的文章不会从另一种语言的站点消失：英文站会展示中文原文（反之亦然），列表里带语言标记，详情页顶部提示原文语言，canonical 指向原文真正所在的 URL。
 - 只要中文文章有对应译文，`/en` 下就会自动换成英文版本，URL 不变。
 
-旧版的 `<slug>.md` / `<slug>-en.md` 命名约定已移除：目录决定 slug，`lang` 决定语言，文件名只是 Markdown 文件的标签。
+目录决定 slug，`lang` 决定语言，文件名只是 Markdown 文件的标签。
 
 ```text
 src/content/blog/
@@ -54,9 +54,9 @@ lang: zh # 可选，默认 zh；英文译文写 en
 
 ## 添加英文译文
 
-1. 在原文所在目录里新建一个文件，按语言命名，例如 `en.md`（文件名本身不参与任何逻辑）。
+1. 在原文所在目录里新建一个文件，推荐按语言命名，例如 `en.md`。
 2. frontmatter 写 `lang: en`；`pubDate`、`tags`、`heroImage` 与原文保持一致，标题、摘要、正文写英文。
-3. 不需要改路由或查询：构建会按目录把两个版本配成一对，`/en/blog/hello-astro/` 自动使用英文版本，`/blog/hello-astro/` 保持中文。
+3. 构建会按目录把两个版本配成一对，`/en/blog/hello-astro/` 自动使用英文版本，`/blog/hello-astro/` 保持中文。
 4. 没有译文的文章仍会出现在另一种语言的站点：列表标注原文语言，详情页提示“暂无英文版/中文版”，canonical 指向原文真正所在的 URL。补上 `en.md` 后这些回退行为自动消失。
 
 ## 字段规则
@@ -100,8 +100,6 @@ lang: zh # 可选，默认 zh；英文译文写 en
 
 所有 query 状态的 canonical 都是各自的基础路径（`/blog/`、`/tag/<tag>/`），`?page=2` 不会作为独立页面被索引；文章本身仍通过列表 HTML、标签页、RSS 和 sitemap 被发现。
 
-旧的分页和标签路径（`/blog/page/…`、`/blog/oldest/…`、`/blog/tag/…` 及英文对应路径）已移除，访问会 404。
-
 ## 正文规则
 
 - 不要写 `#`，文章标题由 `title` 生成；正文从 `##` 开始。
@@ -117,12 +115,6 @@ lang: zh # 可选，默认 zh；英文译文写 en
 - `draft: true` 的文章在 `pnpm dev` 中可见，在 `pnpm build` 中不会生成任何页面，也不会进入列表、标签、时间轴、RSS 和 sitemap。
 - `pubDate` 晚于当前时间的文章同样只在开发服务器中可见。生产构建会过滤未来文章，GitHub Actions 每天 00:00 UTC 定时重建一次，因此文章会在到达日期后的下一次构建中自动上线。
 - 删除文章目录等于下线，旧链接会 404；重命名目录也会改变 URL，发布后应尽量保持目录名稳定。文件名可以随时改，不影响路由。
-
-## 首页与关于页
-
-- 首页开场白与站点介绍：`src/pages/index.astro`、`src/pages/en/index.astro`。
-- 关于页自我介绍：`src/pages/about.astro`、`src/pages/en/about.astro`。
-- 友链列表：`src/lib/friends.ts`。每条包含 `name`、`url`、`description`（中/英）和 `tag`（中/英），中英文描述都需要填写。
 
 ## 本地检查
 
