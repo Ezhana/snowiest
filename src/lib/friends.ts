@@ -1,5 +1,6 @@
 import type { Lang } from '../i18n/ui'
 import { SITE_GITHUB_URL } from '../consts'
+import type { TagId } from './tags.ts'
 
 export interface FriendLink {
   name: string
@@ -7,7 +8,7 @@ export interface FriendLink {
   /** One-line introduction shown under the name. */
   description: Record<Lang, string>
   /** Short label, used as a quiet category marker on the card. */
-  tag: Record<Lang, string>
+  tag?: TagId
 }
 
 /**
@@ -25,7 +26,7 @@ export const FRIEND_LINKS: readonly FriendLink[] = [
       zh: '本站的骨架。文档写得清楚，社区也很温和。',
       en: 'The skeleton of this site. Clear docs and a gentle community.',
     },
-    tag: { zh: '框架', en: 'Framework' },
+    tag: 'framework',
   },
   {
     name: 'GitHub',
@@ -34,7 +35,7 @@ export const FRIEND_LINKS: readonly FriendLink[] = [
       zh: '代码、版本，以及这个站点的老家。',
       en: 'Code, versions, and the home of this site.',
     },
-    tag: { zh: '代码', en: 'Code' },
+    tag: 'code',
   },
   {
     name: 'Bangumi',
@@ -43,7 +44,7 @@ export const FRIEND_LINKS: readonly FriendLink[] = [
       zh: '追番记录和 ACGN 资讯的落脚点。',
       en: 'Where the watchlist and ACGN news live.',
     },
-    tag: { zh: 'ACGN', en: 'ACGN' },
+    tag: 'acgn',
   },
   {
     name: '萌娘百科',
@@ -52,6 +53,6 @@ export const FRIEND_LINKS: readonly FriendLink[] = [
       zh: '查设定、补梗，偶尔一查就是一下午。',
       en: 'For lore and memes — and the occasional lost afternoon.',
     },
-    tag: { zh: '百科', en: 'Wiki' },
+    tag: 'wiki',
   },
 ]

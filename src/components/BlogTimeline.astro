@@ -56,8 +56,10 @@ const titleTransitionName = (slug: string) => `post-title-${slug.replace(/[^a-zA
                     <p class="mt-1 text-small text-fg-muted">
                       <FormattedDate date={post.data.pubDate} />
                       {postLang(post) !== lang && (
-                        <span title={t('blog.originalLanguage')}
-                              class="before:content-['·'] before:mx-1 before:inline-block">
+                        <span
+                          title={t('blog.originalLanguage')}
+                          class="before:content-['·'] before:mx-1 before:inline-block"
+                        >
                           {languageName(postLang(post), lang)}
                         </span>
                       )}
