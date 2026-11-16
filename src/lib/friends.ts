@@ -29,7 +29,7 @@ export const FRIEND_LINKS: readonly FriendLink[] = [
     description: {
       en: 'The skeleton of this site. Clear docs and a gentle community.',
     },
-    tag: 'framework',
+    tag: 'engineering',
   },
   {
     name: 'GitHub',
@@ -38,7 +38,7 @@ export const FRIEND_LINKS: readonly FriendLink[] = [
       zh: '代码、版本，以及这个站点的老家。',
       en: 'Code, versions, and the home of this site.',
     },
-    tag: 'code',
+    tag: 'engineering',
   },
   {
     name: 'Bangumi',
@@ -47,7 +47,7 @@ export const FRIEND_LINKS: readonly FriendLink[] = [
       zh: '追番记录和 ACGN 资讯的落脚点。',
       en: 'Where the watchlist and ACGN news live.',
     },
-    tag: 'acgn',
+    tag: 'news',
   },
   {
     name: '萌娘百科',
@@ -55,7 +55,7 @@ export const FRIEND_LINKS: readonly FriendLink[] = [
     description: {
       zh: '查设定、补梗，偶尔一查就是一下午。',
     },
-    tag: 'wiki',
+    tag: 'news',
   },
 ]
 

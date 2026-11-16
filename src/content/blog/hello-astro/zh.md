@@ -3,7 +3,6 @@ title: '把博客迁移到 Astro 之后'
 description: '从静态模板迁到 Astro 的内容集合、路由与图片处理，以及迁移后真正省下来的部分。'
 pubDate: '2026-11-12'
 tags:
-  - astro
   - engineering
   - design
 heroImage: '../../../assets/blog-placeholder-1.jpg'

@@ -1,9 +1,8 @@
 ---
 title: '把约定从文件名里搬走'
 description: '从 `-en` 后缀到目录即 slug，再到把分页和标签移出路径：一次清理隐含规则的记录。'
-pubDate: '2026-11-16'
+pubDate: '2026-10-16T12:48:59+08:00'
 tags:
-  - astro
   - engineering
 lang: zh
 ---

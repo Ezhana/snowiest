@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro'
+import BlogFilter from '../blog/BlogFilter.astro'
 import BlogPostList from '../blog/BlogPostList.astro'
 import BlogTagFilter from './BlogTagFilter.astro'
 import FriendLinkListing from '../friends/FriendLinkListing.astro'
@@ -35,7 +36,7 @@ const title = `${heading} · ${t('site.title')}`
       <p class="m-0 text-small text-fg-muted">{t('tag.noPosts')}</p>
     )}
     {friends.length > 0 && (
-      <section class="mt-12 space-y-4" aria-labelledby="tag-friends-heading">
+      <section class="mt-8 space-y-4" aria-labelledby="tag-friends-heading">
         <h2 id="tag-friends-heading" class="text-h2 font-bold text-fg-strong">
           {t('tag.friendsHeading')}
         </h2>
@@ -44,3 +45,9 @@ const title = `${heading} · ${t('site.title')}`
     )}
   </main>
 </BaseLayout>
+
+<script>
+  import { setupBlogListing } from '../blog/blog-listing'
+
+  setupBlogListing()
+</script>

@@ -6,16 +6,14 @@ interface TagDefinition {
 }
 
 export const TAG_DEFINITIONS = [
-  { id: 'astro', label: { zh: 'Astro', en: 'Astro' } },
   { id: 'design', label: { zh: '设计', en: 'Design' } },
   { id: 'engineering', label: { zh: '工程', en: 'Engineering' } },
   { id: 'writing', label: { zh: '写作', en: 'Writing' } },
   { id: 'notes', label: { zh: '随笔', en: 'Notes' } },
   { id: 'life', label: { zh: '生活', en: 'Life' } },
-  { id: 'acgn', label: { zh: 'ACGN', en: 'ACGN' } },
-  { id: 'framework', label: { zh: '框架', en: 'Framework' } },
-  { id: 'code', label: { zh: '代码', en: 'Code' } },
-  { id: 'wiki', label: { zh: '百科', en: 'Wiki' } },
+  { id: 'nonsense', label: { zh: '牢骚', en: 'Nonsense' } },
+  { id: 'news', label: { zh: '新闻', en: 'News' } },
+  { id: 'olds', label: { zh: '旧闻', en: 'Olds' } },
 ] as const satisfies readonly TagDefinition[]
 
 export type TagId = (typeof TAG_DEFINITIONS)[number]['id']

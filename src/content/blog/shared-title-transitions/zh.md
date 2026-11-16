@@ -3,7 +3,6 @@ title: '用 View Transitions 做共享标题'
 description: '从列表到详情页时，让标题在位置和字号之间平滑过渡，而不是整页硬切。'
 pubDate: '2026-10-22'
 tags:
-  - astro
   - design
 heroImage: '../../../assets/blog-placeholder-2.jpg'
 ---

@@ -15,10 +15,23 @@ const setLinkState = (link: HTMLElement, active: boolean) => {
   }
 }
 
+function applyOrderState(order: 'newest' | 'oldest'): void {
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-order-link]')) {
+    setLinkState(link, link.dataset.orderLink === order)
+  }
+
+  // Keep the active ordering when the reader switches tags.
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-tag-filter] a')) {
+    const href = link.getAttribute('href')
+    if (href) link.setAttribute('href', order === 'oldest' ? `${href}?order=oldest` : href)
+  }
+}
+
 /**
- * Pagination and ordering live in the query string, so the list is fully server-rendered and this
- * script only reveals the current slice. Without JavaScript every post stays visible and the
- * pagination controls stay hidden.
+ * Ordering and pagination live in the query string, so the list is fully server-rendered and this
+ * script only reorders the posts and reveals the current slice. Listings without a pagination
+ * container (the tag page) still get the ordering. Without JavaScript every post stays visible in
+ * the server order and the pagination controls stay hidden.
  */
 export function setupBlogListing(): void {
   const setup = () => {
@@ -26,16 +39,12 @@ export function setupBlogListing(): void {
     if (!root || root.dataset.blogListingReady === 'true') return
 
     const list = root.querySelector<HTMLElement>('[data-blog-list]')
-    const pagination = root.querySelector<HTMLElement>('[data-blog-pagination]')
-    if (!list || !pagination) return
+    if (!list) return
 
     root.dataset.blogListingReady = 'true'
 
-    const pageSize = Number(root.dataset.pageSize) || 5
     const params = new URLSearchParams(window.location.search)
     const order = params.get('order') === 'oldest' ? 'oldest' : 'newest'
-    const requestedPage = Number.parseInt(params.get('page') ?? '1', 10)
-
     const posts = Array.from(list.querySelectorAll<HTMLElement>('[data-post]'))
     const orderedPosts =
       order === 'oldest'
@@ -43,6 +52,14 @@ export function setupBlogListing(): void {
         : posts
 
     for (const post of orderedPosts) list.append(post)
+
+    applyOrderState(order)
+
+    const pagination = root.querySelector<HTMLElement>('[data-blog-pagination]')
+    if (!pagination) return
+
+    const pageSize = Number(root.dataset.pageSize) || 5
+    const requestedPage = Number.parseInt(params.get('page') ?? '1', 10)
 
     const totalPages = Math.max(1, Math.ceil(orderedPosts.length / pageSize))
     const page = Number.isFinite(requestedPage)
@@ -102,16 +119,6 @@ export function setupBlogListing(): void {
     if (next) {
       next.href = pageHref(Math.min(totalPages, page + 1))
       next.hidden = page >= totalPages
-    }
-
-    for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-order-link]')) {
-      setLinkState(link, link.dataset.orderLink === order)
-    }
-
-    // Keep the active ordering when the reader switches tags.
-    for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-tag-filter] a')) {
-      const href = link.getAttribute('href')
-      if (href) link.setAttribute('href', order === 'oldest' ? `${href}?order=oldest` : href)
     }
 
     pagination.hidden = totalPages <= 1

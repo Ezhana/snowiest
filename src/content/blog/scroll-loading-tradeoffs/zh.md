@@ -4,7 +4,6 @@ description: '无限滚动改善了首屏体感，也带来了可发现性、可
 pubDate: '2026-09-18'
 tags:
   - engineering
-  - astro
 ---
 
 滚动加载看起来是一个纯前端问题，实际会影响内容结构、URL 和可访问性。
