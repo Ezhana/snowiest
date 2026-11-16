@@ -1,9 +1,10 @@
 ---
 import type { ImageMetadata } from 'astro'
 import { ClientRouter } from 'astro:transitions'
-import BaseHead from '../components/BaseHead.astro'
-import Footer from '../components/Footer.astro'
-import Header from '../components/Header.astro'
+import BaseHead from '../components/site/BaseHead.astro'
+import Footer from '../components/site/Footer.astro'
+import Header from '../components/site/Header.astro'
+import themeBootstrap from '../components/site/theme-bootstrap.js?raw'
 import { getLang, type Lang } from '../i18n/ui'
 
 interface Props {
@@ -21,8 +22,8 @@ const lang = getLang(Astro.currentLocale)
 
 /**
  * The document shell lives here exactly once: the Ezhana theme, the colour mode and the shared
- * chrome. `data-theme` is server-rendered; the stored preference is replayed by the inline script
- * below (using @ezhana/theme's storage contract) before first paint to avoid a flash.
+ * chrome. `data-theme` is server-rendered; the stored preference is replayed before first paint by
+ * `components/site/theme-bootstrap.js`, inlined through `?raw` to avoid a flash.
  *
  * `<ClientRouter />` enables Astro view transitions, including the shared-title morph between the
  * blog list and a post. Component scripts therefore run once and use `astro:page-load` for
@@ -40,28 +41,7 @@ const lang = getLang(Astro.currentLocale)
       alternates={alternates}
     />
     <ClientRouter />
-    <script is:inline>
-      // Mirror @ezhana/theme's persistence contract before the stylesheet paints.
-      try {
-        const stored = JSON.parse(localStorage.getItem('ezhana-theme') || 'null')
-        const legacyMode = localStorage.getItem('color-mode')
-
-        if (!stored && (legacyMode === 'light' || legacyMode === 'dark')) {
-          localStorage.setItem(
-            'ezhana-theme',
-            JSON.stringify({ theme: 'cerulean', mode: legacyMode }),
-          )
-          localStorage.removeItem('color-mode')
-          document.documentElement.dataset.colorMode = legacyMode
-        } else if (stored && typeof stored === 'object' && !Array.isArray(stored)) {
-          if (stored.mode === 'light' || stored.mode === 'dark') {
-            document.documentElement.dataset.colorMode = stored.mode
-          }
-        }
-      } catch {
-        // localStorage can be unavailable (private mode, blocked storage): follow the OS.
-      }
-    </script>
+    <script is:inline set:html={themeBootstrap}></script>
   </head>
   <body>
     <div
@@ -82,193 +62,9 @@ const lang = getLang(Astro.currentLocale)
     </div>
     <Footer />
     <script>
-      const getProgressRoot = () => document.querySelector<HTMLElement>('[data-page-progress]')
-      const getProgressBar = () => document.querySelector<HTMLElement>('[data-page-progress-bar]')
+      import { setupPageProgress } from '../components/site/page-progress'
 
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      const timers = new Set<number>()
-      let finished = false
-
-      const paint = (value: number) => {
-        const bar = getProgressBar()
-        if (bar) bar.style.transform = `scaleX(${value})`
-      }
-
-      const setOpacity = (value: string) => {
-        const root = getProgressRoot()
-        if (root) root.style.opacity = value
-      }
-
-      const schedule = (callback: () => void, delay: number) => {
-        const id = window.setTimeout(() => {
-          timers.delete(id)
-          callback()
-        }, delay)
-        timers.add(id)
-      }
-
-      const clearTimers = () => {
-        for (const id of timers) window.clearTimeout(id)
-        timers.clear()
-      }
-
-      /** Hide the bar and cancel pending progress work (page unload / bfcache restore). */
-      const reset = () => {
-        clearTimers()
-        const root = getProgressRoot()
-        const bar = getProgressBar()
-
-        if (root) {
-          root.style.transition = 'none'
-          root.style.opacity = '0'
-        }
-        if (bar) bar.style.transition = 'none'
-        paint(0)
-
-        window.requestAnimationFrame(() => {
-          const nextRoot = getProgressRoot()
-          const nextBar = getProgressBar()
-          if (nextRoot) nextRoot.style.transition = ''
-          if (nextBar) nextBar.style.transition = ''
-        })
-      }
-
-      const start = () => {
-        finished = false
-        clearTimers()
-        setOpacity('1')
-        paint(reduceMotion ? 0.6 : 0.15)
-
-        if (!reduceMotion) {
-          schedule(() => paint(0.65), 180)
-        }
-      }
-
-      const finish = () => {
-        if (finished) return
-        finished = true
-        paint(1)
-        schedule(
-          () => {
-            setOpacity('0')
-            schedule(() => paint(0), reduceMotion ? 0 : 300)
-          },
-          reduceMotion ? 0 : 200,
-        )
-      }
-
-      // Initial full-page load.
-      start()
-      if (document.readyState === 'complete') {
-        finish()
-      } else {
-        window.addEventListener('load', finish, { once: true })
-      }
-
-      // Client-side navigation via <ClientRouter />.
-      document.addEventListener('astro:before-preparation', start)
-      document.addEventListener('astro:page-load', finish)
-      document.addEventListener('astro:before-swap', (event) => {
-        // The router swaps <body>, not the <html> attributes: keep lang in sync with the
-        // incoming locale so screen readers and search engines see the correct language.
-        const nextLang = event.newDocument.documentElement.lang
-        if (nextLang) document.documentElement.lang = nextLang
-      })
-
-      // Full navigations (for example RSS/XML) and back-forward cache restores.
-      window.addEventListener('pagehide', reset)
-      window.addEventListener('pageshow', (event) => {
-        if (event.persisted) reset()
-      })
-    </script>
-    <script>
-      let timelineController: AbortController | null = null
-
-      /**
-       * Homepage timeline: reveal month groups as the bottom sentinel approaches the viewport.
-       * All groups are server-rendered (so the page works without JavaScript); extra groups are
-       * hidden once this script runs and revealed in batches on scroll or button activation.
-       */
-      const setupTimeline = () => {
-        const timeline = document.querySelector<HTMLElement>('[data-timeline]')
-
-        if (!timeline) {
-          timelineController?.abort()
-          timelineController = null
-          return
-        }
-
-        if (timeline.dataset.timelineReady === 'true') return
-
-        timelineController?.abort()
-        timelineController = new AbortController()
-        timeline.dataset.timelineReady = 'true'
-
-        const groups = Array.from(timeline.querySelectorAll<HTMLElement>('[data-timeline-group]'))
-        const sentinel = timeline.querySelector<HTMLButtonElement>('[data-timeline-sentinel]')
-        if (!sentinel) return
-
-        const INITIAL_GROUPS = 3
-        const BATCH_GROUPS = 2
-        const SENTINEL_MARGIN = 0
-
-        if (groups.length <= INITIAL_GROUPS) {
-          sentinel.hidden = true
-          return
-        }
-
-        sentinel.hidden = false
-        for (const group of groups.slice(INITIAL_GROUPS)) group.hidden = true
-
-        let visibleGroups = INITIAL_GROUPS
-        let loading = false
-
-        const hasMore = () => visibleGroups < groups.length
-        const nearSentinel = () =>
-          sentinel.getBoundingClientRect().top < window.innerHeight + SENTINEL_MARGIN
-
-        const loadMore = () => {
-          if (loading || !hasMore()) return
-          loading = true
-
-          window.setTimeout(() => {
-            const nextGroups = groups.slice(visibleGroups, visibleGroups + BATCH_GROUPS)
-            visibleGroups += nextGroups.length
-
-            for (const group of nextGroups) {
-              group.hidden = false
-              group.classList.add('animate-fade-up', 'motion-reduce:animate-none')
-            }
-
-            loading = false
-
-            if (!hasMore()) {
-              sentinel.hidden = true
-            } else {
-              window.requestAnimationFrame(maybeLoad)
-            }
-          }, 220)
-        }
-
-        const maybeLoad = () => {
-          if (!loading && hasMore() && nearSentinel()) loadMore()
-        }
-
-        sentinel.addEventListener('click', loadMore, {
-          signal: timelineController.signal,
-        })
-        window.addEventListener('scroll', maybeLoad, {
-          passive: true,
-          signal: timelineController.signal,
-        })
-        window.addEventListener('resize', maybeLoad, {
-          passive: true,
-          signal: timelineController.signal,
-        })
-      }
-
-      setupTimeline()
-      document.addEventListener('astro:page-load', setupTimeline)
+      setupPageProgress()
     </script>
   </body>
 </html>

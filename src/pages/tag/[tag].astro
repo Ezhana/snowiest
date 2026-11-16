@@ -1,5 +1,5 @@
 ---
-import BlogIndex from '../../components/BlogIndex.astro'
+import TagDetail from '../../components/tag/TagDetail.astro'
 import { TAG_DEFINITIONS, type TagId } from '../../lib/tags'
 
 export function getStaticPaths() {
@@ -13,4 +13,4 @@ interface Props {
 const { tag } = Astro.props
 ---
 
-<BlogIndex tag={tag} />
+<TagDetail tag={tag} />

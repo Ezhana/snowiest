@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import BlogPostList from '../blog/BlogPostList.astro'
+import BlogTagFilter from './BlogTagFilter.astro'
+import FriendLinkListing from '../friends/FriendLinkListing.astro'
+import { getBlogPosts } from '../../lib/blog'
+import { getFriendLinksByTag } from '../../lib/friends'
+import { getTagLabel, type TagId } from '../../lib/tags'
+import { getLang, useTranslations } from '../../i18n/ui'
+
+interface Props {
+  tag: TagId
+}
+
+const { tag } = Astro.props
+const lang = getLang(Astro.currentLocale)
+const t = useTranslations(lang)
+const tagLabel = getTagLabel(tag, lang)
+const posts = (await getBlogPosts(lang)).filter((post) => post.data.tags.includes(tag))
+const friends = getFriendLinksByTag(tag)
+
+const heading = `${t('blog.tagPrefix')}${tagLabel}`
+const title = `${heading} · ${t('site.title')}`
+---
+
+<BaseLayout title={title} description={title}>
+  <main class="mx-auto w-full max-w-180 px-4 py-12">
+    <h1 class="m-0 text-h1 font-bold text-fg-strong">{heading}</h1>
+    <div class="mt-4 mb-6">
+      <BlogTagFilter activeTag={tag} />
+    </div>
+    {posts.length > 0 ? (
+      <section>
+        <BlogPostList posts={posts} />
+      </section>
+    ) : (
+      <p class="m-0 text-small text-fg-muted">{t('tag.noPosts')}</p>
+    )}
+    {friends.length > 0 && (
+      <section class="mt-12 space-y-4" aria-labelledby="tag-friends-heading">
+        <h2 id="tag-friends-heading" class="m-0 text-h2 font-bold text-fg-strong">
+          {t('tag.friendsHeading')}
+        </h2>
+        <FriendLinkListing friends={friends} lang={lang} showTag={false} />
+      </section>
+    )}
+  </main>
+</BaseLayout>

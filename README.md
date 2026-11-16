@@ -30,9 +30,9 @@ pnpm preview    # 预览构建结果
 ├── public/                       # 静态资源
 ├── src/
 │   ├── assets/                   # 参与构建优化的图片
-│   ├── components/               # 页头、页脚、文章列表等组件
+│   ├── components/               # 按 feature 分目录：site/ blog/ timeline/ tag/ friends/
 │   ├── content/blog/             # Markdown / MDX 文章
-│   ├── lib/                      # 文章查询、标签与分页逻辑
+│   ├── lib/                      # 文章查询、标签数据与跨 feature 客户端工具
 │   ├── i18n/                     # 中英文案与路由
 │   ├── layouts/                  # 页面与文章布局
 │   ├── pages/                    # 路由（中文根路径 + /en 英文路由）

@@ -1,57 +1,27 @@
----
-import BaseLayout from '../layouts/BaseLayout.astro'
-import BlogListing from './BlogListing.astro'
-import { BLOG_PAGE_SIZE, getBlogPosts } from '../lib/blog'
-import { getTagLabel, type TagId } from '../lib/tags'
-import { getLang, useTranslations } from '../i18n/ui'
+import { onPageLoad } from '../../lib/runtime'
 
-interface Props {
-  tag?: TagId
+const setLinkState = (link: HTMLElement, active: boolean) => {
+  const classes = (value: string | undefined) => (value ?? '').split(/\s+/).filter(Boolean)
+  const activeClasses = classes(link.dataset.stateActive)
+  const inactiveClasses = classes(link.dataset.stateInactive)
+
+  link.classList.remove(...(active ? inactiveClasses : activeClasses))
+  link.classList.add(...(active ? activeClasses : inactiveClasses))
+
+  if (active) {
+    link.setAttribute('aria-current', 'page')
+  } else {
+    link.removeAttribute('aria-current')
+  }
 }
 
-const { tag } = Astro.props
-const lang = getLang(Astro.currentLocale)
-const t = useTranslations(lang)
-const posts = await getBlogPosts(lang)
-const visiblePosts = tag ? posts.filter((post) => post.data.tags.includes(tag)) : posts
-const totalPages = Math.max(1, Math.ceil(visiblePosts.length / BLOG_PAGE_SIZE))
-const basePath = tag ? `/tag/${tag}/` : '/blog/'
-
-const siteTitle = t('site.title')
-const title = tag
-  ? `${t('blog.tagPrefix')}${getTagLabel(tag, lang)} · ${siteTitle}`
-  : `${t('blog.title')} · ${siteTitle}`
-const description = tag
-  ? `${t('blog.tagPrefix')}${getTagLabel(tag, lang)} · ${siteTitle}`
-  : t('site.description')
----
-
-<BaseLayout title={title} description={description}>
-  <BlogListing posts={visiblePosts} tag={tag} basePath={basePath} totalPages={totalPages} />
-</BaseLayout>
-
-<script>
-  /**
-   * Pagination and ordering live in the query string, so the list is fully server-rendered and this
-   * script only reveals the current slice. Without JavaScript every post stays visible and the
-   * pagination controls stay hidden.
-   */
-  const setLinkState = (link: HTMLElement, active: boolean) => {
-    const classes = (value: string | undefined) => (value ?? '').split(/\s+/).filter(Boolean)
-    const activeClasses = classes(link.dataset.stateActive)
-    const inactiveClasses = classes(link.dataset.stateInactive)
-
-    link.classList.remove(...(active ? inactiveClasses : activeClasses))
-    link.classList.add(...(active ? activeClasses : inactiveClasses))
-
-    if (active) {
-      link.setAttribute('aria-current', 'page')
-    } else {
-      link.removeAttribute('aria-current')
-    }
-  }
-
-  const setupBlogListing = () => {
+/**
+ * Pagination and ordering live in the query string, so the list is fully server-rendered and this
+ * script only reveals the current slice. Without JavaScript every post stays visible and the
+ * pagination controls stay hidden.
+ */
+export function setupBlogListing(): void {
+  const setup = () => {
     const root = document.querySelector<HTMLElement>('[data-blog-listing]')
     if (!root || root.dataset.blogListingReady === 'true') return
 
@@ -147,6 +117,5 @@ const description = tag
     pagination.hidden = totalPages <= 1
   }
 
-  setupBlogListing()
-  document.addEventListener('astro:page-load', setupBlogListing)
-</script>
+  onPageLoad(setup)
+}

@@ -1,6 +1,7 @@
 ---
-import type { Lang } from '../i18n/ui'
-import { SITE_GITHUB_PROFILE_URL } from '../consts'
+import type { Lang } from '../../i18n/ui'
+import { SITE_GITHUB_PROFILE_URL } from '../../consts'
+import { FRIEND_LINKS } from '../../lib/friends'
 import FriendLinkListing from './FriendLinkListing.astro'
 
 interface Props {
@@ -33,7 +34,7 @@ const copy = {
     {copy.heading}
   </h2>
   <p>{copy.intro}</p>
-  <FriendLinkListing lang={lang} />
+  <FriendLinkListing friends={FRIEND_LINKS} lang={lang} />
   <p class="text-small text-fg-muted">
     {copy.exchange} <a href={SITE_GITHUB_PROFILE_URL}>{copy.exchangeLink}</a> {copy.exchangeTail}
   </p>

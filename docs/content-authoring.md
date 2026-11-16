@@ -77,14 +77,14 @@ lang: zh # 可选，默认 zh；英文译文写 en
 当前标签注册表在 `src/lib/tags.ts`：
 
 ```ts
-;(astro, design, engineering, writing, notes, life)
+;(astro, design, engineering, writing, notes, life, acgn, framework, code, wiki)
 ```
 
-新增标签需要同时修改注册表和文章 frontmatter，否则 schema 校验失败。标签会自动获得：
+新增标签需要同时修改注册表；文章 frontmatter 和友链的 `tag` 都必须引用已定义的 id。标签会自动获得：
 
 - `/tag/<tag>/` 标签页（全站命名空间，将来其他内容类型可以并入同一个标签页）；
-- `/tag/<tag>/?order=oldest` 时间顺序标签页；
-- `/tag/<tag>/?page=2` 等分页状态；
+- 标签页里该标签的全部文章（一次列出，不分页）；
+- `src/lib/friends.ts` 中 `tag` 与该标签相同的友链；
 - 博客列表的标签链接；
 - Footer 的完整标签列表。
 
@@ -92,13 +92,13 @@ lang: zh # 可选，默认 zh；英文译文写 en
 
 - 文章列表：`/blog/`，默认时间倒序。
 - 分页：`/blog/?page=2`；时间顺序：`/blog/?order=oldest`；两者组合：`/blog/?page=2&order=oldest`。
-- 标签：`/tag/design/`、`/tag/design/?order=oldest`、`/tag/design/?page=2`。
+- 标签：`/tag/design/`，列出该标签下的全部文章，并附带同标签的友链；标签页不参与分页和排序。
 - 英文对应路径加 `/en` 前缀：`/en/blog/?page=2`、`/en/tag/design/`。
 - 每页 5 篇，由 `src/lib/blog.ts` 的 `BLOG_PAGE_SIZE` 控制。
 
 分页和排序是 querystring，不是独立页面。GitHub Pages 是静态托管，构建时读不到 query，所以列表页会一次性渲染全部文章的元数据（标题、摘要、日期、标签、封面），由脚本按 query 只显示当前页；无 JavaScript 时所有文章都显示，分页控件隐藏。正文仍然只在 `/blog/<slug>/` 渲染。
 
-所有 query 状态的 canonical 都是各自的基础路径（`/blog/`、`/tag/<tag>/`），`?page=2` 不会作为独立页面被索引；文章本身仍通过列表 HTML、标签页、RSS 和 sitemap 被发现。
+所有 query 状态的 canonical 都是各自的基础路径（`/blog/`、`/tag/<tag>/`），`?page=2` 不会作为独立页面被索引；文章本身仍通过列表 HTML、标签页、RSS 和 sitemap 被发现。标签页忽略分页和排序参数。
 
 ## 正文规则
 
@@ -128,7 +128,7 @@ pnpm format:check
 构建会校验 frontmatter、标签 id、封面图片路径、目录名的 URL 规则，以及同一目录下同一语言只有一篇。发布前建议检查：
 
 - `/blog/`、`/blog/?page=2`、`/blog/?order=oldest`；
-- `/tag/<tag>/` 与 `/tag/<tag>/?order=oldest`；
+- `/tag/<tag>/`（文章列表与关联友链）；
 - `/en/blog/` 的英文界面；
 - 已翻译文章的 `/en/blog/<slug>/` 是否为英文，未翻译文章是否带原文提示；
 - 文章页的 canonical 与 hreflang 是否指向正确语言；

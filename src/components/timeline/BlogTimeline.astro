@@ -1,8 +1,9 @@
 ---
-import FormattedDate from './FormattedDate.astro'
-import { getLang, languageName, useTranslations } from '../i18n/ui'
-import { localeUrl } from '../i18n/routing'
-import { getBlogPosts, groupBlogPostsByMonth, postLang, postSlug } from '../lib/blog'
+import FormattedDate from '../blog/FormattedDate.astro'
+import { getLang, languageName, useTranslations } from '../../i18n/ui'
+import { localeUrl } from '../../i18n/routing'
+import { getBlogPosts, groupBlogPostsByMonth, postLang, postSlug } from '../../lib/blog'
+import { postTitleTransitionName } from '../../lib/view-transitions'
 
 const lang = getLang(Astro.currentLocale)
 const posts = await getBlogPosts(lang)
@@ -10,9 +11,6 @@ const months = groupBlogPostsByMonth(posts)
 const t = useTranslations(lang)
 const locale = lang === 'zh' ? 'zh-CN' : 'en-US'
 const monthFormatter = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long' })
-
-/** Shared view-transition name for the timeline title → article title morph. */
-const titleTransitionName = (slug: string) => `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g, '-')}`
 ---
 
 <section class="mt-12" aria-labelledby="timeline-heading">
@@ -48,7 +46,7 @@ const titleTransitionName = (slug: string) => `post-title-${slug.replace(/[^a-zA
                     href={localeUrl(lang, `/blog/${postSlug(post)}/`)}
                   >
                     <h3
-                      transition:name={titleTransitionName(postSlug(post))}
+                      transition:name={postTitleTransitionName(postSlug(post))}
                       class="m-0 text-body font-medium text-fg-strong transition-colors group-hover:text-accent"
                     >
                       {post.data.title}
@@ -84,3 +82,9 @@ const titleTransitionName = (slug: string) => `post-title-${slug.replace(/[^a-zA
     </div>
   </div>
 </section>
+
+<script>
+  import { setupTimeline } from './timeline'
+
+  setupTimeline()
+</script>

@@ -1,17 +1,20 @@
 ---
-import type { Lang } from '../i18n/ui.ts'
-import { FRIEND_LINKS } from '../lib/friends.ts'
-import { getTagLabel } from '../lib/tags.ts'
+import type { Lang } from '../../i18n/ui.ts'
+import type { FriendLink } from '../../lib/friends.ts'
+import { getTagLabel } from '../../lib/tags.ts'
 
 interface Props {
+  friends: readonly FriendLink[]
   lang: Lang
+  /** Hide the category marker where the surrounding context already scopes the list to one tag. */
+  showTag?: boolean
 }
 
-const { lang } = Astro.props
+const { friends, lang, showTag = true } = Astro.props
 ---
 
 <ul class="grid gap-3 sm:grid-cols-2">
-  {FRIEND_LINKS.map((friend) => (
+  {friends.map((friend) => (
     <li>
       <a
         href={friend.url}
@@ -31,7 +34,7 @@ const { lang } = Astro.props
               {friend.name}
             </span>
           </span>
-          {friend.tag && (
+          {showTag && friend.tag && (
             <span class="shrink-0 text-caption text-fg-muted">{getTagLabel(friend.tag, lang)}</span>
           )}
         </span>

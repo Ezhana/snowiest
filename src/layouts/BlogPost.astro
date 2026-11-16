@@ -2,11 +2,12 @@
 import type { ImageMetadata, MarkdownHeading } from 'astro'
 import { Image } from 'astro:assets'
 import BaseLayout from './BaseLayout.astro'
-import FormattedDate from '../components/FormattedDate.astro'
+import FormattedDate from '../components/blog/FormattedDate.astro'
 import TableOfContents from '../components/TableOfContents.astro'
 import { getLang, useTranslations, type Lang } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
 import type { BlogPost as BlogPostEntry } from '../lib/blog'
+import { postTitleTransitionName } from '../lib/view-transitions'
 import BackToTop from '../components/BackToTop.astro'
 
 interface Props {
@@ -53,7 +54,7 @@ const alternates: Partial<Record<Lang, string>> | undefined = !postPath
     ? { zh: postUrl('zh'), en: postUrl('en') }
     : {}
 
-const titleTransitionName = slug ? `post-title-${slug.replace(/[^a-zA-Z0-9_-]/g, '-')}` : undefined
+const titleTransitionName = slug ? postTitleTransitionName(slug) : undefined
 ---
 
 <BaseLayout

@@ -59,3 +59,8 @@ export const FRIEND_LINKS: readonly FriendLink[] = [
     tag: 'wiki',
   },
 ]
+
+/** Friend links carrying `tag`, in list order. */
+export function getFriendLinksByTag(tag: TagId): readonly FriendLink[] {
+  return FRIEND_LINKS.filter((friend) => friend.tag === tag)
+}
