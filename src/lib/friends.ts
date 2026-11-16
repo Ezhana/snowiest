@@ -2,11 +2,15 @@ import type { Lang } from '../i18n/ui'
 import { SITE_GITHUB_URL } from '../consts'
 import type { TagId } from './tags.ts'
 
+type AtLeastOneKeyRecord<K extends PropertyKey, V> = {
+  [P in K]: Record<P, V> & Partial<Record<Exclude<K, P>, V>>
+}[K]
+
 export interface FriendLink {
   name: string
   url: string
   /** One-line introduction shown under the name. */
-  description: Record<Lang, string>
+  description: AtLeastOneKeyRecord<Lang, string>
   /** Short label, used as a quiet category marker on the card. */
   tag?: TagId
 }
@@ -23,7 +27,6 @@ export const FRIEND_LINKS: readonly FriendLink[] = [
     name: 'Astro',
     url: 'https://astro.build/',
     description: {
-      zh: '本站的骨架。文档写得清楚，社区也很温和。',
       en: 'The skeleton of this site. Clear docs and a gentle community.',
     },
     tag: 'framework',

@@ -36,7 +36,7 @@ const { lang } = Astro.props
           )}
         </span>
         <span class="mt-2 text-small leading-relaxed text-fg-muted">
-          {friend.description[lang]}
+          {friend.description[lang] ?? Object.values(friend.description)[0]}
         </span>
       </a>
     </li>
