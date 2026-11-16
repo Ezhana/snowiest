@@ -5,7 +5,6 @@ pubDate: '2026-11-16'
 tags:
   - astro
   - engineering
-draft: true
 lang: zh
 ---
 
