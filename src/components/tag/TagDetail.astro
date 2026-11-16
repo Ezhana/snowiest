@@ -38,7 +38,7 @@ const title = `${heading} · ${t('site.title')}`
     )}
     {friends.length > 0 && (
       <section class="mt-12 space-y-4" aria-labelledby="tag-friends-heading">
-        <h2 id="tag-friends-heading" class="m-0 text-h2 font-bold text-fg-strong">
+        <h2 id="tag-friends-heading" class="text-h2 font-bold text-fg-strong">
           {t('tag.friendsHeading')}
         </h2>
         <FriendLinkListing friends={friends} lang={lang} showTag={false} />
