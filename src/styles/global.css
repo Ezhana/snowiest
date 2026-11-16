@@ -168,7 +168,28 @@
   html {
     min-height: 100%;
     background-color: var(--color-bg);
-    scroll-padding-top: 6rem;
+    /*
+     * Anchors must clear the sticky header. The header script measures its real height (two rows on
+     * phones, one from `md`, and shorter once scrolled) into `--header-height`; the fallbacks cover
+     * the no-JS and first-paint cases.
+     */
+    scroll-padding-top: calc(var(--header-height, 6rem) + 1rem);
+  }
+
+  @media (max-width: 767px) {
+    html {
+      scroll-padding-top: calc(var(--header-height, 7.5rem) + 1rem);
+    }
+  }
+
+  /*
+   * While the outline drawer is modal, the document behind it must not scroll. The controller
+   * measures the scrollbar width and exposes it as `--drawer-scrollbar-gap` so removing the
+   * scrollbar does not shift the sticky header or the reading column.
+   */
+  html.has-drawer-open {
+    overflow: hidden;
+    padding-right: var(--drawer-scrollbar-gap, 0px);
   }
 
   /*
@@ -217,6 +238,22 @@
  * - the about page redaction hides a sentence visually but keeps it in the accessibility tree.
  */
 @layer components {
+  /*
+   * Page entrance. Deliberately has no `animation-fill-mode`: the final keyframe equals the base
+   * styles, and a filled transform (even an identity matrix) would make this wrapper the containing
+   * block for `position: fixed` descendants forever. The post actions live inside the page now and
+   * rely on the viewport containing block after the entrance finishes.
+   */
+  .page-enter {
+    animation: fade-up 600ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-enter {
+      animation: none;
+    }
+  }
+
   .theme-mode-icon {
     grid-area: 1 / 1;
     opacity: 0;
@@ -312,6 +349,26 @@
     text-decoration-thickness: 2px;
   }
 
+  /*
+   * Outline drawer. The native <dialog> supplies the top layer and the backdrop; this layer owns
+   * only the scrim token and the open/close fade. Ezhana has no scrim token, so the veil is a mix
+   * of the semantic background: it fades the page toward the active colour mode instead of
+   * introducing a second palette. A stronger mix keeps the article from competing with the drawer.
+   */
+  [data-drawer]::backdrop {
+    background-color: color-mix(in oklab, var(--color-bg) 82%, transparent);
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  [data-drawer][data-state='open']::backdrop {
+    opacity: 1;
+  }
+
+  [data-drawer][data-state='closed']::backdrop {
+    opacity: 0;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .theme-mode-icon,
     [data-theme-mode] [data-mode-check],
@@ -323,6 +380,10 @@
     details[open] > [data-menu-panel],
     details.is-closing > [data-menu-panel] {
       animation: none;
+    }
+
+    [data-drawer]::backdrop {
+      transition: none;
     }
   }
 }

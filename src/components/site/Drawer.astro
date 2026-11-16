@@ -1,0 +1,79 @@
+---
+/**
+ * Side drawer built on the native <dialog> element.
+ *
+ * `showModal()` gives the drawer a top-layer panel, a real backdrop, background inertness, a focus
+ * trap, ESC handling and focus restoration. That is why the mask is `::backdrop` and not a separate
+ * element: a plain mask div would still need all of those behaviours hand-written.
+ *
+ * The dialog is a full-viewport transparent layer; the panel inside it is what slides. Clicks on
+ * the dialog itself (outside the panel) close the drawer. `drawer.ts` owns opening, closing,
+ * scroll locking, `aria-expanded`, breakpoint changes and ClientRouter cleanup.
+ *
+ * Placement is deliberately limited to `xl` and below by the caller: from `xl` up the article
+ * outline lives in the aside column.
+ */
+interface Props {
+  id: string
+  label: string
+  closeLabel: string
+  side?: 'start' | 'end'
+}
+
+const { id, label, closeLabel, side = 'start' } = Astro.props
+const isStart = side === 'start'
+const hasFooter = Astro.slots.has('footer')
+---
+
+<dialog
+  id={id}
+  data-drawer={id}
+  aria-labelledby={`${id}-title`}
+  class="group fixed inset-0 m-0 h-dvh w-full max-h-none max-w-none overflow-hidden overscroll-contain border-0 bg-transparent p-0 text-fg"
+>
+  <div
+    class:list={[
+      'absolute inset-y-0 flex w-[min(20rem,85vw)] flex-col border-border bg-surface shadow-xl transition-transform duration-300 ease-out motion-reduce:transition-none',
+      isStart ? 'start-0 border-e' : 'end-0 border-s',
+      isStart ? '-translate-x-full' : 'translate-x-full',
+      'group-data-[state=open]:translate-x-0',
+    ]}
+  >
+    <div class="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3">
+      <h2 id={`${id}-title`} class="m-0 text-small font-semibold text-fg-strong">
+        {label}
+      </h2>
+      <button
+        type="button"
+        data-drawer-close
+        class="inline-flex size-9 shrink-0 items-center justify-center rounded-control text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg-strong"
+        aria-label={closeLabel}
+        title={closeLabel}
+        autofocus
+      >
+        <svg
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M18 6 6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-3">
+      <slot />
+    </div>
+
+    {hasFooter && (
+      <div class="shrink-0 border-t border-border px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <slot name="footer" />
+      </div>
+    )}
+  </div>
+</dialog>

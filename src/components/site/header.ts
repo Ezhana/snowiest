@@ -13,6 +13,39 @@ export function setupSiteHeader(): void {
 
   const getHeader = () => document.querySelector<HTMLElement>('[data-site-header]')
 
+  /*
+   * The header is two rows on phones and one row from `md` up, and it shrinks once the page
+   * scrolls. Anchors need the real height, not a hard-coded `6rem`, so publish it as a custom
+   * property that `scroll-padding-top` reads. A ResizeObserver keeps it correct across the
+   * breakpoint, the scrolled state and late font loading.
+   */
+  let observedHeader: HTMLElement | null = null
+  const headerObserver = new ResizeObserver(() => {
+    const header = getHeader()
+    if (header) {
+      document.documentElement.style.setProperty(
+        '--header-height',
+        `${header.getBoundingClientRect().height}px`,
+      )
+    }
+  })
+
+  const observeHeader = () => {
+    const header = getHeader()
+    if (!header) return
+
+    if (observedHeader !== header) {
+      if (observedHeader) headerObserver.unobserve(observedHeader)
+      headerObserver.observe(header)
+      observedHeader = header
+    }
+
+    document.documentElement.style.setProperty(
+      '--header-height',
+      `${header.getBoundingClientRect().height}px`,
+    )
+  }
+
   const SCROLL_ENTER_THRESHOLD = 120
   const SCROLL_EXIT_THRESHOLD = 24
 
@@ -31,6 +64,7 @@ export function setupSiteHeader(): void {
   }
 
   const scrollController = new AbortController()
+  observeHeader()
   updateScrolledState()
   onScrollFrame(updateScrolledState, scrollController.signal)
 
@@ -125,6 +159,7 @@ export function setupSiteHeader(): void {
   // <ClientRouter /> keeps the document alive across navigations, so re-query the new header and
   // re-sync the mode buttons after every page load.
   onPageLoad(() => {
+    observeHeader()
     updateScrolledState()
     syncThemeButtons()
   })

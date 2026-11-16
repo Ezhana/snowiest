@@ -56,15 +56,28 @@ const lang = getLang(Astro.currentLocale)
         data-page-progress-bar
       ></div>
     </div>
-    <Header />
-    <div class="animate-fade-up motion-reduce:animate-none">
+    <Header>
+      <slot name="header-nav-start" slot="nav-start" />
+      <slot name="header-nav-end" slot="nav-end" />
+    </Header>
+    {/*
+      The outline drawer is a top-layer dialog and stays outside the entrance animation. The post
+      actions now live inside `main`; `page-enter` deliberately does not fill its final transform so
+      they regain the viewport as their fixed containing block once the entrance finishes.
+    */}
+    <slot name="page-overlays" />
+    <div class="page-enter motion-reduce:animate-none">
       <slot />
     </div>
     <Footer />
     <script>
       import { setupPageProgress } from '../components/site/page-progress'
+      import { setupDrawers } from '../components/site/drawer'
+      import { setupAnchorScroll } from '../lib/anchor-scroll'
 
       setupPageProgress()
+      setupDrawers()
+      setupAnchorScroll()
     </script>
   </body>
 </html>

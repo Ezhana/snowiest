@@ -1,0 +1,47 @@
+---
+/**
+ * Opens the post outline drawer. The same button has two presentations: a quiet icon in the phone
+ * header and a floating circle next to the reading column on tablet.
+ *
+ * The drawer controller wires it up by `data-drawer-trigger` / `aria-controls`; no script here.
+ */
+interface Props {
+  label: string
+  targetId: string
+  variant?: 'header' | 'floating'
+  className?: string
+}
+
+const { label, targetId, variant = 'header', className } = Astro.props
+const isFloating = variant === 'floating'
+---
+
+<button
+  type="button"
+  data-drawer-trigger={targetId}
+  aria-controls={targetId}
+  aria-haspopup="dialog"
+  aria-expanded="false"
+  aria-label={label}
+  title={label}
+  class:list={[
+    'pointer-events-auto inline-flex shrink-0 items-center justify-center transition-colors',
+    isFloating
+      ? 'size-11 rounded-pill border border-border bg-surface text-fg-muted shadow-sm hover:border-accent-border hover:bg-accent-subtle hover:text-accent'
+      : 'size-9 rounded-control text-fg-muted hover:bg-bg-subtle hover:text-fg-strong',
+    className,
+  ]}
+>
+  <svg
+    class={isFloating ? 'size-5' : 'size-4'}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
+  </svg>
+</button>

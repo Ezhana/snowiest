@@ -55,15 +55,24 @@ const themeOptions = [
           <span class="text-body font-bold tracking-tight">{t('site.title')}</span>
         </a>
 
-        <nav
-          aria-label={t('nav.primary')}
-          class="col-span-2 row-start-2 flex animate-fade-in items-center justify-center justify-self-center gap-1 [animation-delay:120ms] motion-reduce:animate-none md:col-span-1 md:col-start-2 md:row-start-1"
-        >
-          {navItems.map((item) => (
-            <HeaderLink href={item.href}>{item.label}</HeaderLink>
-          ))}
-        </nav>
+        <div class="col-span-2 row-start-2 grid grid-cols-[1fr_auto_1fr] animate-fade-in items-center gap-1 [animation-delay:120ms] motion-reduce:animate-none md:col-span-1 md:col-start-2 md:row-start-1 md:block">
+          <div class="justify-self-start md:hidden">
+            <slot name="nav-start" />
+          </div>
 
+          <nav
+            aria-label={t('nav.primary')}
+            class="flex items-center justify-center justify-self-center gap-1"
+          >
+            {navItems.map((item) => (
+              <HeaderLink href={item.href}>{item.label}</HeaderLink>
+            ))}
+          </nav>
+
+          <div class="justify-self-end md:hidden">
+            <slot name="nav-end" />
+          </div>
+        </div>
         <div class="col-start-2 row-start-1 flex animate-fade-in items-center justify-self-end gap-1 [animation-delay:180ms] motion-reduce:animate-none md:col-start-3">
           <details class="relative" data-menu data-language-menu>
             <summary

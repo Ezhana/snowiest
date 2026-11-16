@@ -32,6 +32,37 @@
   padding-block: 3rem 4rem;
 }
 
+/* The reading column is the anchor for the floating controls. */
+.post-column {
+  anchor-name: --post-column;
+}
+
+/*
+ * Post actions (outline trigger on tablet, back to top on tablet and desktop).
+ *
+ * The button's right edge sits 4.5rem outside the reading column's right edge. The fallback keeps
+ * the old centre/45rem arithmetic for browsers without Anchor Positioning; where it is supported,
+ * `--post-column` is the real column, so the offset is measured from the anchor instead of being
+ * reconstructed from the viewport. The `max(1rem, ...)` clamp keeps the button on screen when the
+ * column is too close to the edge (the 768–839px range).
+ *
+ * Phones do not use this container (the header carries the controls).
+ */
+.post-actions {
+  position: fixed;
+  right: max(1rem, calc((100% - 45rem) / 2 - 4.5rem));
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  z-index: 40;
+}
+
+@supports (position-anchor: --post-column) {
+  .post-actions {
+    position-anchor: --post-column;
+    /* In a `right` inset, `anchor(right)` is already measured from the containing block's right. */
+    right: max(1rem, calc(anchor(right) - 4.5rem));
+  }
+}
+
 /* Article hero: part of the reading column, not a full-bleed banner. The radius is Ezhana's
  * surface radius because this is app markup, not Markdown. */
 .article-hero {

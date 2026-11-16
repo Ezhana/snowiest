@@ -1,0 +1,26 @@
+---
+/**
+ * The text "back to top" entry. It is a plain anchor so it still works without JavaScript; the
+ * shared `data-scroll-to` handler upgrades the jump to a smooth scroll when JS is available.
+ *
+ * Kept separate from <TableOfContents /> so the aside, the drawer footer and the no-JS fallback can
+ * place it independently.
+ */
+interface Props {
+  label: string
+  className?: string
+}
+
+const { label, className } = Astro.props
+---
+
+<a
+  href="#page-top"
+  data-scroll-to
+  class:list={[
+    'inline-flex items-center gap-1.5 text-small text-fg-muted no-underline transition-colors hover:text-accent',
+    className,
+  ]}
+>
+  {label}
+</a>

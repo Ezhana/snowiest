@@ -4,37 +4,43 @@ import type { MarkdownHeading } from 'astro'
 interface Props {
   headings: MarkdownHeading[]
   label: string
-  /** Label for the "back to top" entry inside the outline and the button below it. */
-  topLabel: string
+  /** The drawer supplies its own title; the aside shows it above the list. */
+  showLabel?: boolean
+  /** Extra classes for the nav, e.g. `flex-1` when the parent bounds the scroll area. */
+  className?: string
+  /** Extra classes for each link, e.g. a larger tap target inside the drawer. */
+  linkClass?: string
+  /**
+   * Language of the headings. A fallback page renders another language's body while the UI chrome
+   * stays in the page locale, so the list must not inherit the chrome's language.
+   */
+  contentLang?: string
 }
 
-const { headings, label, topLabel } = Astro.props
+const { headings, label, showLabel = true, className, linkClass = '', contentLang } = Astro.props
 const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3)
 ---
 
 {toc.length > 0 && (
-  <nav aria-label={label} class="flex min-h-0 flex-col">
-    <p class="m-0 mb-3 shrink-0 text-small font-semibold text-fg-strong">{label}</p>
-    <ul class="m-0 min-h-0 flex-1 list-none space-y-2 overflow-y-auto overscroll-contain border-s border-border p-0 ps-4 pe-1 [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin]">
+  <nav aria-label={label} class:list={['flex min-h-0 flex-col', className]}>
+    {showLabel && <p class="m-0 mb-3 shrink-0 text-small font-semibold text-fg-strong">{label}</p>}
+    <ul
+      class="m-0 min-h-0 flex-1 list-none space-y-2 overflow-y-auto overscroll-contain border-s border-border p-0 ps-4 pe-1 [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin]"
+      lang={contentLang}
+    >
       {toc.map((heading) => (
         <li class:list={[heading.depth === 3 && 'ps-3']}>
           <a
             href={`#${heading.slug}`}
-            class="block text-small leading-snug text-fg-muted no-underline transition-colors hover:text-accent"
+            class:list={[
+              'block text-small leading-snug text-fg-muted no-underline transition-colors hover:text-accent',
+              linkClass,
+            ]}
           >
             {heading.text}
           </a>
         </li>
       ))}
     </ul>
-    <div class="mt-3 shrink-0">
-      <a
-        href="#page-top"
-        data-scroll-to-top
-        class="inline-flex items-center gap-1.5 text-small text-fg-muted no-underline transition-colors hover:text-accent"
-      >
-        {topLabel}
-      </a>
-    </div>
   </nav>
 )}

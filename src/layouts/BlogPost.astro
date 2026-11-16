@@ -3,6 +3,9 @@ import type { ImageMetadata, MarkdownHeading } from 'astro'
 import { Image } from 'astro:assets'
 import BaseLayout from './BaseLayout.astro'
 import FormattedDate from '../components/blog/FormattedDate.astro'
+import BackToTopLink from '../components/blog/BackToTopLink.astro'
+import TocTrigger from '../components/blog/TocTrigger.astro'
+import Drawer from '../components/site/Drawer.astro'
 import TableOfContents from '../components/TableOfContents.astro'
 import { getLang, useTranslations, type Lang } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
@@ -55,6 +58,9 @@ const alternates: Partial<Record<Lang, string>> | undefined = !postPath
     : {}
 
 const titleTransitionName = slug ? postTitleTransitionName(slug) : undefined
+
+const tocId = 'post-toc'
+const hasToc = headings.some((heading) => heading.depth === 2 || heading.depth === 3)
 ---
 
 <BaseLayout
@@ -64,8 +70,59 @@ const titleTransitionName = slug ? postTitleTransitionName(slug) : undefined
   canonical={canonical}
   alternates={alternates}
 >
+  <Fragment slot="header-nav-start">
+    {hasToc && <TocTrigger label={t('post.toc')} targetId={tocId} variant="header" />}
+  </Fragment>
+  <Fragment slot="header-nav-end">
+    <BackToTop label={t('post.backToTop')} variant="header" />
+  </Fragment>
+
+  {/*
+    The drawer is a top-layer dialog; it stays outside the fade-up wrapper. The floating post
+    actions now live inside `main` so they share the article's coordinate system.
+  */}
+  <Fragment slot="page-overlays">
+    {hasToc && (
+      <Drawer id={tocId} label={t('post.toc')} closeLabel={t('common.close')}>
+        <TableOfContents
+          headings={headings}
+          label={t('post.toc')}
+          showLabel={false}
+          className="flex-1"
+          linkClass="py-2"
+          contentLang={sourceLang}
+        />
+        <BackToTopLink slot="footer" label={t('post.backToTop')} className="py-2" />
+      </Drawer>
+    )}
+  </Fragment>
+
   <main id="page-top" class="mx-auto w-full max-w-[72rem] px-4 py-10 lg:py-14">
-    <div class="relative mx-auto w-full max-w-[45rem]">
+    <div class="post-column relative mx-auto w-full max-w-[45rem]">
+      {/*
+        The floating controls are part of main now. The fixed containing block is still the
+        transformed fade-up wrapper during the entrance animation; that known caveat is accepted.
+        Anchor Positioning replaces the viewport/column arithmetic: `--post-column` is the
+        article column, so `right` is measured from that anchor instead of guessing its centre.
+      */}
+      <div class="post-actions pointer-events-none hidden md:block">
+        <div class="relative flex flex-col items-end">
+          <BackToTop
+            label={t('post.backToTop')}
+            variant="floating"
+            className="absolute end-0 bottom-full mb-2 xl:mb-0"
+          />
+          {hasToc && (
+            <TocTrigger
+              label={t('post.toc')}
+              targetId={tocId}
+              variant="floating"
+              className="xl:hidden"
+            />
+          )}
+        </div>
+      </div>
+
       <article lang={sourceLang}>
         {heroImage && (
           <Image class="article-hero" width={1020} height={510} src={heroImage} alt="" />
@@ -94,19 +151,55 @@ const titleTransitionName = slug ? postTitleTransitionName(slug) : undefined
             {t(sourceLang === 'zh' ? 'post.fallbackFromZh' : 'post.fallbackFromEn')}
           </p>
         )}
+        {/*
+          No-JS fallback for the drawer. The triggers are buttons and do nothing without the
+          controller, so they are hidden here; desktop keeps the server-rendered aside outline.
+        */}
+        <noscript>
+          <style is:inline>
+            [data-drawer-trigger] {
+              display: none !important;
+            }
+          </style>
+          {hasToc && (
+            <details class="mb-8 rounded-panel border border-border bg-bg-subtle px-4 py-3 xl:hidden">
+              <summary
+                class="cursor-pointer text-small font-semibold text-fg-strong"
+                lang={currentLang}
+              >
+                {t('post.toc')}
+              </summary>
+              <div class="mt-3 flex max-h-[60dvh] min-h-0 flex-col">
+                <TableOfContents
+                  headings={headings}
+                  label={t('post.toc')}
+                  showLabel={false}
+                  className="flex-1"
+                  linkClass="py-2"
+                  contentLang={sourceLang}
+                />
+                <div class="mt-3 shrink-0" lang={currentLang}>
+                  <BackToTopLink label={t('post.backToTop')} className="py-2" />
+                </div>
+              </div>
+            </details>
+          )}
+        </noscript>
         {/* The editorial preset owns rendered prose only; the article shell above is app markup. */}
         <div class="ez-editorial">
           <slot />
         </div>
       </article>
       <aside class="absolute left-full top-0 ms-8 hidden h-full w-52 xl:block">
-        <div class="sticky top-24 flex h-[calc(100dvh-9rem)] max-h-full flex-col justify-between">
-          <TableOfContents
-            headings={headings}
-            label={t('post.toc')}
-            topLabel={t('post.backToTop')}
-          />
-          <BackToTop label={t('post.backToTop')} />
+        {/*
+          The rail is flush to the reading column: the outline and the back-to-top button share the
+          same left edge. The outline sits at the top with a max height of 80% of the viewport, so a
+          long outline scrolls instead of running into the button; the button stays fixed at the
+          bottom. The space between them is intentionally empty when the outline is short.
+        */}
+        <div class="sticky top-24 flex max-h-[calc(80dvh-6rem)] flex-col">
+          <TableOfContents headings={headings} label={t('post.toc')} contentLang={sourceLang} />
+          {hasToc && <BackToTopLink label={t('post.backToTop')} className="mt-3 shrink-0" />}
         </div>
       </aside>
     </div>
