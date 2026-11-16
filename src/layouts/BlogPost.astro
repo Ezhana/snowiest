@@ -9,7 +9,7 @@ import Drawer from '../components/site/Drawer.astro'
 import TableOfContents from '../components/TableOfContents.astro'
 import { getLang, useTranslations, type Lang } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
-import type { BlogPost as BlogPostEntry } from '../lib/blog'
+import type { BlogPostTranslations } from '../lib/blog'
 import { postTitleTransitionName } from '../lib/view-transitions'
 import BackToTop from '../components/BackToTop.astro'
 
@@ -23,8 +23,8 @@ interface Props {
   slug?: string
   /** Language of the rendered body (may differ from the page locale when untranslated). */
   langOfPost?: Lang
-  /** Existing language versions of this slug, when the caller resolved them. */
-  variants?: Partial<Record<Lang, BlogPostEntry>>
+  /** Existing language versions of this slug. */
+  translations?: BlogPostTranslations
   headings?: MarkdownHeading[]
 }
 
@@ -36,7 +36,7 @@ const {
   heroImage,
   slug,
   langOfPost,
-  variants,
+  translations,
   headings = [],
 } = Astro.props
 const currentLang = getLang(Astro.currentLocale)
@@ -46,7 +46,7 @@ const t = useTranslations(currentLang)
 
 const postPath = slug ? `/blog/${slug}/` : null
 const postUrl = (lang: Lang) => new URL(localeUrl(lang, postPath ?? '/'), Astro.site).toString()
-const hasTranslation = Boolean(variants?.zh && variants?.en)
+const hasTranslation = Boolean(translations?.zh && translations?.en)
 
 // A fallback page shows the other language's body, so point search engines at the URL where that
 // body actually lives instead of declaring two equivalents.

@@ -6,16 +6,21 @@ export const BLOG_PAGE_SIZE = 5
 
 export type BlogPost = CollectionEntry<'blog'>
 
+/** All existing language versions of one slug, keyed by language. */
+export type BlogPostTranslations = Partial<Record<Lang, BlogPost>>
+
+/** Publication-date order: `newest` sorts descending, `oldest` ascending. */
 export type BlogOrder = 'newest' | 'oldest'
+
+export interface BlogQueryOptions {
+  /** Defaults to `newest`. */
+  order?: BlogOrder
+}
 
 const BLOG_DIR_PREFIX = `${BLOG_CONTENT_DIR}/`
 
 /** A post folder is a URL: lowercase ASCII words joined by single hyphens. */
 const SLUG_SEGMENT = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
-
-interface GetBlogPostsOptions {
-  includeUnpublished?: boolean
-}
 
 /** Language declared in the post frontmatter. */
 export function postLang(post: BlogPost): Lang {
@@ -75,33 +80,47 @@ function assertPostConventions(posts: BlogPost[]): void {
   }
 }
 
-/** Posts that pass the draft / publish-date rules, in no particular order. */
-async function getVisiblePosts(options: GetBlogPostsOptions = {}): Promise<BlogPost[]> {
-  const includeUnpublished = options.includeUnpublished ?? import.meta.env.DEV
-  const now = Date.now()
-  const posts = await getCollection('blog')
-
-  const visible = posts.filter(
-    (post) => includeUnpublished || (!post.data.draft && post.data.pubDate.valueOf() <= now),
+function sortByPubDate(posts: BlogPost[], order: BlogOrder): BlogPost[] {
+  const direction = order === 'oldest' ? 1 : -1
+  return [...posts].sort(
+    (a, b) => direction * (a.data.pubDate.valueOf() - b.data.pubDate.valueOf()),
   )
+}
+
+/**
+ * Visibility is the shared read layer for every query below: development includes drafts and
+ * future posts, production excludes both, and convention violations fail the build.
+ */
+async function readVisibleBlogPosts(): Promise<BlogPost[]> {
+  const posts = await getCollection('blog')
+  const visible = import.meta.env.DEV
+    ? posts
+    : posts.filter((post) => !post.data.draft && post.data.pubDate.valueOf() <= Date.now())
+
   assertPostConventions(visible)
   return visible
 }
 
 /**
- * Posts for one language, newest first. Each slug yields exactly one post: its translation in
- * `lang` when one exists, otherwise the version in the other language, so a language never shows
- * an empty archive just because translations lag behind. Detect the fallback with
- * `postLang(post) !== lang`.
+ * Raw query layer: every visible post record in every language, one entry per language version.
+ * Translations are not paired and no per-language choice is made.
+ */
+export async function getAllBlogPosts(options: BlogQueryOptions = {}): Promise<BlogPost[]> {
+  return sortByPubDate(await readVisibleBlogPosts(), options.order ?? 'newest')
+}
+
+/**
+ * Language view: one post per slug, the version written in `lang` when it exists and the other
+ * language's version otherwise, so a language never shows an empty archive just because
+ * translations lag behind. Detect the fallback with `postLang(post) !== lang`.
  */
 export async function getBlogPosts(
   lang: Lang,
-  options: GetBlogPostsOptions = {},
+  options: BlogQueryOptions = {},
 ): Promise<BlogPost[]> {
-  const visible = await getVisiblePosts(options)
   const groups = new Map<string, BlogPost[]>()
 
-  for (const post of visible) {
+  for (const post of await readVisibleBlogPosts()) {
     const slug = postSlug(post)
     const group = groups.get(slug)
     if (group) {
@@ -111,21 +130,26 @@ export async function getBlogPosts(
     }
   }
 
-  return [...groups.values()]
-    .map((group) => group.find((post) => postLang(post) === lang) ?? group[0])
-    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  const view = [...groups.values()].map(
+    (group) => group.find((post) => postLang(post) === lang) ?? group[0],
+  )
+
+  return sortByPubDate(view, options.order ?? 'newest')
 }
 
-/** All language versions of one slug, keyed by language. Missing languages are absent. */
-export async function getPostVariants(
-  slug: string,
-  options: GetBlogPostsOptions = {},
-): Promise<Partial<Record<Lang, BlogPost>>> {
-  const posts = (await getVisiblePosts(options)).filter((post) => postSlug(post) === slug)
-  const variants: Partial<Record<Lang, BlogPost>> = {}
+/** Exact language version of `slug`; `undefined` when that language has no version. */
+export async function getBlogPostBySlug(slug: string, lang: Lang): Promise<BlogPost | undefined> {
+  const posts = await readVisibleBlogPosts()
+  return posts.find((post) => postSlug(post) === slug && postLang(post) === lang)
+}
 
-  for (const post of posts) variants[postLang(post)] = post
-  return variants
+/** Every existing language version of `slug`, keyed by language. Missing languages are absent. */
+export async function getBlogPostTranslations(slug: string): Promise<BlogPostTranslations> {
+  const posts = (await readVisibleBlogPosts()).filter((post) => postSlug(post) === slug)
+  const translations: BlogPostTranslations = {}
+
+  for (const post of posts) translations[postLang(post)] = post
+  return translations
 }
 
 export interface BlogMonthGroup {

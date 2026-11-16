@@ -3,8 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro'
 import BlogPostList from '../blog/BlogPostList.astro'
 import BlogTagFilter from './BlogTagFilter.astro'
 import FriendLinkListing from '../friends/FriendLinkListing.astro'
-import { getBlogPosts } from '../../lib/blog'
-import { getFriendLinksByTag } from '../../lib/friends'
+import { getTagResources } from '../../lib/tag-resources'
 import { getTagLabel, type TagId } from '../../lib/tags'
 import { getLang, useTranslations } from '../../i18n/ui'
 
@@ -16,8 +15,7 @@ const { tag } = Astro.props
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
 const tagLabel = getTagLabel(tag, lang)
-const posts = (await getBlogPosts(lang)).filter((post) => post.data.tags.includes(tag))
-const friends = getFriendLinksByTag(tag)
+const { posts, friends } = await getTagResources(tag, lang)
 
 const heading = `${t('blog.tagPrefix')}${tagLabel}`
 const title = `${heading} · ${t('site.title')}`

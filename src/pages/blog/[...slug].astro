@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry, render } from 'astro:content'
 import BlogPost from '../../layouts/BlogPost.astro'
-import { getBlogPosts, getPostVariants, postLang, postSlug } from '../../lib/blog'
+import { getBlogPostTranslations, getBlogPosts, postLang, postSlug } from '../../lib/blog'
 
 export async function getStaticPaths() {
   const posts = await getBlogPosts('zh')
@@ -15,7 +15,7 @@ type Props = CollectionEntry<'blog'>
 
 const post = Astro.props
 const slug = postSlug(post)
-const variants = await getPostVariants(slug)
+const translations = await getBlogPostTranslations(slug)
 const { Content, headings } = await render(post)
 ---
 
@@ -23,7 +23,7 @@ const { Content, headings } = await render(post)
   {...post.data}
   slug={slug}
   langOfPost={postLang(post)}
-  variants={variants}
+  translations={translations}
   headings={headings}
 >
   <Content />
