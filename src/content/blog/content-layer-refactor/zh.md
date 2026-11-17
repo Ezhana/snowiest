@@ -1,7 +1,7 @@
 ---
 title: '把友链、动态和标签搬进 content 之后'
 description: '从一份写死的友链数组开始，把内容类型、标签数据和命令行入口收进同一层，再补上动态页、无限滚动和时间排序。'
-pubDate: '2026-11-17'
+pubDate: '2026-7-17'
 tags:
   - engineering
   - design

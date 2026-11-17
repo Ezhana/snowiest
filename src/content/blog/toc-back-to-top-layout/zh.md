@@ -1,7 +1,7 @@
 ---
 title: '目录、回顶和两套坐标'
 description: '右侧目录和回顶按钮原本各用一套坐标定位。把按钮放进 main，再用 Anchor Positioning 锚定正文列之后，布局才回到一个模型里。'
-pubDate: '2026-11-16'
+pubDate: '2026-10-16'
 tags:
   - engineering
   - design
