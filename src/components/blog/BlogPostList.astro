@@ -1,10 +1,11 @@
 ---
 import { Image } from 'astro:assets'
-import FormattedDate from './FormattedDate.astro'
+import DateTime from '../site/DateTime.astro'
+import OriginalLanguage from '../site/OriginalLanguage.astro'
+import Tag from '../tag/Tag.astro'
 import { postLang, postSlug, type BlogPost } from '../../lib/blog'
-import { getTagLabel, type TagId } from '../../lib/tags'
 import { postTitleTransitionName } from '../../lib/view-transitions'
-import { getLang, languageName, useTranslations } from '../../i18n/ui'
+import { getLang } from '../../i18n/ui'
 import { localeUrl } from '../../i18n/routing'
 
 interface Props {
@@ -13,10 +14,8 @@ interface Props {
 
 const { posts } = Astro.props
 const lang = getLang(Astro.currentLocale)
-const t = useTranslations(lang)
 
 const postHref = (post: BlogPost) => localeUrl(lang, `/blog/${postSlug(post)}/`)
-const tagHref = (id: TagId) => localeUrl(lang, `/tag/${id}/`)
 ---
 
 <ul data-blog-list class="m-0 list-none p-0">
@@ -37,23 +36,10 @@ const tagHref = (id: TagId) => localeUrl(lang, `/tag/${id}/`)
           </h2>
           <p class="mt-2 line-clamp-2 text-body text-fg-muted">{post.data.description}</p>
           <div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-small text-fg-muted">
-            <FormattedDate date={post.data.pubDate} />
-            {postLang(post) !== lang && (
-              <span
-                class="rounded-pill border border-border px-2 py-0.5 text-caption text-fg-muted"
-                title={t('blog.originalLanguage')}
-              >
-                {languageName(postLang(post), lang)}
-              </span>
-            )}
-            {post.data.tags.length > 0 && <span aria-hidden="true">·</span>}
+            <DateTime date={post.data.pubDate} />
+            <OriginalLanguage lang={postLang(post)} />
             {post.data.tags.map((tagId) => (
-              <a
-                class="text-fg-muted transition-colors hover:text-accent hover:underline"
-                href={tagHref(tagId)}
-              >
-                #{getTagLabel(tagId, lang)}
-              </a>
+              <Tag tag={tagId} lang={lang} interactive />
             ))}
           </div>
         </div>

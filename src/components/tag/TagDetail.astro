@@ -4,6 +4,7 @@ import BlogPostList from '../blog/BlogPostList.astro'
 import BlogTagFilter from './BlogTagFilter.astro'
 import LinkListing from '../links/LinkListing.astro'
 import MomentCard from '../moments/MomentCard.astro'
+import Tag from './Tag.astro'
 import { renderMoments } from '../../lib/moments'
 import { getTagResources } from '../../lib/tag-resources'
 import { getTagLabel, type TagId } from '../../lib/tags'
@@ -20,13 +21,15 @@ const tagLabel = getTagLabel(tag, lang)
 const { posts, links, moments } = await getTagResources(tag, lang)
 const renderedMoments = await renderMoments(moments)
 
-const heading = `${t('blog.tagPrefix')}${tagLabel}`
+const heading = `#${tagLabel}`
 const title = `${heading} · ${t('site.title')}`
 ---
 
 <BaseLayout title={title} description={title}>
   <main class="mx-auto w-full max-w-180 px-4 py-12">
-    <h1 class="m-0 text-h1 font-bold text-fg-strong">{heading}</h1>
+    <h1 class="m-0 text-h1 font-bold text-fg-strong">
+      <Tag tag={tag} lang={lang} />
+    </h1>
     <div class="mt-4 mb-6">
       <BlogTagFilter activeTag={tag} />
     </div>

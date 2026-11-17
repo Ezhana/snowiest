@@ -1,7 +1,7 @@
 ---
 import type { Lang } from '../../i18n/ui'
 import { linkDescription, linkName, type Link } from '../../lib/links'
-import { getTagLabel } from '../../lib/tags'
+import Tag from '../tag/Tag.astro'
 
 interface Props {
   links: readonly Link[]
@@ -39,7 +39,7 @@ const { links, lang, showTag = true } = Astro.props
             </span>
             {showTag && link.data.tag && (
               <span class="shrink-0 text-caption text-fg-muted">
-                {getTagLabel(link.data.tag, lang)}
+                <Tag tag={link.data.tag} lang={lang} />
               </span>
             )}
           </span>

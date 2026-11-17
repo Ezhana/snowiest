@@ -41,6 +41,10 @@ const copy = {
     {links.length > 0 && <LinkListing links={links} lang={lang} />}
   </div>
   <p class="text-small text-fg-muted">
-    {copy.exchange} <a class="copy-link" href={SITE_GITHUB_PROFILE_URL}>{copy.exchangeLink}</a> {copy.exchangeTail}
+    {copy.exchange}{' '}
+    <a class="copy-link" href={SITE_GITHUB_PROFILE_URL}>
+      {copy.exchangeLink}
+    </a>{' '}
+    {copy.exchangeTail}
   </p>
 </section>

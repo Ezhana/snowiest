@@ -1,0 +1,35 @@
+---
+/**
+ * The single date/time renderer for the site. It owns locale selection and the format presets, so
+ * callers only say which kind of date they are showing. `tabular` switches to tabular numerals for
+ * the moment feed, where timestamps line up in a column.
+ */
+import { getLang } from '../../i18n/ui'
+
+type DateTimeFormat = 'date' | 'datetime' | 'month'
+
+interface Props {
+  date: Date
+  /** `date` for metadata, `datetime` for moments, `month` for timeline group labels. */
+  format?: DateTimeFormat
+  /** Use tabular numerals; the moment feed opts in. */
+  tabular?: boolean
+  className?: string
+}
+
+const { date, format = 'date', tabular = false, className } = Astro.props
+const locale = getLang(Astro.currentLocale) === 'zh' ? 'zh-CN' : 'en-US'
+const options: Record<DateTimeFormat, Intl.DateTimeFormatOptions> = {
+  date: { year: 'numeric', month: 'short', day: 'numeric' },
+  datetime: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' },
+  month: { year: 'numeric', month: 'long' },
+}
+const formatter = new Intl.DateTimeFormat(locale, options[format])
+---
+
+<time
+  datetime={date.toISOString()}
+  class:list={['whitespace-nowrap', tabular && 'tabular-nums', className]}
+>
+  {formatter.format(date)}
+</time>

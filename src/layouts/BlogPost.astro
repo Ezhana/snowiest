@@ -2,7 +2,7 @@
 import type { ImageMetadata, MarkdownHeading } from 'astro'
 import { Image } from 'astro:assets'
 import BaseLayout from './BaseLayout.astro'
-import FormattedDate from '../components/blog/FormattedDate.astro'
+import DateTime from '../components/site/DateTime.astro'
 import BackToTopLink from '../components/blog/BackToTopLink.astro'
 import TocTrigger from '../components/blog/TocTrigger.astro'
 import Drawer from '../components/site/Drawer.astro'
@@ -130,10 +130,10 @@ const hasToc = headings.some((heading) => heading.depth === 2 || heading.depth =
         <header class="article-header">
           {(pubDate || updatedDate) && (
             <p class="article-meta">
-              {pubDate && <FormattedDate date={pubDate} />}
+              {pubDate && <DateTime date={pubDate} />}
               {updatedDate && (
                 <span class="article-updated">
-                  {t('post.updated')} <FormattedDate date={updatedDate} />
+                  {t('post.updated')} <DateTime date={updatedDate} />
                 </span>
               )}
             </p>

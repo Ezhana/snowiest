@@ -1,7 +1,9 @@
 ---
-import { getLang, languageName, useTranslations } from '../../i18n/ui'
+import { getLang } from '../../i18n/ui'
 import { momentDate, type Moment } from '../../lib/moments'
-import { getTagLabel } from '../../lib/tags'
+import Tag from '../tag/Tag.astro'
+import DateTime from '../site/DateTime.astro'
+import OriginalLanguage from '../site/OriginalLanguage.astro'
 
 interface Props {
   moment: Moment
@@ -11,16 +13,7 @@ interface Props {
 
 const { moment, showTags = true } = Astro.props
 const lang = getLang(Astro.currentLocale)
-const t = useTranslations(lang)
-const locale = lang === 'zh' ? 'zh-CN' : 'en-US'
 const date = momentDate(moment)
-const dateFormatter = new Intl.DateTimeFormat(locale, {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-})
 ---
 
 <article class="rounded-panel border border-border/70 bg-surface p-5">
@@ -28,24 +21,14 @@ const dateFormatter = new Intl.DateTimeFormat(locale, {
     <slot />
   </div>
   <footer class="mt-4 flex flex-wrap items-center gap-2 text-caption text-fg-muted">
-    <time datetime={date.toISOString()} class="tabular-nums">
-      {dateFormatter.format(date)}
-    </time>
-    {moment.data.lang !== lang && (
-      <span
-        class="before:content-['·'] before:mr-1.5 before:inline-block"
-        title={t('moment.language')}
-      >
-        {languageName(moment.data.lang, lang)}
-      </span>
-    )}
-    <div class="ms-auto flex gap-2">
-      {showTags &&
-        moment.data.tags.map((tagId) => (
-          <span class="before:content-['#'] before:mr-0.5 before:inline-block">
-          {getTagLabel(tagId, lang)}
-        </span>
+    <DateTime date={date} format="datetime" tabular />
+    <OriginalLanguage lang={moment.data.lang} />
+    {showTags && moment.data.tags.length > 0 && (
+      <div class="ms-auto flex flex-wrap items-center justify-end gap-2">
+        {moment.data.tags.map((tagId) => (
+          <Tag tag={tagId} lang={lang} />
         ))}
-    </div>
+      </div>
+    )}
   </footer>
 </article>

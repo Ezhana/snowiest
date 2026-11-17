@@ -1,8 +1,9 @@
 ---
 import type { TagId } from '../../lib/tags'
-import { TAG_DEFINITIONS, getTagLabel } from '../../lib/tags'
+import { TAG_DEFINITIONS } from '../../lib/tags'
 import { getLang, useTranslations } from '../../i18n/ui'
 import { localeUrl } from '../../i18n/routing'
+import Tag from './Tag.astro'
 
 interface Props {
   activeTag?: TagId
@@ -15,7 +16,8 @@ const t = useTranslations(lang)
 const allHref = localeUrl(lang, '/blog/')
 const tagHref = (tag: TagId) => localeUrl(lang, `/tag/${tag}/`)
 
-const chipClass = 'rounded-pill border px-3 py-1 text-small no-underline transition-colors'
+const chipClass =
+  'inline-flex items-center rounded-pill border px-3 py-1 text-small no-underline transition-colors'
 ---
 
 <nav data-tag-filter aria-label={t('blog.tagsLabel')} class="flex flex-wrap items-center gap-2">
@@ -42,7 +44,7 @@ const chipClass = 'rounded-pill border px-3 py-1 text-small no-underline transit
           : 'border-border text-fg-muted hover:bg-bg-subtle hover:text-fg-strong active:text-accent',
       ]}
     >
-      {getTagLabel(tag.id, lang)}
+      <Tag tag={tag.id} lang={lang} />
     </a>
   ))}
 </nav>

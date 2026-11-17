@@ -1,6 +1,8 @@
 ---
-import FormattedDate from '../blog/FormattedDate.astro'
-import { getLang, languageName, useTranslations } from '../../i18n/ui'
+import DateTime from '../site/DateTime.astro'
+import OriginalLanguage from '../site/OriginalLanguage.astro'
+import Tag from '../tag/Tag.astro'
+import { getLang, useTranslations } from '../../i18n/ui'
 import { localeUrl } from '../../i18n/routing'
 import { getBlogPosts, groupBlogPostsByMonth, postLang, postSlug } from '../../lib/blog'
 import { postTitleTransitionName } from '../../lib/view-transitions'
@@ -9,8 +11,6 @@ const lang = getLang(Astro.currentLocale)
 const posts = await getBlogPosts(lang)
 const months = groupBlogPostsByMonth(posts)
 const t = useTranslations(lang)
-const locale = lang === 'zh' ? 'zh-CN' : 'en-US'
-const monthFormatter = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long' })
 ---
 
 <section class="mt-12" aria-labelledby="timeline-heading">
@@ -36,7 +36,7 @@ const monthFormatter = new Intl.DateTimeFormat(locale, { year: 'numeric', month:
             ]}
           >
             <p class="m-0 text-small font-semibold text-fg-strong">
-              {monthFormatter.format(month.date)}
+              <DateTime date={month.date} format="month" />
             </p>
             <ul class="m-0 mt-3 list-none p-0">
               {month.posts.map((post) => (
@@ -51,18 +51,19 @@ const monthFormatter = new Intl.DateTimeFormat(locale, { year: 'numeric', month:
                     >
                       {post.data.title}
                     </h3>
-                    <p class="mt-1 text-small text-fg-muted">
-                      <FormattedDate date={post.data.pubDate} />
-                      {postLang(post) !== lang && (
-                        <span
-                          title={t('blog.originalLanguage')}
-                          class="before:content-['·'] before:mx-1 before:inline-block"
-                        >
-                          {languageName(postLang(post), lang)}
-                        </span>
-                      )}
-                    </p>
                   </a>
+                  <p
+                    class:list={[
+                      'mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-small text-fg-muted',
+                      index % 2 === 0 ? 'md:justify-start' : 'md:justify-end',
+                    ]}
+                  >
+                    <DateTime date={post.data.pubDate} />
+                    <OriginalLanguage lang={postLang(post)} />
+                    {post.data.tags.map((tagId) => (
+                      <Tag tag={tagId} lang={lang} />
+                    ))}
+                  </p>
                 </li>
               ))}
             </ul>

@@ -1,0 +1,41 @@
+---
+/**
+ * One tag label. This is the only place that owns the `#` marker and the tag-page URL, so every
+ * tag on the site reads the same.
+ *
+ * `interactive` renders a locale-aware link to `/tag/<id>/`; the timeline, moment cards, tag
+ * filters and link category markers use the plain-text form.
+ */
+import { getLang, type Lang } from '../../i18n/ui'
+import { localeUrl } from '../../i18n/routing'
+import { getTagLabel, type TagId } from '../../lib/tags'
+
+interface Props {
+  tag: TagId
+  /** Defaults to the page locale. */
+  lang?: Lang
+  /** Link to the tag page instead of rendering plain text. */
+  interactive?: boolean
+  className?: string
+}
+
+const { tag, lang = getLang(Astro.currentLocale), interactive = false, className } = Astro.props
+const label = getTagLabel(tag, lang)
+const href = localeUrl(lang, `/tag/${tag}/`)
+---
+
+{interactive ? (
+  <a
+    href={href}
+    class:list={[
+      "before:content-['#'] inline-block whitespace-nowrap text-fg-muted no-underline transition-colors hover:text-accent hover:underline",
+      className,
+    ]}
+  >
+    {label}
+  </a>
+) : (
+  <span class:list={["before:content-['#'] inline-block whitespace-nowrap", className]}>
+    {label}
+  </span>
+)}

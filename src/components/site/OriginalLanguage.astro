@@ -1,0 +1,28 @@
+---
+/**
+ * Marks content that is rendered in its original language because the page locale has no
+ * translation. The marker is always `·Language` (for example `·Chinese`), never a pill, and it
+ * renders nothing when the content already matches the page locale.
+ */
+import { getLang, languageName, useTranslations, type Lang } from '../../i18n/ui'
+
+interface Props {
+  /** Language the content was written in. */
+  lang: Lang
+  /** Page locale; defaults to the current locale. */
+  uiLang?: Lang
+  className?: string
+}
+
+const { lang, uiLang = getLang(Astro.currentLocale), className } = Astro.props
+const t = useTranslations(uiLang)
+---
+
+{lang !== uiLang && (
+  <span
+    class:list={["before:content-['·'] before:me-1 inline-block whitespace-nowrap", className]}
+    title={t('content.originalLanguage')}
+  >
+    {languageName(lang, uiLang)}
+  </span>
+)}
