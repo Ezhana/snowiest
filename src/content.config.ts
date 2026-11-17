@@ -63,6 +63,9 @@ const links = defineCollection({
     // still worth listing.
     description: localizedText.optional(),
     tag: z.enum(TAG_IDS).optional(),
+    // Optional square icon (absolute URL). Listings fall back to the name's initial when the
+    // link has none.
+    icon: z.url().optional(),
   }),
 })
 

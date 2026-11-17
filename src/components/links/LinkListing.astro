@@ -27,12 +27,24 @@ const { links, lang, showTag = true } = Astro.props
         >
           <span class="flex items-center justify-between gap-3">
             <span class="flex min-w-0 items-center gap-2.5">
-              <span
-                class="grid size-8 shrink-0 place-items-center rounded-control bg-accent-subtle text-small font-semibold text-accent"
-                aria-hidden="true"
-              >
-                {name.slice(0, 1)}
-              </span>
+              {link.data.icon ? (
+                <img
+                  src={link.data.icon}
+                  alt=""
+                  width="32"
+                  height="32"
+                  loading="lazy"
+                  decoding="async"
+                  class="size-8 shrink-0 rounded-control bg-accent-subtle object-cover"
+                />
+              ) : (
+                <span
+                  class="grid size-8 shrink-0 place-items-center rounded-control bg-accent-subtle text-small font-semibold text-accent"
+                  aria-hidden="true"
+                >
+                  {name.slice(0, 1)}
+                </span>
+              )}
               <span class="truncate font-semibold text-fg-strong transition-colors group-hover:text-accent">
                 {name}
               </span>

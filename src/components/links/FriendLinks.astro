@@ -1,7 +1,7 @@
 ---
 import type { Lang } from '../../i18n/ui'
 import { SITE_GITHUB_PROFILE_URL } from '../../consts'
-import { getLinks } from '../../lib/links'
+import { getLinks, linkDescription, linkName } from '../../lib/links'
 import LinkListing from './LinkListing.astro'
 
 interface Props {
@@ -9,7 +9,29 @@ interface Props {
 }
 
 const { lang } = Astro.props
-const links = await getLinks()
+
+/**
+ * The friend links shown on the About page, in display order. The links collection also holds
+ * tools and references, which stay reachable from tag pages but do not belong in this section.
+ * A slug with no matching entry fails the build instead of silently dropping a friend.
+ */
+const FRIEND_LINK_SLUGS = ['bangumi', 'moegirl', 'bilibili']
+
+/** The site's own link, rendered at the end of the section as reference for link exchanges. */
+const SELF_LINK_SLUG = 'snowiest'
+
+const allLinks = await getLinks()
+
+function findLink(slug: string) {
+  const link = allLinks.find((candidate) => candidate.data.slug === slug)
+  if (!link) throw new Error(`Link "${slug}" is not defined in the links collection.`)
+  return link
+}
+
+const links = FRIEND_LINK_SLUGS.map(findLink)
+const selfLink = findLink(SELF_LINK_SLUG)
+const selfName = linkName(selfLink, lang)
+const selfDescription = linkDescription(selfLink, lang)
 
 const copy = {
   zh: {
@@ -19,6 +41,12 @@ const copy = {
     exchange: '互通有无？来',
     exchangeLink: 'GitHub',
     exchangeTail: '找我，带上链接和一句介绍。',
+    selfLabel: '本站信息',
+    selfNote: '交换友链时可直接引用以下信息。',
+    selfNameLabel: '名称：',
+    selfIconLabel: '图标：',
+    selfLinkLabel: '链接：',
+    selfDescriptionLabel: '介绍：',
   },
   en: {
     heading: 'FriendLinks',
@@ -27,6 +55,12 @@ const copy = {
     exchange: 'Have a place worth listing? Find me on',
     exchangeLink: 'GitHub',
     exchangeTail: 'with a link and a one-line intro.',
+    selfLabel: 'This site',
+    selfNote: 'These details can be quoted directly when exchanging links.',
+    selfNameLabel: 'Name:',
+    selfIconLabel: 'Icon:',
+    selfLinkLabel: 'Link:',
+    selfDescriptionLabel: 'Intro:',
   },
 }[lang]
 ---
@@ -47,4 +81,37 @@ const copy = {
     </a>{' '}
     {copy.exchangeTail}
   </p>
+  <aside
+    class="rounded-surface border border-border bg-bg-subtle p-4"
+    aria-labelledby="self-link-heading"
+  >
+    <h3 id="self-link-heading" class="text-small font-semibold text-fg-strong">
+      {copy.selfLabel}
+    </h3>
+    <p class="mt-1 text-small text-fg-muted">{copy.selfNote}</p>
+    <dl class="mt-2 space-y-1 text-small">
+      <div class="flex items-start gap-1">
+        <dt class="shrink-0 text-fg-muted">{copy.selfNameLabel}</dt>
+        <dd class="font-semibold text-fg-strong">{selfName}</dd>
+      </div>
+      <div class="flex items-center gap-1">
+        <dt class="shrink-0 text-fg-muted">{copy.selfIconLabel}</dt>
+        <dd>
+          {selfLink.data.icon}
+        </dd>
+      </div>
+      <div class="flex items-start gap-1">
+        <dt class="shrink-0 text-fg-muted">{copy.selfLinkLabel}</dt>
+        <dd class="min-w-0">
+          {selfLink.data.url}
+        </dd>
+      </div>
+      {selfDescription && (
+        <div class="flex items-start gap-1">
+          <dt class="shrink-0 text-fg-muted">{copy.selfDescriptionLabel}</dt>
+          <dd class="text-fg-muted">{selfDescription}</dd>
+        </div>
+      )}
+    </dl>
+  </aside>
 </section>

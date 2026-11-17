@@ -119,6 +119,7 @@ description:
   zh: '这个站点的骨架。文档清楚，社区温和。'
   en: 'The skeleton of this site. Clear docs and a gentle community.'
 tag: engineering
+icon: 'https://astro.build/favicon.svg'
 ---
 ```
 
@@ -129,9 +130,12 @@ tag: engineering
 | `url`         | 是   | 链接地址，必须是合法的 http(s) URL                                           |
 | `description` | 否   | 一句话介绍，按语言写；至少提供 `zh`、`en` 其中一种，缺失语言会回退           |
 | `tag`         | 否   | 标签 id；标签页会列出同标签的链接                                            |
+| `icon`        | 否   | 方形图标的外部 URL；缺失时回退为名称首字母方块                               |
 
-- 展示位置：`/about/` 的「链接」区块，以及 `/tag/<tag>/` 中带同一标签的链接。
-- 链接列表不分先后：展示顺序只是为了稳定（由 `slug` 决定），不代表推荐程度。将来若需要真正的排序，应新增独立的排序字段，而不是复用 `slug`。
+- 展示位置：`/about/` 的「友情链接」主列表只展示 `src/components/links/FriendLinks.astro` 里 `FRIEND_LINK_SLUGS` 列出的 slug，并按列表顺序排列；本站（`SELF_LINK_SLUG`，当前是 `snowiest`）单独放在小节末尾，以「本站信息」为标题，按名称、图标、链接、介绍列出。`/tag/<tag>/` 展示该标签下的全部链接，不受这些列表限制。
+- 新增友链时除了创建链接文件，还要把 `slug` 加进 `FRIEND_LINK_SLUGS`；列表里写了不存在的 slug 会让构建失败，避免友链悄悄消失。工具、参考资料等只给标签页用的链接不需要加进去。本站链接由 `SELF_LINK_SLUG` 指定，不放进友链主列表。
+- `icon` 只在编辑器中手动写入 frontmatter（content CLI 暂不询问），建议使用站点 favicon 或方形图标；图标在 About、标签页和本站信息中都生效。本站的 `icon` 指向部署后的 `/snowiest/favicon.ico`。
+- 链接列表不分先后：标签页按 `slug` 稳定排序，About 按 `FRIEND_LINK_SLUGS` 的顺序展示，都不代表推荐程度。将来若需要真正的排序，应新增独立的排序字段，而不是复用 `slug`。
 - 新增推荐用 CLI：`pnpm content link add <url> --name <中文名> --name-en <英文名> --description <介绍> --tag <id>`。
 - 删除链接就是删除对应文件；修改名称、地址、介绍直接编辑文件。
 - 链接正文（`---` 之后的部分）目前不展示，可留空。
