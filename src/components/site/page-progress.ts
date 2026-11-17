@@ -4,30 +4,37 @@ import { prefersReducedMotion } from '../../lib/runtime'
  * Thin progress bar for page loads and ClientRouter navigations. The marker is persisted across
  * swaps, so element lookups are repeated instead of cached.
  *
- * Three rules keep the motion honest:
- * - a run owns every timer it schedules: `finish()` cancels the pending growth step, otherwise that
- *   stale step fires a moment later and drags the fill back to 65% right after it completed;
- * - the fill is only reset while the bar is invisible and without animating it, otherwise the
- *   completed bar visibly travels back to zero while it fades out;
- * - the starting state is painted without a transition, because ClientRouter moves the persisted
- *   marker into the incoming document a few dozen ms later — re-attaching a node cancels the
- *   transitions still in flight and snaps them to their target, which flashes a half-faded bar.
+ * The lifecycle follows browser state, not guesses:
+ * - `astro:before-preparation` starts a run; growing to 65% happens while the page is loading.
+ * - `astro:before-swap` hands over the navigation's `ViewTransition`.
+ * - `astro:page-load` does *not* mean the screen has changed — the browser is still playing the
+ *   snapshot animation. The run only completes after `viewTransition.finished`, i.e. once the live
+ *   DOM is actually visible, so the 100% fill and the fade can be seen. Without that wait, the fill
+ *   happens behind the snapshots and the bar appears to jump when they are removed.
+ * - The fade starts on the bar's own `transitionend`, so the fill duration stays in CSS.
+ *
+ * Two older rules still hold: a run owns every timer it schedules (a stale growth step would drag
+ * the fill back to 65% after completion), and the fill is only reset while invisible (otherwise the
+ * completed bar visibly travels back to zero while fading out).
  */
 
-/** The root fades over 300ms (`transition-opacity duration-300`); the fill uses the same 300ms. */
+/** The bar fills over 300ms (`transition-transform duration-300` in BaseLayout). */
+const FILL_MS = 300
+/** Safety net for engines that never emit `transitionend` for the completion. */
+const FILL_FALLBACK_MS = FILL_MS + 120
+/** The root fades over 300ms (`transition-opacity duration-300`). */
 const FADE_MS = 300
-/** Hold the full bar until the fill transition has landed before fading it out. */
-const HOLD_MS = 300
-/** A visible-but-still beat for reduced motion, which skips the animated transitions. */
-const SHORT_HOLD_MS = 120
-/** Safety net for engines that never emit `transitionend` (or skip the fade entirely). */
+/** Safety net for engines that never emit `transitionend` for the fade. */
 const FADE_FALLBACK_MS = FADE_MS + 200
 const GROWTH_DELAY_MS = 180
 const GROWTH_VALUE = 0.65
 const INITIAL_VALUE = 0.15
 const REDUCED_VALUE = 0.6
-/** Client navigations stop at `GROWTH_VALUE`; the fill to it runs before the swap, where it is visible. */
-const PEAK_FILL_MS = 140
+
+/** The subset of the browser's ViewTransition the bar needs. Astro's fallback provides it too. */
+interface ViewTransitionLike {
+  finished: Promise<unknown>
+}
 
 export function setupPageProgress(): void {
   const getProgressRoot = () => document.querySelector<HTMLElement>('[data-page-progress]')
@@ -39,8 +46,14 @@ export function setupPageProgress(): void {
   let running = false
   /** Drops a pending fade: removes its listener and cancels its fallback timer. */
   let cancelFade: (() => void) | null = null
+  /** Drops a pending completion: the bar reached 100% but has not faded out yet. */
+  let cancelCompletion: (() => void) | null = null
   /** Guards the deferred restore so an older pass cannot re-enable transitions too early. */
   let transitionEpoch = 0
+  /** The visual transition of the navigation in flight, captured before the swap. */
+  let activeTransition: ViewTransitionLike | undefined
+  /** Bumped per navigation, so a stale `finished` cannot complete a newer run. */
+  let navigation = 0
 
   const paint = (value: number) => {
     const bar = getProgressBar()
@@ -97,9 +110,15 @@ export function setupPageProgress(): void {
     cancelFade = null
   }
 
+  const stopCompletion = () => {
+    cancelCompletion?.()
+    cancelCompletion = null
+  }
+
   /** Hide the bar and cancel pending progress work (page unload / bfcache restore). */
   const reset = () => {
     stopFade()
+    stopCompletion()
     clearTimers()
     running = false
     setOpacity('0')
@@ -108,6 +127,7 @@ export function setupPageProgress(): void {
 
   const start = () => {
     stopFade()
+    stopCompletion()
 
     let startedRun = false
 
@@ -170,75 +190,52 @@ export function setupPageProgress(): void {
   }
 
   /**
-   * Fill to the peak with a visible transition and resolve once it lands. `<ClientRouter />` awaits
-   * the loader before it swaps, so this is the only place where the last stretch can actually be
-   * seen: everything after the swap is covered by the view transition's snapshots.
+   * Paint the full bar and let its own CSS transition decide when the fade starts: the duration
+   * belongs to the stylesheet, the trigger to `finish()`.
    */
-  const fillToPeak = (signal?: AbortSignal) =>
-    new Promise<void>((resolve) => {
-      if (!running) return resolve()
-
-      if (reduceMotion) {
-        withoutTransitions(() => paint(GROWTH_VALUE))
-        return resolve()
-      }
-
-      const bar = getProgressBar()
-      if (!bar) return resolve()
-
-      clearTimers()
-
-      let settled = false
-      let timer = 0
-
-      const settle = () => {
-        if (settled) return
-        settled = true
-        window.clearTimeout(timer)
-        bar.removeEventListener('transitionend', onEnd)
-        bar.style.transition = ''
-        resolve()
-      }
-
-      const onEnd = (event: TransitionEvent) => {
-        if (event.target === bar && event.propertyName === 'transform') settle()
-      }
-
-      bar.style.transition = `transform ${PEAK_FILL_MS}ms cubic-bezier(0.2, 0, 0, 1)`
-      paint(GROWTH_VALUE)
-      bar.addEventListener('transitionend', onEnd)
-      timer = window.setTimeout(settle, PEAK_FILL_MS + 80)
-      signal?.addEventListener('abort', settle, { once: true })
-    })
-
-  /** Hold the swap until the bar has visibly reached the peak, then let it fade with the old page. */
-  const prepare = (raw: Event) => {
-    start()
-
-    const event = raw as Event & { loader: () => Promise<void>; signal: AbortSignal }
-    const load = event.loader
-    if (typeof load !== 'function') return
-
-    event.loader = async () => {
-      await load()
-      await fillToPeak(event.signal)
-    }
-  }
-
-  /**
-   * Hide the bar before `<ClientRouter />` snapshots the incoming page: a bar captured mid-fade is
-   * frozen in that snapshot and reappears when the live layer takes over.
-   */
-  const clearBeforeSwap = () => {
-    if (!running) return
-
-    stopFade()
+  const complete = () => {
     clearTimers()
-    running = false
-    withoutTransitions(() => {
-      setOpacity('0')
-      paint(0)
-    })
+
+    if (reduceMotion) {
+      withoutTransitions(() => paint(1))
+      hide()
+      return
+    }
+
+    paint(1)
+
+    const bar = getProgressBar()
+    if (!bar) {
+      hide()
+      return
+    }
+
+    let settled = false
+    let fallbackId = 0
+
+    const cleanup = () => {
+      window.clearTimeout(fallbackId)
+      bar.removeEventListener('transitionend', onTransitionEnd)
+      cancelCompletion = null
+    }
+
+    const settle = () => {
+      if (settled) return
+      settled = true
+      cleanup()
+      hide()
+    }
+
+    const onTransitionEnd = (event: TransitionEvent) => {
+      if (event.target === bar && event.propertyName === 'transform') settle()
+    }
+
+    bar.addEventListener('transitionend', onTransitionEnd)
+    fallbackId = window.setTimeout(settle, FILL_FALLBACK_MS)
+    cancelCompletion = () => {
+      settled = true
+      cleanup()
+    }
   }
 
   const finish = () => {
@@ -247,26 +244,49 @@ export function setupPageProgress(): void {
     running = false
     // The growth step must not survive the completion, or it repaints 65% after the bar hit 100%.
     clearTimers()
+    complete()
+  }
 
-    if (reduceMotion) {
-      withoutTransitions(() => paint(1))
-    } else {
-      paint(1)
+  /**
+   * `astro:page-load` fires while the view transition is still on screen: the DOM is swapped, but
+   * the browser is playing snapshot animations. Completing the bar then would be invisible — and
+   * would be exposed as a jump the moment the live layer replaces the snapshots. Waiting for the
+   * transition's own `finished` makes the fill land on the live page instead.
+   */
+  const finishAfterTransition = async () => {
+    const epoch = navigation
+    const transition = activeTransition
+    activeTransition = undefined
+
+    if (transition) {
+      try {
+        await transition.finished
+      } catch {
+        // An aborted transition has no visible end; complete anyway.
+      }
     }
 
-    schedule(hide, reduceMotion ? SHORT_HOLD_MS : HOLD_MS)
+    if (epoch !== navigation) return // a newer navigation owns the bar now
+    finish()
   }
 
   start()
   if (document.readyState === 'complete') {
-    finish()
+    void finishAfterTransition()
   } else {
-    window.addEventListener('load', finish, { once: true })
+    window.addEventListener('load', () => void finishAfterTransition(), { once: true })
   }
 
-  document.addEventListener('astro:before-preparation', prepare)
-  document.addEventListener('astro:before-swap', clearBeforeSwap)
-  document.addEventListener('astro:page-load', finish)
+  document.addEventListener('astro:before-preparation', () => {
+    navigation += 1
+    activeTransition = undefined
+    start()
+  })
+  document.addEventListener('astro:before-swap', (rawEvent) => {
+    const event = rawEvent as Event & { viewTransition?: ViewTransitionLike | null }
+    activeTransition = event.viewTransition ?? undefined
+  })
+  document.addEventListener('astro:page-load', () => void finishAfterTransition())
 
   // Full navigations (for example RSS/XML) and back-forward cache restores.
   window.addEventListener('pagehide', reset)
