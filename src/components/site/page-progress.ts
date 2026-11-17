@@ -26,8 +26,8 @@ const GROWTH_DELAY_MS = 180
 const GROWTH_VALUE = 0.65
 const INITIAL_VALUE = 0.15
 const REDUCED_VALUE = 0.6
-/** Client navigations stop here: the view transition cannot show a completion, so they fade out. */
-const READY_PEAK = 0.8
+/** Client navigations stop at `GROWTH_VALUE`; the fill to it runs before the swap, where it is visible. */
+const PEAK_FILL_MS = 140
 
 export function setupPageProgress(): void {
   const getProgressRoot = () => document.querySelector<HTMLElement>('[data-page-progress]')
@@ -170,15 +170,59 @@ export function setupPageProgress(): void {
   }
 
   /**
-   * The page is ready. Show the peak before the outgoing page is snapshotted, then let the bar fade
-   * out with it: the view transition never shows anything that happens while it runs, so claiming a
-   * completion (100%) would only exist in the frozen snapshot and jump when the live layer returns.
+   * Fill to the peak with a visible transition and resolve once it lands. `<ClientRouter />` awaits
+   * the loader before it swaps, so this is the only place where the last stretch can actually be
+   * seen: everything after the swap is covered by the view transition's snapshots.
    */
-  const peakBeforeSnapshot = () => {
-    if (!running) return
+  const fillToPeak = (signal?: AbortSignal) =>
+    new Promise<void>((resolve) => {
+      if (!running) return resolve()
 
-    clearTimers()
-    withoutTransitions(() => paint(READY_PEAK))
+      if (reduceMotion) {
+        withoutTransitions(() => paint(GROWTH_VALUE))
+        return resolve()
+      }
+
+      const bar = getProgressBar()
+      if (!bar) return resolve()
+
+      clearTimers()
+
+      let settled = false
+      let timer = 0
+
+      const settle = () => {
+        if (settled) return
+        settled = true
+        window.clearTimeout(timer)
+        bar.removeEventListener('transitionend', onEnd)
+        bar.style.transition = ''
+        resolve()
+      }
+
+      const onEnd = (event: TransitionEvent) => {
+        if (event.target === bar && event.propertyName === 'transform') settle()
+      }
+
+      bar.style.transition = `transform ${PEAK_FILL_MS}ms cubic-bezier(0.2, 0, 0, 1)`
+      paint(GROWTH_VALUE)
+      bar.addEventListener('transitionend', onEnd)
+      timer = window.setTimeout(settle, PEAK_FILL_MS + 80)
+      signal?.addEventListener('abort', settle, { once: true })
+    })
+
+  /** Hold the swap until the bar has visibly reached the peak, then let it fade with the old page. */
+  const prepare = (raw: Event) => {
+    start()
+
+    const event = raw as Event & { loader: () => Promise<void>; signal: AbortSignal }
+    const load = event.loader
+    if (typeof load !== 'function') return
+
+    event.loader = async () => {
+      await load()
+      await fillToPeak(event.signal)
+    }
   }
 
   /**
@@ -220,8 +264,7 @@ export function setupPageProgress(): void {
     window.addEventListener('load', finish, { once: true })
   }
 
-  document.addEventListener('astro:before-preparation', start)
-  document.addEventListener('astro:after-preparation', peakBeforeSnapshot)
+  document.addEventListener('astro:before-preparation', prepare)
   document.addEventListener('astro:before-swap', clearBeforeSwap)
   document.addEventListener('astro:page-load', finish)
 
