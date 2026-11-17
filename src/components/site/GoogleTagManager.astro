@@ -1,18 +1,22 @@
 ---
 /**
- * Google Tag Manager container loader, placed in `<head>`.
+ * Google Tag Manager container loader, placed in `<head>`; render one per container.
  *
  * This is Google's snippet with the container ID injected: the loader only creates an `async`
  * script tag, so an unreachable `googletagmanager.com` never delays parsing or first paint. Keep it
- * `is:inline` so the container starts before the bundled scripts; ClientRouter reuses the same head
- * element across navigations instead of running it again, so there is exactly one container.
+ * `is:inline` so the containers start before the bundled scripts; ClientRouter reuses the same head
+ * elements across navigations instead of running them again, so each container loads exactly once.
  *
  * Page views are reported separately by `setupAnalytics()` in `lib/analytics.ts`.
  */
-import { GTM_ID } from '../../lib/analytics'
+interface Props {
+  id: string
+}
+
+const { id } = Astro.props
 ---
 
-<script is:inline define:vars={{ gtmId: GTM_ID }}>
+<script is:inline define:vars={{ gtmId: id }}>
   ;(function (w, d, s, l, i) {
     w[l] = w[l] || []
     w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })

@@ -1,11 +1,16 @@
 /**
  * Google Tag Manager wiring.
  *
- * Analytics is a non-critical dependency: the container script is loaded asynchronously and every
+ * Analytics is a non-critical dependency: the container scripts are loaded asynchronously and every
  * call here only writes to `window.dataLayer`, so a blocked or unreachable `googletagmanager.com`
  * (for example in mainland China) degrades to nothing instead of affecting the page.
  */
-export const GTM_ID = 'GTM-KZNSRQVJ'
+
+/**
+ * Containers loaded on every page. They share the default `dataLayer`, so a tag in either container
+ * sees the same events; a page view must be configured in exactly one of them to avoid double hits.
+ */
+export const GTM_IDS = ['GTM-KZNSRQVJ', 'GTM-WCT24CJ4'] as const
 
 declare global {
   interface Window {
