@@ -7,10 +7,13 @@
     "node": ">=22.23.4"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
+    "dev": "pnpm tags:generate && astro dev",
+    "build": "pnpm tags:generate && astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "content": "node scripts/content.mjs",
+    "tags:generate": "node scripts/generate-tags.mjs",
+    "tags:check": "node scripts/generate-tags.mjs --check",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:check": "eslint . --no-fix",

@@ -44,6 +44,9 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Check generated tags
+        run: pnpm tags:check
+
       - name: Build
         run: pnpm build
 
