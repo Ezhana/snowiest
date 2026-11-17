@@ -1,8 +1,18 @@
 # 内容管理指南
 
-站点的文章管理完全基于 Git 和 `src/content/blog/`，没有后台或 CMS。推送 `main` 后由 GitHub Actions 构建并发布。
+站点的内容都在 `src/content/` 下，按资源类型分为三个集合，完全基于 Git，没有后台或 CMS：
 
-## 目录与语言
+| 集合      | 目录                   | 用途                           |
+| :-------- | :--------------------- | :----------------------------- |
+| `blog`    | `src/content/blog/`    | 文章                           |
+| `links`   | `src/content/links/`   | 链接：友链、工具、常逛的站点等 |
+| `moments` | `src/content/moments/` | 动态：一两句话的短内容         |
+
+日常新建内容推荐用 [content CLI](content-cli.md)（`pnpm content ...`），它负责生成元数据和文件名；也可以用编辑器直接建文件，规则见下文。推送 `main` 后由 GitHub Actions 构建并发布。
+
+## 文章（Blog）
+
+### 目录与语言
 
 - 中文是默认语言：中文页面在 `/`、`/blog/`、`/about/`，英文界面在 `/en` 前缀下。
 - 每篇文章一个目录，**目录名就是 slug，也是 URL**：`src/content/blog/hello-astro/` → `/blog/hello-astro/`。
@@ -28,9 +38,18 @@ src/content/blog/
     └── en.md
 ```
 
-## 新建文章
+### 新建文章
 
-新建 `src/content/blog/<slug>/` 目录，在里面写 `zh.md`（需要组件时用 `.mdx`，文件名任意）：
+推荐用 CLI：
+
+```sh
+pnpm content blog new                 # 交互询问标题、slug、摘要、标签，随后打开编辑器
+pnpm content blog new <slug> --title '标题' --description '摘要' --no-edit
+```
+
+CLI 会创建 `src/content/blog/<slug>/<lang>.md`，写入 `title`、`description`、`pubDate`、`tags`、`lang`，并把 `draft` 设为 `true`。写完后用 `pnpm content blog publish <slug>` 发布。
+
+手动创建时新建 `src/content/blog/<slug>/` 目录，在里面写 `zh.md`（需要组件时用 `.mdx`，文件名任意）：
 
 ```yaml
 ---
@@ -39,7 +58,6 @@ description: '一两句话摘要，会用于列表、SEO description 和 RSS。'
 pubDate: '2026-11-12'
 updatedDate: '2026-11-15' # 可选
 tags:
-  - astro
   - engineering
 heroImage: './cover.jpg' # 可选，路径相对于当前 Markdown 文件
 draft: false # 可选，默认 false
@@ -52,14 +70,14 @@ lang: zh # 可选，默认 zh；英文译文写 en
 
 字段定义在 `src/content.config.ts`。
 
-## 添加英文译文
+### 添加英文译文
 
 1. 在原文所在目录里新建一个文件，推荐按语言命名，例如 `en.md`。
 2. frontmatter 写 `lang: en`；`pubDate`、`tags`、`heroImage` 与原文保持一致，标题、摘要、正文写英文。
 3. 构建会按目录把两个版本配成一对，`/en/blog/hello-astro/` 自动使用英文版本，`/blog/hello-astro/` 保持中文。
 4. 没有译文的文章仍会出现在另一种语言的站点：列表标注原文语言，详情页提示“暂无英文版/中文版”，canonical 指向原文真正所在的 URL。补上 `en.md` 后这些回退行为自动消失。
 
-## 字段规则
+### 字段规则
 
 | 字段          | 必填 | 说明                                                                    |
 | ------------- | ---- | ----------------------------------------------------------------------- |
@@ -67,20 +85,96 @@ lang: zh # 可选，默认 zh；英文译文写 en
 | `description` | 是   | 摘要，列表/SEO/RSS 共用                                                 |
 | `pubDate`     | 是   | 排序、时间轴、分页依据；推荐 `YYYY-MM-DD`                               |
 | `updatedDate` | 否   | 详情页显示最后更新时间                                                  |
-| `tags`        | 否   | 标签 id 数组，必须是 `src/lib/tags.ts` 中已定义的 id                    |
+| `tags`        | 否   | 标签 id 数组，必须是 `src/content/tags.json` 中已定义的 id              |
 | `heroImage`   | 否   | 本地封面图，路径相对于当前文件；同时用于列表缩略图、详情大图和 OG image |
 | `draft`       | 否   | `true` 时只在开发服务器可见，生产构建排除                               |
 | `lang`        | 否   | `zh`（默认）或 `en`；译文与原文同目录，推荐文件名用语言代码             |
 
+## 链接（Link）
+
+链接不只用于友链：朋友、工具、参考资料、常逛的站点都放在同一个集合里。一个链接一个文件：
+
+```text
+src/content/links/
+├── astro.md
+├── bangumi.md
+├── github.md
+└── moegirl.md
+```
+
+文件名（去掉扩展名）就是链接 id，按 id 排序展示，发布后尽量保持稳定。文件内容：
+
+```yaml
+---
+name: 'Astro'
+url: 'https://astro.build/'
+description:
+  zh: '这个站点的骨架。文档清楚，社区温和。'
+  en: 'The skeleton of this site. Clear docs and a gentle community.'
+tag: engineering
+---
+```
+
+| 字段          | 必填 | 说明                                                               |
+| ------------- | ---- | ------------------------------------------------------------------ |
+| `name`        | 是   | 卡片标题                                                           |
+| `url`         | 是   | 链接地址，必须是合法的 http(s) URL                                 |
+| `description` | 否   | 一句话介绍，按语言写；至少提供 `zh`、`en` 其中一种，缺失语言会回退 |
+| `tag`         | 否   | 标签 id；标签页会列出同标签的链接                                  |
+
+- 展示位置：`/about/` 的「链接」区块，以及 `/tag/<tag>/` 中带同一标签的链接。
+- 新增推荐用 CLI：`pnpm content link add <url> --name <名称> --description <介绍> --tag <id>`。
+- 删除链接就是删除对应文件；修改名称、地址、介绍直接编辑文件。
+- 链接正文（`---` 之后的部分）目前不展示，可留空。
+
+## 动态（Moment）
+
+动态是零配置的短内容：正文就是 Markdown 本体，发布时间来自文件名，默认不需要任何 frontmatter。
+
+```text
+src/content/moments/
+└── 2026-11-17T18-30-00+0800.md
+```
+
+```md
+今天终于把 content CLI 写完了，发一条动态测试一下。
+```
+
+- 文件名是本地时间加数字时区偏移：`YYYY-MM-DDTHH-mm-ss+HHMM.md`。发布时刻由文件名推导，因此**不要随意改名**。
+- 零元数据即可发布；可选 `tags`（标签 id 数组）和 `lang`（`zh` 默认 / `en`）。
+- 动态展示在 `/moment/` 与 `/en/moment/`：纯列表，不分月、不画时间轴；沿用通用无限滚动（先渲染全部，脚本按滚动分批显示）。默认近期优先，`?order=oldest` 切换为最早优先；动态保持写作时的语言，页面会给非当前语言的条目加语言标记。
+- 发布推荐用 CLI，它会自动生成时间戳文件名：
+
+```sh
+pnpm content moment add 今天终于把 content CLI 写完了 --tag engineering
+pnpm content moment add        # 打开 $EDITOR 写正文
+echo '来自管道的一句话' | pnpm content moment add
+```
+
+- 动态的 `tag` 会显示在动态卡片上，并聚合到对应标签页的「相关动态」，位置在「相关链接」之后；标签 id 仍会校验。
+
 ## 标签
 
-当前标签注册表在 `src/lib/tags.ts`：
+标签的唯一数据源是 `src/content/tags.json`，一个文件描述全部标签：
 
-新增标签需要同时修改注册表；文章 frontmatter 和友链的 `tag` 都必须引用已定义的 id。标签会自动获得：
+```json
+[
+  { "id": "design", "label": { "zh": "设计", "en": "Design" } },
+  { "id": "engineering", "label": { "zh": "工程", "en": "Engineering" } }
+]
+```
 
-- `/tag/<tag>/` 标签页（全站命名空间，将来其他内容类型可以并入同一个标签页）；
+- `id` 只能使用小写英文字母、数字和连字符，且不能重复；`label.zh` / `label.en` 都必须填写。
+- 修改 JSON 后运行 `pnpm tags:generate` 生成 `src/lib/tags.generated.ts`；`pnpm dev` 和 `pnpm build` 会自动执行这一步。如果绕过 pnpm 直接运行 `astro dev` / `astro build`，需要先手动生成。**不要直接修改生成文件。**
+- 推荐用 CLI 维护：`pnpm content tag add <id> --zh <中文名> --en <英文名>`、`pnpm content tag list`、`pnpm content tag remove <id>`。仍被文章、链接或动态引用的标签不允许删除。
+- 文章 frontmatter、链接和动态的 `tag` 都必须引用已定义的 id；否则构建失败。
+
+标签会自动获得：
+
+- `/tag/<tag>/` 标签页（全站命名空间，其他内容类型可以并入同一个标签页）；
 - 标签页里该标签的全部文章（一次列出，不分页）；
-- `src/lib/friends.ts` 中 `tag` 与该标签相同的友链；
+- 同标签的链接；
+- 同标签的动态（以「相关动态」区块展示在链接之后）；
 - 博客列表的标签链接；
 - Footer 的完整标签列表。
 
@@ -88,7 +182,8 @@ lang: zh # 可选，默认 zh；英文译文写 en
 
 - 文章列表：`/blog/`，默认时间倒序。
 - 分页：`/blog/?page=2`；时间顺序：`/blog/?order=oldest`；两者组合：`/blog/?page=2&order=oldest`。
-- 标签：`/tag/design/`，列出该标签下的全部文章，并附带同标签的友链；标签页不分页，但和列表页一样支持 `?order=oldest` 时间排序。
+- 标签：`/tag/design/`，列出该标签下的全部文章，并附带同标签的链接和动态；标签页不分页，但和列表页一样支持 `?order=oldest` 时间排序。
+- 动态：`/moment/`，默认近期优先，`?order=oldest` 切换为最早优先；排序与无限滚动都是客户端行为，服务端始终按近期优先输出完整列表。
 - 英文对应路径加 `/en` 前缀：`/en/blog/?page=2`、`/en/tag/design/`。
 - 每页 5 篇，由 `src/lib/blog.ts` 的 `BLOG_PAGE_SIZE` 控制。
 
@@ -113,7 +208,8 @@ lang: zh # 可选，默认 zh；英文译文写 en
 ## 草稿与发布
 
 - `draft: true` 的文章在 `pnpm dev` 中可见，在 `pnpm build` 中不会生成任何页面，也不会进入列表、标签、时间轴、RSS 和 sitemap。
-- `pubDate` 晚于当前时间的文章同样只在开发服务器中可见。生产构建会过滤未来文章，GitHub Actions 每天 00:00 UTC 定时重建一次，因此文章会在到达日期后的下一次构建中自动上线。
+- `pnpm content blog publish <slug>` 会把该文章目录下所有语言版本的 `draft` 改成 `false`；它不修改 `pubDate`。
+- `pubDate` 晚于当前时间的文章同样只在开发服务器中可见。生产构建会过滤未来文章，GitHub Actions 每天 00:00 UTC 定时重建一次，因此文章会在到达日期后的下一次构建中自动上线。CLI 发布未来日期的文章时会提示这一点。
 - 删除文章目录等于下线，旧链接会 404；重命名目录也会改变 URL，发布后应尽量保持目录名稳定。文件名可以随时改，不影响路由。
 
 ## 本地检查
@@ -121,14 +217,17 @@ lang: zh # 可选，默认 zh；英文译文写 en
 ```sh
 pnpm dev
 pnpm build
+pnpm tags:check
 pnpm lint:check
 pnpm format:check
 ```
 
-构建会校验 frontmatter、标签 id、封面图片路径、目录名的 URL 规则，以及同一目录下同一语言只有一篇。发布前建议检查：
+构建前会由 `pnpm tags:generate` 把 `tags.json` 编译成类型；构建会校验 frontmatter、标签 id、封面图片路径、链接的 URL 与描述、动态文件名的时间戳格式、文章目录名的 URL 规则，以及同一目录下同一语言只有一篇。发布前建议检查：
 
 - `/blog/`、`/blog/?page=2`、`/blog/?order=oldest`；
-- `/tag/<tag>/`（文章列表、关联友链与时间排序）；
+- `/tag/<tag>/`（文章列表、关联链接、相关动态与时间排序）；
+- `/about/` 的链接区块；
+- `/moment/` 与 `/en/moment/` 的动态列表、近期/最早排序和滚动加载；
 - `/en/blog/` 的英文界面；
 - 已翻译文章的 `/en/blog/<slug>/` 是否为英文，未翻译文章是否带原文提示；
 - 文章页的 canonical 与 hreflang 是否指向正确语言；
@@ -146,3 +245,5 @@ pnpm format:check
 - 英文文章：`/en/blog/<slug>/`
 - 中文 RSS：`/rss.xml`
 - 英文 RSS：`/en/rss.xml`
+- 中文动态：`/moment/`
+- 英文动态：`/en/moment/`
