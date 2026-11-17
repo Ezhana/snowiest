@@ -74,10 +74,12 @@ const lang = getLang(Astro.currentLocale)
       import { setupPageProgress } from '../components/site/page-progress'
       import { setupDrawers } from '../components/site/drawer'
       import { setupAnchorScroll } from '../lib/anchor-scroll'
+      import { setupClientNavigation } from '../lib/client-navigation'
 
       setupPageProgress()
       setupDrawers()
       setupAnchorScroll()
+      setupClientNavigation()
     </script>
   </body>
 </html>

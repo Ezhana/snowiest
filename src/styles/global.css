@@ -243,6 +243,11 @@
    * styles, and a filled transform (even an identity matrix) would make this wrapper the containing
    * block for `position: fixed` descendants forever. The post actions live inside the page now and
    * rely on the viewport containing block after the entrance finishes.
+   *
+   * ClientRouter navigations skip the entrance (content and header rows alike): the view transition
+   * snapshots the incoming page right after the swap, and anything starting at `opacity: 0` would
+   * be captured as a blank page — the cross-fade would then flash through white before the live
+   * content faded in. See `src/lib/client-navigation.ts`.
    */
   .page-enter {
     animation: fade-up 600ms cubic-bezier(0.2, 0, 0, 1);
@@ -386,4 +391,15 @@
       transition: none;
     }
   }
+}
+
+/*
+ * Entrance animations are skipped on `<ClientRouter />` navigations: the view transition snapshots
+ * the incoming page right after the swap, and anything starting at `opacity: 0` would be captured
+ * as a blank page (see `src/lib/client-navigation.ts`). The header rows animate through a utility,
+ * whose layer sits above the component layer, so these overrides stay outside the layers.
+ */
+html[data-client-nav] .page-enter,
+html[data-client-nav] [data-site-header] .animate-fade-in {
+  animation: none;
 }
