@@ -46,16 +46,10 @@ const lang = getLang(Astro.currentLocale)
   <body>
     <div
       transition:persist="page-progress"
-      class="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px] opacity-0 transition-opacity duration-300"
+      class="page-progress"
       data-page-progress
       aria-hidden="true"
-    >
-      <div
-        class="h-full origin-left bg-accent shadow-[0_0_10px_var(--color-accent)] transition-transform duration-300 ease-out"
-        style="transform: scaleX(0)"
-        data-page-progress-bar
-      ></div>
-    </div>
+    ></div>
     <Header>
       <slot name="header-nav-start" slot="nav-start" />
       <slot name="header-nav-end" slot="nav-end" />

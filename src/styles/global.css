@@ -257,6 +257,44 @@
     .page-enter {
       animation: none;
     }
+
+    .page-progress {
+      transition: none;
+    }
+  }
+
+  /*
+   * Top progress bar. The script only writes `--progress`; the transitions below own the timing, and
+   * the fill is a `transform` so it stays on the compositor. `transition:persist` in the layout
+   * keeps this node — and therefore its current fill — across ClientRouter swaps.
+   */
+  .page-progress {
+    --progress: 0;
+
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 60;
+    height: 3px;
+    background-color: var(--color-accent);
+    box-shadow: 0 0 10px var(--color-accent);
+    opacity: 0;
+    pointer-events: none;
+    transform: scaleX(var(--progress));
+    transform-origin: left center;
+    transition:
+      transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 180ms ease;
+    will-change: transform;
+  }
+
+  .page-progress.is-visible {
+    opacity: 1;
+  }
+
+  /* Committing the reset or the first frame must not animate; only used at rest or while hidden. */
+  .page-progress.is-resetting {
+    transition: none;
   }
 
   .theme-mode-icon {
