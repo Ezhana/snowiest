@@ -145,10 +145,17 @@ const start = () => {
 
 目标页是首页或博客时，浏览器很快就结束了这次过渡，空白阶段被跳过；目标页是动态或关于时，cross-fade 完整播放，空白帧就露出来了。首页和博客上那 17 个带 `view-transition-name` 的标题很可能是浏览器提前收敛过渡的原因，这一点还没查实，但它不影响结论：**只要快照里不是空白，两条路径都不会闪**。
 
-修法是让 ClientRouter 导航不再重播入场动画，交给视图过渡：
+第一版修法是「client 导航干脆不放入场动画，交给视图过渡」。这确实不闪了，但入场动画也没了——而在快照里消失的不只它：**进度条也在快照里**。条子是在 `before-swap` 之后、快照之前还在长的，浏览器把那一刻的宽度冻进新页面快照，过渡期间显示的是它，过渡结束才换回实时层，于是又出现一次“回退”。
+
+所以真正的规则是两条：
+
+1. **快照里必须是「最终画面」。** 入场动画如果从 `opacity: 0` 开始，快照就是空白页；条子如果还在长，快照就是半截。
+2. **能让视图过渡承担的部分，就不要再叠一层。** 淡入交给 cross-fade，页面只负责位移。
+
+落地是：
 
 ```ts
-/** 标记这是 client 导航，CSS 据此跳过入场动画。 */
+/** 标记这是 client 导航，CSS 据此换一套入场。 */
 export function setupClientNavigation(): void {
   const mark = () => {
     document.documentElement.dataset.clientNav = ''
@@ -160,18 +167,44 @@ export function setupClientNavigation(): void {
 ```
 
 ```css
-/* 层外：页头用的是 utility 的 animate-fade-in，它的层高于 components 层。 */
-html[data-client-nav] .page-enter,
+/* 只位移、不改透明度：快照里有内容，淡入由 cross-fade 完成。层外是因为 utility 层在 components 之后。 */
+html[data-client-nav] .page-enter {
+  animation: rise 600ms cubic-bezier(0.2, 0, 0, 1);
+}
+
 html[data-client-nav] [data-site-header] .animate-fade-in {
   animation: none;
 }
+
+@keyframes rise {
+  from {
+    transform: translateY(14px);
+  }
+  to {
+    transform: none;
+  }
+}
 ```
 
-首屏仍然保留入场动画（新文档不会被快照），client 导航则完全交给视图过渡。页头的 `animate-fade-in` 也在快照里是透明的，所以一并跳过——它写在 `@layer components` 里不生效，因为 utility 层在后，最后只能放在层外。
+```ts
+/** 新页面就绪：在 swap 之前把条子画满，快照里的条子就是满格。 */
+const completeBeforeSwap = () => {
+  if (!running) return
+  stopFade()
+  clearTimers()
+  withoutTransitions(() => paint(1))
+}
+
+document.addEventListener('astro:before-swap', completeBeforeSwap)
+```
+
+首屏仍然走完整的 `fade-up`（新文档不会被快照）；client 导航则是「旧页面淡出 + 新页面升起」的 cross-fade，进度条在 swap 那一刻直接满格，然后照常淡出。
 
 ## 现在的行为
 
-点击 → 15% 立刻出现 → 180ms 后到 65% → 页面加载完 → 100% → 300ms 后淡出 → 淡出结束瞬时归零。开启「减弱动态效果」时全程没有动画：直接出现、直接满格、停一小会儿、直接消失。首屏仍然淡入，切页签则完全交给视图过渡的 cross-fade。
+首屏：点击/加载 → 15% 立刻出现 → 180ms 后到 65% → 加载完 → 100% → 300ms 后淡出 → 淡出结束瞬时归零。
+
+站内跳转：15% 立刻出现 → 长到 65%（加载慢时才有机会）→ `before-swap` 直接满格 → 视图过渡期间保持满格 → 过渡结束后淡出。条子的宽度全程只增不减。开启「减弱动态效果」时全程没有动画：直接出现、直接满格、停一小会儿、直接消失。
 
 ## 验证
 
@@ -188,7 +221,7 @@ html[data-client-nav] [data-site-header] .animate-fade-in {
 
 ## 留下的东西
 
-- **视图过渡的快照就是最终画面。** 任何从 `opacity: 0` 开始的入场动画，都会让新页面的快照变成空白页；cross-fade 于是变成“旧页面 → 空白 → 淡入”。client 导航应该只留一种过渡：要么视图过渡，要么入场动画。
+- **视图过渡的快照就是最终画面。** 任何在快照时还在动画中的东西都会被冻住：从 `opacity: 0` 开始的入场动画会让快照变成空白页，还在长的进度条会被冻在半截，过渡结束换回实时层时就会“跳一下”。入场动画只保留视图过渡能承担的部分（位移），条子在 swap 前画满。
 - **跨 DOM 搬迁的过渡不可靠。** 被 `transition:persist` 保留的元素会在导航中被搬走，任何还在飞的过渡都会被取消、落到目标值。起点、终点这类“必须准确”的状态，用落定值画。
 - **一个 run 拥有它排的所有定时器。** 进度条这种“开始—进行—结束”的状态机，最容易死在上一轮的定时器上。
 - **判断动效要看帧，不要看截图。** 截图只采样一个瞬间，而且不一定包含视图过渡的合成结果；`getComputedStyle` 的逐帧采样能看到“跳变点”，正好指向真正的触发时机；整屏平均亮度能一眼看出“白了一下”。
