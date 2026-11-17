@@ -51,6 +51,9 @@ const hreflangCodes: Record<Lang, string> = { zh: 'zh-CN', en: 'en' }
 <meta name="generator" content={Astro.generator} />
 <meta name="author" content={SITE_AUTHOR} />
 
+<!-- Google Search Console ownership proof for the URL-prefix property. -->
+<meta name="google-site-verification" content="9EdlcTvmKZWIJTlqtfRch-bAQGLD7y5SzV9L8qBPIds" />
+
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 {(Object.entries(alternateUrls) as Array<[Lang, string | undefined]>).map(([code, href]) =>
