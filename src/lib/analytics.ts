@@ -10,7 +10,7 @@
  * Containers loaded on every page. They share the default `dataLayer`, so a tag in either container
  * sees the same events; a page view must be configured in exactly one of them to avoid double hits.
  */
-export const GTM_IDS = ['GTM-KZNSRQVJ', 'GTM-WCT24CJ4'] as const
+export const GTM_IDS = ['GTM-KZNSRQVJ'] as const
 
 declare global {
   interface Window {
@@ -24,11 +24,13 @@ function pushToDataLayer(payload: Record<string, unknown>): void {
 }
 
 /**
- * Send one `page_view` per visited URL. The first call covers the initial load; ClientRouter keeps
- * the document alive across navigations, so `astro:page-load` reports every client-side page change.
- * The URL guard turns the initial `astro:page-load` (which fires at `load`) into a no-op and ignores
- * hash-only navigations. GA4 must take page views from this event instead of its own automatic page
- * view, otherwise the first page is counted twice.
+ * Push one `page_view` per visited URL. The first call covers the initial load; ClientRouter keeps
+ * the document alive across navigations, so `astro:page-load` reports every client-side page change
+ * after that. The URL guard turns the repeated `astro:page-load` (it also fires at `load`) into a
+ * no-op and ignores hash-only navigations.
+ *
+ * The Google tag must not send a page view of its own (see `send_page_view` in `docs/analytics.md`),
+ * otherwise the first page is counted twice.
  */
 export function setupAnalytics(): void {
   let lastTrackedUrl = ''

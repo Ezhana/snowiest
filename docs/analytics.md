@@ -1,6 +1,6 @@
 # 站点分析（Google Tag Manager + GA4）
 
-站点同时加载两个 Google Tag Manager 容器：`GTM-KZNSRQVJ`（GA4 数据流 `G-F916494XVL`）和 `GTM-WCT24CJ4`。容器 ID 维护在 `src/lib/analytics.ts` 的 `GTM_IDS`，两个容器共用默认 `dataLayer`。
+站点加载 Google Tag Manager 容器 `GTM-KZNSRQVJ`，对应 GA4 数据流 `G-F916494XVL`。容器 ID 维护在 `src/lib/analytics.ts` 的 `GTM_IDS`（数组，支持多个容器共用默认 `dataLayer`）。
 
 ## 代码位置
 
@@ -22,8 +22,11 @@ window.dataLayer.push({ event: 'page_view', page_title, page_location, page_path
 
 首次加载和每次站内跳转各推一次，同一 URL 不重复推送。GTM 侧需要配合：
 
-1. 在 `GTM-KZNSRQVJ` 中新建 GA4 事件代码：Measurement ID 填 `G-F916494XVL`，事件名称 `page_view`，触发器为自定义事件 `page_view`。只在其中一个容器配置，两个容器都配置会重复上报。
-2. 在 GA4 后台关闭自动页面浏览（数据流 → 增强测量 → 页面浏览）。它会为首屏和浏览器前进/后退各发一次 page_view，与上面的推送重复；关闭后所有 page_view 都来自这个事件代码。
+1. 在 `GTM-KZNSRQVJ` 中新建 GA4 事件代码：Measurement ID 填 `G-F916494XVL`，事件名称 `page_view`，触发器为自定义事件 `page_view`。多个容器共用 `dataLayer`，只在其中一个容器配置，重复配置会重复上报。
+2. 关闭自动页面浏览，让所有 page_view 都来自这个事件代码：
+   - GTM 的 Google 代码（`G-F916494XVL`）→「配置设置」→ 添加参数 `send_page_view` = `false`。Google 代码没有对应的复选框，只能加配置参数；不加的话它加载时会自己发一次 page_view，首屏就算两次。
+   - Google 代码本身必须保持启用：GA4 事件代码要靠它初始化目标（`gtag/destination`），只留事件代码时不会创建目标，一条命中都发不出去。
+   - GA4 后台 → 数据流 → 增强测量 → 关闭「页面浏览」及其中的「基于浏览器历史记录事件的页面更改」，避免增强测量再发一份。
 
 ## 国内网络
 
