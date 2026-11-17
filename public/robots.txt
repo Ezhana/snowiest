@@ -1,0 +1,6 @@
+# Snowiest · 簌雪 — https://ezhana.github.io/snowiest/
+# Everything is public. The sitemap index is produced by @astrojs/sitemap at build time.
+User-agent: *
+Allow: /
+
+Sitemap: https://ezhana.github.io/snowiest/sitemap-index.xml

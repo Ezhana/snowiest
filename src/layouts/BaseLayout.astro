@@ -3,8 +3,10 @@ import type { ImageMetadata } from 'astro'
 import { ClientRouter } from 'astro:transitions'
 import BaseHead from '../components/site/BaseHead.astro'
 import Footer from '../components/site/Footer.astro'
+import GoogleTagManager from '../components/site/GoogleTagManager.astro'
 import Header from '../components/site/Header.astro'
 import themeBootstrap from '../components/site/theme-bootstrap.js?raw'
+import { GTM_ID } from '../lib/analytics'
 import { getLang, type Lang } from '../i18n/ui'
 
 interface Props {
@@ -28,6 +30,10 @@ const lang = getLang(Astro.currentLocale)
  * `<ClientRouter />` enables Astro view transitions, including the shared-title morph between the
  * blog list and a post. Component scripts therefore run once and use `astro:page-load` for
  * per-navigation setup instead of relying on a full document reload.
+ *
+ * Analytics stays out of the way: the GTM loader is `async`, the `<noscript>` fallback only exists
+ * for non-JS readers, and page views are pushed to `dataLayer` from `lib/analytics.ts`. The whole
+ * block is production-only so development traffic never reaches the container.
  */
 ---
 
@@ -41,9 +47,20 @@ const lang = getLang(Astro.currentLocale)
       alternates={alternates}
     />
     <ClientRouter />
+    {import.meta.env.PROD && <GoogleTagManager />}
     <script is:inline set:html={themeBootstrap}></script>
   </head>
   <body>
+    {import.meta.env.PROD && (
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+          height="0"
+          width="0"
+          style="display:none;visibility:hidden"
+        ></iframe>
+      </noscript>
+    )}
     <div
       transition:persist="page-progress"
       class="page-progress"
@@ -68,12 +85,14 @@ const lang = getLang(Astro.currentLocale)
       import { setupPageProgress } from '../components/site/page-progress'
       import { setupDrawers } from '../components/site/drawer'
       import { setupAnchorScroll } from '../lib/anchor-scroll'
+      import { setupAnalytics } from '../lib/analytics'
       import { setupClientNavigation } from '../lib/client-navigation'
 
       setupPageProgress()
       setupDrawers()
       setupAnchorScroll()
       setupClientNavigation()
+      if (import.meta.env.PROD) setupAnalytics()
     </script>
   </body>
 </html>

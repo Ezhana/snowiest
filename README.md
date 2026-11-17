@@ -49,7 +49,7 @@ pnpm preview    # 预览构建结果
 └── package.json
 ```
 
-内容新建、frontmatter、标签、草稿和发布规则见 [docs/content-authoring.md](docs/content-authoring.md)，`pnpm content` 的命令与约定见 [docs/content-cli.md](docs/content-cli.md)。
+内容新建、frontmatter、标签、草稿和发布规则见 [docs/content-authoring.md](docs/content-authoring.md)，`pnpm content` 的命令与约定见 [docs/content-cli.md](docs/content-cli.md)，站点分析（GTM / GA4）的配置见 [docs/analytics.md](docs/analytics.md)。
 
 快速开始：
 
