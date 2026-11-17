@@ -48,8 +48,8 @@ async function usageText() {
       创建草稿文章（元数据 + draft: true），随后在 $EDITOR 中写正文。
   blog publish <slug>
       把文章目录下所有语言版本的 draft 设为 false。
-  link add <url> [--name <名称>] [--slug <id>] [--description <中文介绍>]
-           [--description-en <英文介绍>] [--tag <id>]
+  link add <url> [--name <中文名>] [--name-en <英文名>] [--slug <id>]
+           [--description <中文介绍>] [--description-en <英文介绍>] [--tag <id>]
       添加一个链接（友链、工具、常逛的站点等）。
   tag add <id> [--zh <中文名>] [--en <英文名>]
       添加标签，并重新生成标签类型。
@@ -330,10 +330,15 @@ function blogFileContents({ title, description, tags, lang }) {
   return `${lines.join('\n')}\n`
 }
 
-function linkFileContents({ name, url, description, descriptionEn, tag }) {
-  const lines = ['---', `name: ${yaml(name)}`, `url: ${yaml(url)}`]
-  const descriptions = []
+function linkFileContents({ slug, names, url, description, descriptionEn, tag }) {
+  const lines = ['---', `slug: ${slug}`, 'names:']
 
+  if (names.zh) lines.push(`  zh: ${yaml(names.zh)}`)
+  if (names.en) lines.push(`  en: ${yaml(names.en)}`)
+
+  lines.push(`url: ${yaml(url)}`)
+
+  const descriptions = []
   if (description) descriptions.push(`  zh: ${yaml(description)}`)
   if (descriptionEn) descriptions.push(`  en: ${yaml(descriptionEn)}`)
   if (descriptions.length > 0) lines.push('description:', ...descriptions)
@@ -516,7 +521,7 @@ function normalizeUrl(input) {
 
 async function linkAdd(argv) {
   const { positionals, values } = parseArgs(argv, {
-    values: ['name', 'slug', 'description', 'description-en', 'tag'],
+    values: ['name', 'name-en', 'slug', 'description', 'description-en', 'tag'],
     booleans: [],
   })
 
@@ -527,8 +532,15 @@ async function linkAdd(argv) {
   const hostname = url.hostname.replace(/^www\./, '')
 
   let name = getValue(values, 'name')
-  if (!name && isInteractive()) name = await ask('名称', { defaultValue: hostname })
+  if (name === undefined && isInteractive()) {
+    name = await ask('中文名称', { defaultValue: hostname })
+  }
   name ??= hostname
+
+  let nameEn = getValue(values, 'name-en')
+  if (nameEn === undefined && isInteractive()) {
+    nameEn = await ask('English name（可留空）', { optional: true })
+  }
 
   let description = getValue(values, 'description')
   if (description === undefined && isInteractive()) {
@@ -557,8 +569,8 @@ async function linkAdd(argv) {
   }
 
   let slug = getValue(values, 'slug')
-  if (!slug) slug = slugify(name) || slugify(hostname)
-  if (!slug) fail('无法推导文件 id，请用 --slug 指定。')
+  if (!slug) slug = slugify(nameEn ?? '') || slugify(name) || slugify(hostname)
+  if (!slug) fail('无法推导 slug，请用 --slug 指定。')
   assertSlug(slug)
 
   const directory = join(ROOT, LINKS_CONTENT_DIR)
@@ -568,7 +580,14 @@ async function linkAdd(argv) {
   await mkdir(directory, { recursive: true })
   await writeFile(
     file,
-    linkFileContents({ name, url: url.href, description, descriptionEn, tag }),
+    linkFileContents({
+      slug,
+      names: { zh: name, en: nameEn || undefined },
+      url: url.href,
+      description,
+      descriptionEn,
+      tag,
+    }),
     'utf8',
   )
 

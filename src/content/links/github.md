@@ -1,5 +1,7 @@
 ---
-name: GitHub
+slug: github
+names:
+  zh: GitHub
 url: https://github.com/Ezhana/snowiest
 description:
   zh: 代码、版本，以及这个站点的老家。

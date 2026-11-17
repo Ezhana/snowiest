@@ -11,8 +11,8 @@ pnpm content moment add [内容...] [--tag <id>]... [--lang zh|en]
 pnpm content blog new [slug] [--title <标题>] [--description <摘要>] [--tag <id>]...
                       [--lang zh|en] [--no-edit]
 pnpm content blog publish <slug>
-pnpm content link add <url> [--name <名称>] [--slug <id>] [--description <中文介绍>]
-                          [--description-en <英文介绍>] [--tag <id>]
+pnpm content link add <url> [--name <中文名>] [--name-en <英文名>] [--slug <id>]
+                          [--description <中文介绍>] [--description-en <英文介绍>] [--tag <id>]
 pnpm content tag add <id> [--zh <中文名>] [--en <英文名>]
 pnpm content tag list
 pnpm content tag remove <id>
@@ -85,13 +85,14 @@ pnpm content blog publish <slug>
 链接不只用于友链：朋友、工具、参考资料、常逛的站点都放在同一个集合里。
 
 ```sh
-pnpm content link add https://astro.build --name Astro \
+pnpm content link add https://astro.build --name Astro --name-en Astro \
   --description '这个站点的骨架。文档清楚，社区温和。' \
   --tag engineering
 ```
 
 - URL 可以省略协议，默认补 `https://`；只接受合法的 http(s) 地址。
-- 文件名 id 默认从名称推导（中文名回退到域名），也可以用 `--slug` 指定。
+- `--name` 写中文名称，默认取域名；`--name-en` 写英文名称，可省略，缺少时按全站回退规则显示中文。
+- 文件名默认从英文名推导，其次中文名，最后域名，也可以用 `--slug` 指定；文件名是 `<slug>.md`，`slug` 同时写入 frontmatter，作为链接的稳定标识且必须唯一；列表不分先后，展示顺序不代表推荐程度。
 - `--description` 写中文介绍，`--description-en` 写英文介绍；都可以省略。
 - 链接已存在时命令报错，不会覆盖；删除链接直接删文件。
 - 交互运行时，未提供的名称、介绍、标签会依次询问。

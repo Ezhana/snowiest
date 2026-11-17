@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content'
 import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
+import type { Lang } from './i18n/ui'
 import { BLOG_CONTENT_DIR, LINKS_CONTENT_DIR, MOMENTS_CONTENT_DIR } from './lib/content-paths'
 import { momentDateFromId } from './lib/moment-id'
 import { TAG_IDS } from './lib/tags'
@@ -25,24 +26,42 @@ const blog = defineCollection({
     }),
 })
 
+/** A link slug is a stable identifier, so keep it URL-safe. */
+const LINK_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+/**
+ * Bilingual text: every language is optional, but at least one must be present. Rendering falls
+ * back through `localizedValue`, so a field may carry one or both languages.
+ */
+const localizedText = z
+  .object({
+    zh: z.string().optional(),
+    en: z.string().optional(),
+  } satisfies Record<Lang, z.ZodOptional<z.ZodString>>)
+  .refine((text) => Boolean(text.zh || text.en), {
+    message: 'must provide zh, en, or both',
+  })
+
 const links = defineCollection({
-  // One file per link: `src/content/links/<id>.md`. A link is not necessarily a friend link;
+  // One file per link: `src/content/links/<slug>.md`. A link is not necessarily a friend link;
   // the same collection holds friends, tools, references and other places worth listing.
-  loader: glob({ base: `./${LINKS_CONTENT_DIR}`, pattern: '**/*.{md,mdx}' }),
+  loader: glob({
+    base: `./${LINKS_CONTENT_DIR}`,
+    pattern: '**/*.{md,mdx}',
+    // The loader otherwise uses the frontmatter `slug` as the entry id and silently drops
+    // duplicates after a warning. Keep the file id path-based so the query layer can fail the
+    // build on duplicate slugs.
+    generateId: ({ entry }) => entry.replace(/\.(md|mdx)$/, ''),
+  }),
   schema: z.object({
-    name: z.string(),
+    slug: z
+      .string()
+      .regex(LINK_SLUG_PATTERN, 'slug must be lowercase ASCII words joined by hyphens'),
+    names: localizedText,
     url: z.url(),
-    // One-line introduction per language. The other language is used as a fallback, so a link
-    // may carry one or both.
-    description: z
-      .object({
-        zh: z.string().optional(),
-        en: z.string().optional(),
-      })
-      .refine((description) => Boolean(description.zh || description.en), {
-        message: 'description must provide zh, en, or both',
-      })
-      .optional(),
+    // One-line introduction per language; optional, because a link without a description is
+    // still worth listing.
+    description: localizedText.optional(),
     tag: z.enum(TAG_IDS).optional(),
   }),
 })

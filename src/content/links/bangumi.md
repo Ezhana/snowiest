@@ -1,5 +1,7 @@
 ---
-name: Bangumi
+slug: bangumi
+names:
+  zh: Bangumi
 url: https://bgm.tv/
 description:
   zh: 追番记录和 ACGN 资讯的落脚点。
