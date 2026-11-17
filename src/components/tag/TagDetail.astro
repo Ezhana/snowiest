@@ -1,9 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro'
-import BlogFilter from '../blog/BlogFilter.astro'
 import BlogPostList from '../blog/BlogPostList.astro'
 import BlogTagFilter from './BlogTagFilter.astro'
-import FriendLinkListing from '../friends/FriendLinkListing.astro'
+import LinkListing from '../links/LinkListing.astro'
+import MomentCard from '../moments/MomentCard.astro'
+import { renderMoments } from '../../lib/moments'
 import { getTagResources } from '../../lib/tag-resources'
 import { getTagLabel, type TagId } from '../../lib/tags'
 import { getLang, useTranslations } from '../../i18n/ui'
@@ -16,7 +17,8 @@ const { tag } = Astro.props
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
 const tagLabel = getTagLabel(tag, lang)
-const { posts, friends } = await getTagResources(tag, lang)
+const { posts, links, moments } = await getTagResources(tag, lang)
+const renderedMoments = await renderMoments(moments)
 
 const heading = `${t('blog.tagPrefix')}${tagLabel}`
 const title = `${heading} · ${t('site.title')}`
@@ -35,12 +37,26 @@ const title = `${heading} · ${t('site.title')}`
     ) : (
       <p class="m-0 text-small text-fg-muted">{t('tag.noPosts')}</p>
     )}
-    {friends.length > 0 && (
-      <section class="mt-8 space-y-4" aria-labelledby="tag-friends-heading">
-        <h2 id="tag-friends-heading" class="text-h2 font-bold text-fg-strong">
-          {t('tag.friendsHeading')}
+    {links.length > 0 && (
+      <section class="mt-8 space-y-4" aria-labelledby="tag-links-heading">
+        <h2 id="tag-links-heading" class="text-h2 font-bold text-fg-strong">
+          {t('tag.linksHeading')}
         </h2>
-        <FriendLinkListing friends={friends} lang={lang} showTag={false} />
+        <LinkListing links={links} lang={lang} showTag={false} />
+      </section>
+    )}
+    {moments.length > 0 && (
+      <section class="mt-8 space-y-4" aria-labelledby="tag-moments-heading">
+        <h2 id="tag-moments-heading" class="text-h2 font-bold text-fg-strong">
+          {t('tag.momentsHeading')}
+        </h2>
+        <div class="space-y-3">
+          {renderedMoments.map(({ moment, Content }) => (
+            <MomentCard moment={moment} showTags={false}>
+              <Content />
+            </MomentCard>
+          ))}
+        </div>
       </section>
     )}
   </main>

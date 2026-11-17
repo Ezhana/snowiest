@@ -1,0 +1,52 @@
+---
+import type { Lang } from '../../i18n/ui'
+import { linkDescription, type Link } from '../../lib/links'
+import { getTagLabel } from '../../lib/tags'
+
+interface Props {
+  links: readonly Link[]
+  lang: Lang
+  /** Hide the category marker where the surrounding context already scopes the list to one tag. */
+  showTag?: boolean
+}
+
+const { links, lang, showTag = true } = Astro.props
+---
+
+<ul class="grid gap-3 sm:grid-cols-2">
+  {links.map((link) => {
+    const description = linkDescription(link, lang)
+    return (
+      <li>
+        <a
+          href={link.data.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group flex h-full flex-col rounded-surface border border-border bg-surface p-4 no-underline transition-colors hover:border-accent-border hover:bg-bg-subtle"
+        >
+          <span class="flex items-center justify-between gap-3">
+            <span class="flex min-w-0 items-center gap-2.5">
+              <span
+                class="grid size-8 shrink-0 place-items-center rounded-control bg-accent-subtle text-small font-semibold text-accent"
+                aria-hidden="true"
+              >
+                {link.data.name.slice(0, 1)}
+              </span>
+              <span class="truncate font-semibold text-fg-strong transition-colors group-hover:text-accent">
+                {link.data.name}
+              </span>
+            </span>
+            {showTag && link.data.tag && (
+              <span class="shrink-0 text-caption text-fg-muted">
+                {getTagLabel(link.data.tag, lang)}
+              </span>
+            )}
+          </span>
+          {description && (
+            <span class="mt-2 text-small leading-relaxed text-fg-muted">{description}</span>
+          )}
+        </a>
+      </li>
+    )
+  })}
+</ul>

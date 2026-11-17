@@ -1,7 +1,8 @@
 import { defineCollection } from 'astro:content'
 import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
-import { BLOG_CONTENT_DIR } from './lib/content-paths'
+import { BLOG_CONTENT_DIR, LINKS_CONTENT_DIR, MOMENTS_CONTENT_DIR } from './lib/content-paths'
+import { momentDateFromId } from './lib/moment-id'
 import { TAG_IDS } from './lib/tags'
 
 const blog = defineCollection({
@@ -24,4 +25,47 @@ const blog = defineCollection({
     }),
 })
 
-export const collections = { blog }
+const links = defineCollection({
+  // One file per link: `src/content/links/<id>.md`. A link is not necessarily a friend link;
+  // the same collection holds friends, tools, references and other places worth listing.
+  loader: glob({ base: `./${LINKS_CONTENT_DIR}`, pattern: '**/*.{md,mdx}' }),
+  schema: z.object({
+    name: z.string(),
+    url: z.url(),
+    // One-line introduction per language. The other language is used as a fallback, so a link
+    // may carry one or both.
+    description: z
+      .object({
+        zh: z.string().optional(),
+        en: z.string().optional(),
+      })
+      .refine((description) => Boolean(description.zh || description.en), {
+        message: 'description must provide zh, en, or both',
+      })
+      .optional(),
+    tag: z.enum(TAG_IDS).optional(),
+  }),
+})
+
+const moments = defineCollection({
+  loader: glob({
+    base: `./${MOMENTS_CONTENT_DIR}`,
+    pattern: '**/*.{md,mdx}',
+    // The default id is slugified (lowercased, `+` stripped), which destroys the timestamp.
+    // Moments derive their publication time from the filename, so keep it verbatim. Parsing it
+    // here also fails the build on a malformed timestamp instead of breaking the first reader.
+    generateId: ({ entry }) => {
+      const id = entry.replace(/\.(md|mdx)$/, '')
+      momentDateFromId(id)
+      return id
+    },
+  }),
+  // Moments are zero-configuration: the body carries the content, the filename carries the
+  // timestamp, and everything else is optional. See docs/content-authoring.md.
+  schema: z.object({
+    tags: z.array(z.enum(TAG_IDS)).default([]),
+    lang: z.enum(['zh', 'en']).default('zh'),
+  }),
+})
+
+export const collections = { blog, links, moments }

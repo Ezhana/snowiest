@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
-import FriendLinks from '../components/friends/FriendLinks.astro'
+import Links from '../components/links/Links.astro'
 import { getLang } from '../i18n/ui'
 import { localeUrl, rssUrl } from '../i18n/routing'
 import {
@@ -85,7 +85,7 @@ const lang = getLang(Astro.currentLocale)
           />
         </div>
 
-        <FriendLinks lang={lang} />
+        <Links lang={lang} />
 
         <hr />
 

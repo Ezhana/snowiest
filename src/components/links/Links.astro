@@ -1,0 +1,41 @@
+---
+import type { Lang } from '../../i18n/ui'
+import { SITE_GITHUB_PROFILE_URL } from '../../consts'
+import { getLinks } from '../../lib/links'
+import LinkListing from './LinkListing.astro'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const links = await getLinks()
+
+const copy = {
+  zh: {
+    heading: '链接',
+    intro: '一些常去、也愿意推荐的地方——朋友、工具、常逛的站点都在这里。',
+    exchange: '有值得放上来的地方？来',
+    exchangeLink: 'GitHub',
+    exchangeTail: '找我，带上链接和一句介绍。',
+  },
+  en: {
+    heading: 'Links',
+    intro: 'Places I keep coming back to — friends, tools, and sites worth a detour.',
+    exchange: 'Have a place worth listing? Find me on',
+    exchangeLink: 'GitHub',
+    exchangeTail: 'with a link and a one-line intro.',
+  },
+}[lang]
+---
+
+<section class="space-y-4" aria-labelledby="links-heading">
+  <h2 id="links-heading" class="text-h2 font-bold text-fg-strong">
+    {copy.heading}
+  </h2>
+  <p>{copy.intro}</p>
+  {links.length > 0 && <LinkListing links={links} lang={lang} />}
+  <p class="text-small text-fg-muted">
+    {copy.exchange} <a href={SITE_GITHUB_PROFILE_URL}>{copy.exchangeLink}</a> {copy.exchangeTail}
+  </p>
+</section>

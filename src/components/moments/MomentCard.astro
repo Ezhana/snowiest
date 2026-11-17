@@ -1,0 +1,49 @@
+---
+import { getLang, languageName, useTranslations } from '../../i18n/ui'
+import { momentDate, type Moment } from '../../lib/moments'
+import { getTagLabel } from '../../lib/tags'
+
+interface Props {
+  moment: Moment
+  /** Hide tags when the surrounding page already scopes the cards to one tag. */
+  showTags?: boolean
+}
+
+const { moment, showTags = true } = Astro.props
+const lang = getLang(Astro.currentLocale)
+const t = useTranslations(lang)
+const locale = lang === 'zh' ? 'zh-CN' : 'en-US'
+const date = momentDate(moment)
+const dateFormatter = new Intl.DateTimeFormat(locale, {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+})
+---
+
+<article class="rounded-panel border border-border/70 bg-surface p-5">
+  <div class="ez-editorial moment-body text-fg">
+    <slot />
+  </div>
+  <footer class="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-2 text-caption text-fg-muted">
+    <time datetime={date.toISOString()} class="tabular-nums">
+      {dateFormatter.format(date)}
+    </time>
+    {showTags &&
+      moment.data.tags.map((tagId) => (
+        <span class="rounded-pill border border-border/70 bg-bg-subtle px-2 py-0.5">
+          {getTagLabel(tagId, lang)}
+        </span>
+      ))}
+    {moment.data.lang !== lang && (
+      <span
+        class="ms-auto rounded-pill border border-border px-2 py-0.5"
+        title={t('moment.language')}
+      >
+        {languageName(moment.data.lang, lang)}
+      </span>
+    )}
+  </footer>
+</article>

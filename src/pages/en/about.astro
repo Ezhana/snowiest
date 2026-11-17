@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro'
-import FriendLinks from '../../components/friends/FriendLinks.astro'
+import Links from '../../components/links/Links.astro'
 import { getLang } from '../../i18n/ui'
 import { localeUrl, rssUrl } from '../../i18n/routing'
 import {
@@ -66,7 +66,7 @@ const lang = getLang(Astro.currentLocale)
           set:html={`${SITE_TITLE} is the personal site of ${SITE_AUTHOR}. It's built with <a class="copy-link" href="https://astro.build/">Astro</a>, the source lives on <a class="copy-link" href="${SITE_GITHUB_URL}">GitHub</a>, and it's published through <a class="copy-link" href="${SITE_URL}">GitHub Pages</a>. Expect tech articles, rants, anecdotes, ACGN news, and reflections. <del class="text-fg-muted decoration-danger">Weekly updates.</del> <ins class="text-accent decoration-accent decoration-wavy">Irregular updates, but it isn't going away.</ins>`}
         />
 
-        <FriendLinks lang={lang} />
+        <Links lang={lang} />
 
         <hr />
 
