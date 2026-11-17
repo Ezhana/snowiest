@@ -15,7 +15,7 @@ const { lang } = Astro.props
  * tools and references, which stay reachable from tag pages but do not belong in this section.
  * A slug with no matching entry fails the build instead of silently dropping a friend.
  */
-const FRIEND_LINK_SLUGS = ['bangumi', 'moegirl', 'bilibili']
+const FRIEND_LINK_SLUGS = ['bangumi', 'moegirl', 'umb-ink']
 
 /** The site's own link, rendered at the end of the section as reference for link exchanges. */
 const SELF_LINK_SLUG = 'snowiest'
@@ -96,15 +96,11 @@ const copy = {
       </div>
       <div class="flex items-center gap-1">
         <dt class="shrink-0 text-fg-muted">{copy.selfIconLabel}</dt>
-        <dd>
-          {selfLink.data.icon}
-        </dd>
+        <dd>{selfLink.data.icon}</dd>
       </div>
       <div class="flex items-start gap-1">
         <dt class="shrink-0 text-fg-muted">{copy.selfLinkLabel}</dt>
-        <dd class="min-w-0">
-          {selfLink.data.url}
-        </dd>
+        <dd class="min-w-0">{selfLink.data.url}</dd>
       </div>
       {selfDescription && (
         <div class="flex items-start gap-1">
