@@ -14,13 +14,13 @@ const base = localeUrl(lang, basePath)
 const activeClass = 'bg-accent-subtle font-medium text-accent'
 const inactiveClass = 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong active:text-accent'
 const options = [
-  { order: 'newest', href: base, label: t('blog.sortNewest') },
-  { order: 'oldest', href: `${base}?order=oldest`, label: t('blog.sortOldest') },
+  { order: 'newest', href: base, label: t('order.newest') },
+  { order: 'oldest', href: `${base}?order=oldest`, label: t('order.oldest') },
 ]
 ---
 
 <nav
-  aria-label={t('blog.sortLabel')}
+  aria-label={t('order.label')}
   class="inline-flex shrink-0 items-center gap-0.5 rounded-control border border-border p-0.5"
 >
   {options.map((option) => (

@@ -1,24 +1,8 @@
 import { onPageLoad } from '../../lib/runtime'
+import { applyOrderLinks, readOrder, setLinkState, type Order } from '../../lib/order'
 
-const setLinkState = (link: HTMLElement, active: boolean) => {
-  const classes = (value: string | undefined) => (value ?? '').split(/\s+/).filter(Boolean)
-  const activeClasses = classes(link.dataset.stateActive)
-  const inactiveClasses = classes(link.dataset.stateInactive)
-
-  link.classList.remove(...(active ? inactiveClasses : activeClasses))
-  link.classList.add(...(active ? activeClasses : inactiveClasses))
-
-  if (active) {
-    link.setAttribute('aria-current', 'page')
-  } else {
-    link.removeAttribute('aria-current')
-  }
-}
-
-function applyOrderState(order: 'newest' | 'oldest'): void {
-  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-order-link]')) {
-    setLinkState(link, link.dataset.orderLink === order)
-  }
+function applyOrderState(order: Order): void {
+  applyOrderLinks(order)
 
   // Keep the active ordering when the reader switches tags.
   for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-tag-filter] a')) {
@@ -44,7 +28,7 @@ export function setupBlogListing(): void {
     root.dataset.blogListingReady = 'true'
 
     const params = new URLSearchParams(window.location.search)
-    const order = params.get('order') === 'oldest' ? 'oldest' : 'newest'
+    const order = readOrder(window.location.search)
     const posts = Array.from(list.querySelectorAll<HTMLElement>('[data-post]'))
     const orderedPosts =
       order === 'oldest'

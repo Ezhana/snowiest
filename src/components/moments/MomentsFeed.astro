@@ -1,0 +1,56 @@
+---
+import { getLang, useTranslations } from '../../i18n/ui'
+import { getMoments, renderMoments } from '../../lib/moments'
+import MomentCard from './MomentCard.astro'
+
+/** Moments are short; several fit in one infinite-scroll batch. */
+const MOMENT_BATCH_SIZE = 4
+
+const lang = getLang(Astro.currentLocale)
+const t = useTranslations(lang)
+const moments = await getMoments()
+const entries = await renderMoments(moments)
+const batches = Array.from(
+  { length: Math.ceil(entries.length / MOMENT_BATCH_SIZE) },
+  (_, batchIndex) => {
+    const start = batchIndex * MOMENT_BATCH_SIZE
+    return entries.slice(start, start + MOMENT_BATCH_SIZE)
+  },
+)
+---
+
+{moments.length === 0 ? (
+  <p class="m-0 text-center text-fg-muted">{t('moment.empty')}</p>
+) : (
+  <section aria-label={t('moment.title')}>
+    <div data-moments-feed data-initial-batches="2" data-load-batches="1">
+      <ol class="m-0 list-none space-y-4 p-0">
+        {batches.map((batch) => (
+          <li data-infinite-batch class="space-y-4">
+            {batch.map(({ moment, Content }) => (
+              <MomentCard moment={moment}>
+                <Content />
+              </MomentCard>
+            ))}
+          </li>
+        ))}
+      </ol>
+      <div class="mt-8 flex justify-center">
+        <button
+          type="button"
+          data-infinite-sentinel
+          hidden
+          class="inline-flex items-center justify-center rounded-pill border border-border px-5 py-2 text-small text-fg-muted transition-colors hover:border-accent-border hover:text-fg-strong"
+        >
+          {t('common.loadMore')}
+        </button>
+      </div>
+    </div>
+  </section>
+)}
+
+<script>
+  import { setupMomentsFeed } from './moments-feed'
+
+  setupMomentsFeed()
+</script>

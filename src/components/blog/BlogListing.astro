@@ -1,5 +1,5 @@
 ---
-import BlogFilter from './BlogFilter.astro'
+import OrderFilter from '../site/OrderFilter.astro'
 import BlogPagination from './BlogPagination.astro'
 import BlogPostList from './BlogPostList.astro'
 import BlogTagFilter from '../tag/BlogTagFilter.astro'
@@ -21,7 +21,7 @@ const basePath = '/blog/'
 <main data-blog-listing data-page-size={BLOG_PAGE_SIZE} class="mx-auto w-full max-w-180 px-4 py-12">
   <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
     <h1 class="m-0 text-h1 font-bold text-fg-strong">{t('blog.title')}</h1>
-    <BlogFilter basePath={basePath} />
+    <OrderFilter basePath={basePath} />
   </div>
   <div class="mb-6">
     <BlogTagFilter />

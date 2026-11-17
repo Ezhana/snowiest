@@ -25,6 +25,18 @@
   --ez-editorial-heading-scale-compact: 1.05;
 }
 
+/*
+ * Moment bodies are one or two sentences, not articles. Keep the preset's element styling (links,
+ * lists, code, quotes) but drop to body size and tighten the paragraph rhythm so a short card does
+ * not read like a page of prose.
+ */
+.moment-body {
+  --ez-editorial-font-size: 1rem;
+  --ez-editorial-line-height: 1.65;
+  --ez-editorial-paragraph-spacing: 0.75em;
+  --ez-editorial-block-spacing: 1em;
+}
+
 /* A comfortable long-form measure (~45rem of text), independent of the page shell. */
 .reading-column {
   width: min(45rem, calc(100% - 2rem));
