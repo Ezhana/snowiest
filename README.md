@@ -33,13 +33,13 @@ pnpm preview    # 预览构建结果
 ├── scripts/content.mjs           # content CLI（moment / blog / link）
 ├── src/
 │   ├── assets/                   # 参与构建优化的图片
-│   ├── components/               # 按 feature 分目录：site/ blog/ moments/ timeline/ tag/ links/
+│   ├── components/               # 组件：pages/ 为双语页面实现，其余按 feature 分目录
 │   ├── content/blog/             # 文章
 │   ├── content/links/            # 链接（友链、工具、常逛的站点等）
 │   ├── content/moments/          # 动态
 │   ├── content/tags.json         # 标签唯一数据源（生成 src/lib/tags.generated.ts）
 │   ├── lib/                      # 内容查询、标签数据与跨 feature 客户端工具
-│   ├── i18n/                     # 中英文案与路由
+│   ├── i18n/                     # 中英文案（界面文案 + 页面文案）与路由
 │   ├── layouts/                  # 页面与文章布局
 │   ├── pages/                    # 路由（中文根路径 + /en 英文路由）
 │   ├── styles/                   # 全局样式与文章排版

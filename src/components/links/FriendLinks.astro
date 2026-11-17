@@ -13,15 +13,15 @@ const links = await getLinks()
 
 const copy = {
   zh: {
-    heading: '链接',
-    intro: '一些常去、也愿意推荐的地方——朋友、工具、常逛的站点都在这里。',
+    heading: '友情链接',
+    intro: '标记了几处世外桃源。',
     orderNote: '以下链接不分先后。',
-    exchange: '有值得放上来的地方？来',
+    exchange: '互通有无？来',
     exchangeLink: 'GitHub',
     exchangeTail: '找我，带上链接和一句介绍。',
   },
   en: {
-    heading: 'Links',
+    heading: 'FriendLinks',
     intro: 'Places I keep coming back to — friends, tools, and sites worth a detour.',
     orderNote: 'Listed below in no particular order.',
     exchange: 'Have a place worth listing? Find me on',
@@ -36,9 +36,11 @@ const copy = {
     {copy.heading}
   </h2>
   <p>{copy.intro}</p>
-  <p class="text-small text-fg-muted">{copy.orderNote}</p>
-  {links.length > 0 && <LinkListing links={links} lang={lang} />}
+  <div>
+    <p class="mb-1 text-small text-fg-muted">{copy.orderNote}</p>
+    {links.length > 0 && <LinkListing links={links} lang={lang} />}
+  </div>
   <p class="text-small text-fg-muted">
-    {copy.exchange} <a href={SITE_GITHUB_PROFILE_URL}>{copy.exchangeLink}</a> {copy.exchangeTail}
+    {copy.exchange} <a class="copy-link" href={SITE_GITHUB_PROFILE_URL}>{copy.exchangeLink}</a> {copy.exchangeTail}
   </p>
 </section>
