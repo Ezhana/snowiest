@@ -187,24 +187,36 @@ html[data-client-nav] [data-site-header] .animate-fade-in {
 ```
 
 ```ts
-/** 新页面就绪：在 swap 之前把条子画满，快照里的条子就是满格。 */
-const completeBeforeSwap = () => {
+/** 页面就绪：赶在旧页面被快照前把条子推到 80%，之后就让它随旧页面一起淡出。 */
+const peakBeforeSnapshot = () => {
+  if (!running) return
+  clearTimers()
+  withoutTransitions(() => paint(0.8))
+}
+
+/** 新页面快照之前把条子收掉：半透明的条子被拍进快照，换回实时层时会再冒一次。 */
+const clearBeforeSwap = () => {
   if (!running) return
   stopFade()
   clearTimers()
-  withoutTransitions(() => paint(1))
+  running = false
+  withoutTransitions(() => {
+    setOpacity('0')
+    paint(0)
+  })
 }
 
-document.addEventListener('astro:before-swap', completeBeforeSwap)
+document.addEventListener('astro:after-preparation', peakBeforeSnapshot)
+document.addEventListener('astro:before-swap', clearBeforeSwap)
 ```
 
-首屏仍然走完整的 `fade-up`（新文档不会被快照）；client 导航则是「旧页面淡出 + 新页面升起」的 cross-fade，进度条在 swap 那一刻直接满格，然后照常淡出。
+首屏仍然走完整的 `fade-up`（新文档不会被快照）；client 导航则是「旧页面淡出 + 新页面升起」的 cross-fade。条子不去假装完成：它涨到 80%，然后随旧页面一起淡出。100% 只出现在首屏——那里没有快照可以骗，也没必要骗。
 
 ## 现在的行为
 
 首屏：点击/加载 → 15% 立刻出现 → 180ms 后到 65% → 加载完 → 100% → 300ms 后淡出 → 淡出结束瞬时归零。
 
-站内跳转：15% 立刻出现 → 长到 65%（加载慢时才有机会）→ `before-swap` 直接满格 → 视图过渡期间保持满格 → 过渡结束后淡出。条子的宽度全程只增不减。开启「减弱动态效果」时全程没有动画：直接出现、直接满格、停一小会儿、直接消失。
+站内跳转：15% 立刻出现 → 加载慢的话 180ms 后到 65% → 页面就绪时推到 80% → 随旧页面一起淡出（峰值 80%，不再假装完成）。条子的宽度全程只增不减。开启「减弱动态效果」时全程没有动画：直接出现、直接到峰值、直接消失。
 
 ## 验证
 
