@@ -26,6 +26,8 @@ const GROWTH_DELAY_MS = 180
 const GROWTH_VALUE = 0.65
 const INITIAL_VALUE = 0.15
 const REDUCED_VALUE = 0.6
+/** Client navigations stop here: the view transition cannot show a completion, so they fade out. */
+const READY_PEAK = 0.8
 
 export function setupPageProgress(): void {
   const getProgressRoot = () => document.querySelector<HTMLElement>('[data-page-progress]')
@@ -168,16 +170,31 @@ export function setupPageProgress(): void {
   }
 
   /**
-   * The incoming page is ready. Paint the full bar before `<ClientRouter />` swaps, because the view
-   * transition snapshots the new page right after the swap: a bar captured mid-fill is frozen in
-   * that snapshot and jumps when the live layer takes over (a visible step backwards).
+   * The page is ready. Show the peak before the outgoing page is snapshotted, then let the bar fade
+   * out with it: the view transition never shows anything that happens while it runs, so claiming a
+   * completion (100%) would only exist in the frozen snapshot and jump when the live layer returns.
    */
-  const completeBeforeSwap = () => {
+  const peakBeforeSnapshot = () => {
+    if (!running) return
+
+    clearTimers()
+    withoutTransitions(() => paint(READY_PEAK))
+  }
+
+  /**
+   * Hide the bar before `<ClientRouter />` snapshots the incoming page: a bar captured mid-fade is
+   * frozen in that snapshot and reappears when the live layer takes over.
+   */
+  const clearBeforeSwap = () => {
     if (!running) return
 
     stopFade()
     clearTimers()
-    withoutTransitions(() => paint(1))
+    running = false
+    withoutTransitions(() => {
+      setOpacity('0')
+      paint(0)
+    })
   }
 
   const finish = () => {
@@ -204,7 +221,8 @@ export function setupPageProgress(): void {
   }
 
   document.addEventListener('astro:before-preparation', start)
-  document.addEventListener('astro:before-swap', completeBeforeSwap)
+  document.addEventListener('astro:after-preparation', peakBeforeSnapshot)
+  document.addEventListener('astro:before-swap', clearBeforeSwap)
   document.addEventListener('astro:page-load', finish)
 
   // Full navigations (for example RSS/XML) and back-forward cache restores.
