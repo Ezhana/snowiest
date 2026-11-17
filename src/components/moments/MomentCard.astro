@@ -27,23 +27,25 @@ const dateFormatter = new Intl.DateTimeFormat(locale, {
   <div class="ez-editorial moment-body text-fg">
     <slot />
   </div>
-  <footer class="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-2 text-caption text-fg-muted">
+  <footer class="mt-4 flex flex-wrap items-center gap-2 text-caption text-fg-muted">
     <time datetime={date.toISOString()} class="tabular-nums">
       {dateFormatter.format(date)}
     </time>
-    {showTags &&
-      moment.data.tags.map((tagId) => (
-        <span class="rounded-pill border border-border/70 bg-bg-subtle px-2 py-0.5">
-          {getTagLabel(tagId, lang)}
-        </span>
-      ))}
     {moment.data.lang !== lang && (
       <span
-        class="ms-auto rounded-pill border border-border px-2 py-0.5"
+        class="before:content-['·'] before:mr-1.5 before:inline-block"
         title={t('moment.language')}
       >
         {languageName(moment.data.lang, lang)}
       </span>
     )}
+    <div class="ms-auto flex gap-2">
+      {showTags &&
+        moment.data.tags.map((tagId) => (
+          <span class="before:content-['#'] before:mr-0.5 before:inline-block">
+          {getTagLabel(tagId, lang)}
+        </span>
+        ))}
+    </div>
   </footer>
 </article>
