@@ -167,6 +167,19 @@ export function setupPageProgress(): void {
     }
   }
 
+  /**
+   * The incoming page is ready. Paint the full bar before `<ClientRouter />` swaps, because the view
+   * transition snapshots the new page right after the swap: a bar captured mid-fill is frozen in
+   * that snapshot and jumps when the live layer takes over (a visible step backwards).
+   */
+  const completeBeforeSwap = () => {
+    if (!running) return
+
+    stopFade()
+    clearTimers()
+    withoutTransitions(() => paint(1))
+  }
+
   const finish = () => {
     if (!running) return
 
@@ -191,6 +204,7 @@ export function setupPageProgress(): void {
   }
 
   document.addEventListener('astro:before-preparation', start)
+  document.addEventListener('astro:before-swap', completeBeforeSwap)
   document.addEventListener('astro:page-load', finish)
 
   // Full navigations (for example RSS/XML) and back-forward cache restores.

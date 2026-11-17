@@ -394,12 +394,27 @@
 }
 
 /*
- * Entrance animations are skipped on `<ClientRouter />` navigations: the view transition snapshots
- * the incoming page right after the swap, and anything starting at `opacity: 0` would be captured
- * as a blank page (see `src/lib/client-navigation.ts`). The header rows animate through a utility,
- * whose layer sits above the component layer, so these overrides stay outside the layers.
+ * Client navigations keep the entrance motion but not its opacity half: the view transition
+ * snapshots the incoming page right after the swap, so an `opacity: 0` start would be captured as a
+ * blank page (the cross-fade would flash through it). The transition's own cross-fade supplies the
+ * fade; the page only rises into place. The header rows are not animated for the same reason — they
+ * would be captured blank and fade in after the snapshot. See `src/lib/client-navigation.ts`.
+ *
+ * Unlayered on purpose: `animate-fade-in` lives in the utilities layer, which wins over components.
  */
-html[data-client-nav] .page-enter,
+html[data-client-nav] .page-enter {
+  animation: rise 600ms cubic-bezier(0.2, 0, 0, 1);
+}
+
 html[data-client-nav] [data-site-header] .animate-fade-in {
   animation: none;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(14px);
+  }
+  to {
+    transform: none;
+  }
 }
