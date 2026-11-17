@@ -187,36 +187,36 @@ html[data-client-nav] [data-site-header] .animate-fade-in {
 ```
 
 ```ts
-/** 页面就绪：赶在旧页面被快照前把条子推到 80%，之后就让它随旧页面一起淡出。 */
-const peakBeforeSnapshot = () => {
-  if (!running) return
-  clearTimers()
-  withoutTransitions(() => paint(0.8))
-}
+/** 填充到峰值并等它落地：loader 在 swap 之前被 await，这是最后一段唯一能被看到的地方。 */
+const fillToPeak = (signal?: AbortSignal) =>
+  new Promise<void>((resolve) => {
+    // ……把 transform 过渡调快到 140ms，paint(0.65)，
+    //    等 transitionend（带超时兜底和 abort）落定后 resolve
+  })
+
+/** 包一层 loader：页面就绪后先让条子走完，再放行 swap。 */
+document.addEventListener('astro:before-preparation', (raw) => {
+  const event = raw as Event & { loader: () => Promise<void>; signal: AbortSignal }
+  const load = event.loader
+  event.loader = async () => {
+    await load()
+    await fillToPeak(event.signal)
+  }
+})
 
 /** 新页面快照之前把条子收掉：半透明的条子被拍进快照，换回实时层时会再冒一次。 */
-const clearBeforeSwap = () => {
-  if (!running) return
-  stopFade()
-  clearTimers()
-  running = false
-  withoutTransitions(() => {
-    setOpacity('0')
-    paint(0)
-  })
-}
-
-document.addEventListener('astro:after-preparation', peakBeforeSnapshot)
 document.addEventListener('astro:before-swap', clearBeforeSwap)
 ```
 
-首屏仍然走完整的 `fade-up`（新文档不会被快照）；client 导航则是「旧页面淡出 + 新页面升起」的 cross-fade。条子不去假装完成：它涨到 80%，然后随旧页面一起淡出。100% 只出现在首屏——那里没有快照可以骗，也没必要骗。
+首屏仍然走完整的 `fade-up`（新文档不会被快照）；client 导航则是「旧页面淡出 + 新页面升起」的 cross-fade。条子填到 65% 就停，然后随旧页面一起淡出——100% 只出现在首屏，那里没有快照可以骗，也没必要骗。
+
+这段等待卡在 loader 里，所以**被延后的是整次跳转**（本地约 140ms），不是条子自己。它是纯为条子付的钱：没有条子就完全不会有这段延迟。慢网络下反而不亏——HTML 本来就要等那么久，条子早就到 65% 了。
 
 ## 现在的行为
 
 首屏：点击/加载 → 15% 立刻出现 → 180ms 后到 65% → 加载完 → 100% → 300ms 后淡出 → 淡出结束瞬时归零。
 
-站内跳转：15% 立刻出现 → 加载慢的话 180ms 后到 65% → 页面就绪时推到 80% → 随旧页面一起淡出（峰值 80%，不再假装完成）。条子的宽度全程只增不减。开启「减弱动态效果」时全程没有动画：直接出现、直接到峰值、直接消失。
+站内跳转：15% 立刻出现 → 180ms 后到 65%（慢加载时）→ 页面就绪后由 loader 等条子平滑填到 65%（快加载时约 140ms）→ swap → 随旧页面一起淡出。峰值 65%，宽度全程只增不减。开启「减弱动态效果」时全程没有动画：直接出现、直接到峰值、直接消失。
 
 ## 验证
 
@@ -233,6 +233,7 @@ document.addEventListener('astro:before-swap', clearBeforeSwap)
 
 ## 留下的东西
 
+- **想让用户看见，就得在 swap 之前做完。** 视图过渡期间只有快照。要平滑就得让 loader 先等一等，而这段等待的代价落在整次跳转上——这是这个方案唯一诚实的做法。
 - **视图过渡的快照就是最终画面。** 任何在快照时还在动画中的东西都会被冻住：从 `opacity: 0` 开始的入场动画会让快照变成空白页，还在长的进度条会被冻在半截，过渡结束换回实时层时就会“跳一下”。入场动画只保留视图过渡能承担的部分（位移），条子在 swap 前画满。
 - **跨 DOM 搬迁的过渡不可靠。** 被 `transition:persist` 保留的元素会在导航中被搬走，任何还在飞的过渡都会被取消、落到目标值。起点、终点这类“必须准确”的状态，用落定值画。
 - **一个 run 拥有它排的所有定时器。** 进度条这种“开始—进行—结束”的状态机，最容易死在上一轮的定时器上。
