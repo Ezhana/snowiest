@@ -39,7 +39,7 @@ const postHref = (post: BlogPost) => localeUrl(lang, `/blog/${postSlug(post)}/`)
             <DateTime date={post.data.pubDate} />
             <OriginalLanguage lang={postLang(post)} />
             {post.data.tags.map((tagId) => (
-              <Tag tag={tagId} lang={lang} interactive />
+              <Tag className="text-accent" tag={tagId} lang={lang} interactive />
             ))}
           </div>
         </div>
