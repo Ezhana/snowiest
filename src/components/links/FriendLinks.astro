@@ -1,8 +1,8 @@
 ---
 import type { Lang } from '../../i18n/ui'
-import { SITE_GITHUB_PROFILE_URL } from '../../consts'
 import { getLinks, linkDescription, linkName } from '../../lib/links'
 import LinkListing from './LinkListing.astro'
+import { SITE_GITHUB_URL } from '../../consts.ts'
 
 interface Props {
   lang: Lang
@@ -53,7 +53,7 @@ const copy = {
     orderNote: '以下链接不分先后。',
     exchange: '互通有无？来',
     exchangeLink: 'GitHub',
-    exchangeTail: '找我，带上链接和一句介绍。',
+    exchangeTail: '发个 issue，记得带上链接和一句介绍。',
     selfLabel: '本站信息',
     selfNote: '交换友链时可直接引用以下信息。',
     selfNameLabel: '名称：',
@@ -89,7 +89,7 @@ const copy = {
   </div>
   <p class="text-small text-fg-muted">
     {copy.exchange}{' '}
-    <a class="copy-link" href={SITE_GITHUB_PROFILE_URL}>
+    <a class="copy-link" href={SITE_GITHUB_URL}>
       {copy.exchangeLink}
     </a>{' '}
     {copy.exchangeTail}

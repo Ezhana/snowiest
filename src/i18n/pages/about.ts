@@ -36,7 +36,7 @@ interface AboutCopy {
 const zh: AboutCopy = {
   title: '关于',
   description: `关于${SITE_TITLE_ZH}与它的作者 ${SITE_AUTHOR}。`,
-  intro: `我是 <strong>${SITE_AUTHOR}</strong>，<strong>${SITE_TITLE_ZH}</strong>的维护者。平时写代码，也写点别的；喜欢把复杂的东西理顺，<del class="text-fg-muted decoration-danger">然后制造新的复杂</del>，<ins class="text-accent decoration-accent decoration-wavy">然后发现新的麻烦。</ins>`,
+  intro: `<strong>${SITE_AUTHOR}</strong>，<strong>${SITE_TITLE_ZH}</strong>的维护者。平时写代码，也写点别的；喜欢把复杂的东西理顺，<del class="text-fg-muted decoration-danger">然后制造新的复杂</del>，<ins class="text-accent decoration-accent decoration-wavy">然后发现新的麻烦。</ins>`,
   threeWordsPrompt: '如果只能用三个词介绍自己，我会选：',
   threeWords: '有趣、秩序、和谐',
   fun: `<strong>有趣</strong>是入口。喜欢琢磨一件事还能不能更好玩一点，也喜欢在正经的讨论里突然拐个弯。<del class="text-fg-muted decoration-danger">包括这段自我介绍。</del>`,
