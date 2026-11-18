@@ -10,8 +10,6 @@ export type Link = CollectionEntry<'links'>
  * "all links" section first, so a friend never appears twice on the page.
  */
 export const FRIEND_LINK_SLUGS = [
-  'bangumi',
-  'moegirl',
   'umb-ink',
   'shiyu-dev',
   'imaegoo-s-blog',
