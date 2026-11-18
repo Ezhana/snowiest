@@ -1,0 +1,35 @@
+---
+import { getLang, useTranslations } from '../../i18n/ui'
+
+const lang = getLang(Astro.currentLocale)
+const t = useTranslations(lang)
+const giscusLang = lang === 'zh' ? 'zh-CN' : 'en'
+---
+
+<section class="mt-12 border-t border-border pt-8" aria-label={t('comment.heading')}>
+  {/*
+    The giscus client script reads these options; `giscus.ts` mounts it so the theme can be
+    resolved on the client and the widget can be re-created after each ClientRouter navigation.
+  */}
+  <div
+    data-giscus
+    data-repo="Ezhana/snowiest"
+    data-repo-id="R_kgDOVtkYpQ"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOVtkYpc4DLZ8f"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-lang={giscusLang}
+    data-loading="lazy"
+  ></div>
+</section>
+
+<script>
+  import { onPageLoad } from '../../lib/runtime'
+  import { setupGiscus } from './giscus'
+
+  onPageLoad(setupGiscus)
+</script>

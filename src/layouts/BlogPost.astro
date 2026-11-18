@@ -2,6 +2,7 @@
 import type { ImageMetadata, MarkdownHeading } from 'astro'
 import { Image } from 'astro:assets'
 import BaseLayout from './BaseLayout.astro'
+import Comment from '../components/comment/Comment.astro'
 import DateTime from '../components/site/DateTime.astro'
 import BackToTopLink from '../components/blog/BackToTopLink.astro'
 import TocTrigger from '../components/blog/TocTrigger.astro'
@@ -190,6 +191,7 @@ const hasToc = headings.some((heading) => heading.depth === 2 || heading.depth =
           <slot />
         </div>
       </article>
+      <Comment />
       <aside class="absolute left-full top-0 ms-8 hidden h-full w-52 xl:block">
         {/*
           The rail is flush to the reading column: the outline and the back-to-top button share the

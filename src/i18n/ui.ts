@@ -71,6 +71,7 @@ const en = {
     'This post is not available in English yet. Showing the original Chinese version.',
   'post.fallbackFromEn':
     'This post is not available in Chinese yet. Showing the original English version.',
+  'comment.heading': 'Comments',
   'pagination.label': 'Pagination',
   'pagination.previous': 'Previous',
   'pagination.next': 'Next',
@@ -119,6 +120,7 @@ const zh: Record<UiKey, string> = {
   'post.backToTop': '回到顶部',
   'post.fallbackFromZh': '本文暂无英文版，以下为中文原文。',
   'post.fallbackFromEn': '本文暂无中文版，以下为英文原文。',
+  'comment.heading': '评论',
   'pagination.label': '分页导航',
   'pagination.previous': '上一页',
   'pagination.next': '下一页',
