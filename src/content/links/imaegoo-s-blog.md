@@ -1,7 +1,6 @@
 ---
 slug: imaegoo-s-blog
 names:
-  zh: 'imaegoo.com'
   en: 'iMaeGoo’s Blog'
 url: 'https://www.imaegoo.com/'
 description:
