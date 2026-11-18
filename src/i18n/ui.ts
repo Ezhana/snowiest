@@ -78,6 +78,7 @@ const en = {
   'timeline.label': 'Writing timeline',
   'common.loadMore': 'Load more',
   'footer.copyright': 'Ezhana. All rights reserved.',
+  'footer.license': 'Content license by',
   'footer.source': 'Source on GitHub',
   'footer.hosted': 'Hosted on GitHub Pages',
 } as const
@@ -125,6 +126,7 @@ const zh: Record<UiKey, string> = {
   'timeline.label': '文章时间轴',
   'common.loadMore': '加载更多',
   'footer.copyright': 'Ezhana，保留所有权利。',
+  'footer.license': '内容许可',
   'footer.source': 'GitHub 源码',
   'footer.hosted': '托管于 GitHub Pages',
 }
