@@ -18,7 +18,7 @@ const lang = getLang(Astro.currentLocale)
 const postHref = (post: BlogPost) => localeUrl(lang, `/blog/${postSlug(post)}/`)
 ---
 
-<ul data-blog-list class="m-0 list-none p-0">
+<ul data-blog-list class="list-none">
   {posts.map((post) => (
     <li data-post data-date={post.data.pubDate.valueOf()} class="group py-3">
       <div class="flex items-start justify-between gap-4">

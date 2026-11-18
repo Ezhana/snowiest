@@ -57,68 +57,69 @@ const title = `${copy.title} · ${t('site.title')}`
 
 <BaseLayout title={title} description={copy.description}>
   <main class="mx-auto w-full max-w-6xl px-4 py-10 lg:py-14">
-    <div class="mx-auto w-full max-w-180">
-      <h1 class="text-center text-h1 font-bold text-fg-strong">{copy.title}</h1>
-      <p class="text-center text-small text-fg-muted">{copy.orderNote}</p>
+    <div class="mx-auto w-full max-w-180 space-y-4">
+      <div class="space-y-2">
+        <h1 class="text-h1 font-bold text-fg-strong">{copy.title}</h1>
+        <p class="text-small text-fg-muted">{copy.orderNote}</p>
+      </div>
+      {otherLinks.length > 0 && (
+        <section aria-labelledby="all-links-heading">
+          <LinkListing links={otherLinks} lang={lang} />
+        </section>
+      )}
 
-      <div class="mt-10 space-y-10">
-        {otherLinks.length > 0 && (
-          <section aria-labelledby="all-links-heading">
-            <LinkListing links={otherLinks} lang={lang} />
-          </section>
-        )}
-
-        <section class="space-y-4" aria-labelledby="friend-links-heading">
+      <section class="space-y-4" aria-labelledby="friend-links-heading">
+        <div class="space-y-2">
           <h2 id="friend-links-heading" class="text-h2 font-bold text-fg-strong">
             {copy.friendHeading}
           </h2>
           <p>{copy.intro}</p>
-          {friendLinks.length > 0 && <LinkListing links={friendLinks} lang={lang} />}
+        </div>
+        {friendLinks.length > 0 && <LinkListing links={friendLinks} lang={lang} />}
 
-          <p class="text-small text-fg-muted">
-            {copy.exchange}{' '}
-            <a class="copy-link" href={SITE_LINK_EXCHANGE_URL}>
-              {copy.exchangeLink}
-            </a>{' '}
-            {copy.exchangeTail}
-          </p>
+        <p class="text-small text-fg-muted">
+          {copy.exchange}{' '}
+          <a class="copy-link" href={SITE_LINK_EXCHANGE_URL}>
+            {copy.exchangeLink}
+          </a>{' '}
+          {copy.exchangeTail}
+        </p>
 
-          <aside
-            class="rounded-surface border border-border bg-bg-subtle p-4"
-            aria-labelledby="self-link-heading"
-          >
-            <div class="flex items-center justify-between gap-2">
-              <h3 id="self-link-heading" class="text-small font-semibold text-fg-strong">
-                {copy.selfLabel}
-              </h3>
-              <CopyButton text={selfInfoText} ariaLabel={copy.copyAriaLabel} />
+        <aside
+          class="rounded-surface border border-border bg-bg-subtle p-4"
+          aria-labelledby="self-link-heading"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <h3 id="self-link-heading" class="text-small font-semibold text-fg-strong">
+              {copy.selfLabel}
+            </h3>
+            <CopyButton text={selfInfoText} ariaLabel={copy.copyAriaLabel} />
+          </div>
+          <p class="mt-1 text-small text-fg-muted">{copy.selfNote}</p>
+          <dl class="mt-2 space-y-1 text-small">
+            <div>
+              <dt class="inline text-fg-muted">{copy.selfNameLabel}</dt>
+              <dd class="inline font-semibold text-fg-strong">{selfName}</dd>
             </div>
-            <p class="mt-1 text-small text-fg-muted">{copy.selfNote}</p>
-            <dl class="mt-2 space-y-1 text-small">
+            <div>
+              <dt class="inline text-fg-muted">{copy.selfIconLabel}</dt>
+              <dd class="inline break-all select-all">{selfLink.data.icon}</dd>
+            </div>
+            <div>
+              <dt class="inline text-fg-muted">{copy.selfLinkLabel}</dt>
+              <dd class="inline break-all select-all">{selfLink.data.url}</dd>
+            </div>
+            {selfDescription && (
               <div>
-                <dt class="inline text-fg-muted">{copy.selfNameLabel}</dt>
-                <dd class="inline font-semibold text-fg-strong">{selfName}</dd>
+                <dt class="inline text-fg-muted">{copy.selfDescriptionLabel}</dt>
+                <dd class="inline text-fg-muted">{selfDescription}</dd>
               </div>
-              <div>
-                <dt class="inline text-fg-muted">{copy.selfIconLabel}</dt>
-                <dd class="inline break-all select-all">{selfLink.data.icon}</dd>
-              </div>
-              <div>
-                <dt class="inline text-fg-muted">{copy.selfLinkLabel}</dt>
-                <dd class="inline break-all select-all">{selfLink.data.url}</dd>
-              </div>
-              {selfDescription && (
-                <div>
-                  <dt class="inline text-fg-muted">{copy.selfDescriptionLabel}</dt>
-                  <dd class="inline text-fg-muted">{selfDescription}</dd>
-                </div>
-              )}
-            </dl>
-          </aside>
-        </section>
-      </div>
-
-      <Comment />
+            )}
+          </dl>
+        </aside>
+      </section>
     </div>
+
+    <Comment />
   </main>
 </BaseLayout>

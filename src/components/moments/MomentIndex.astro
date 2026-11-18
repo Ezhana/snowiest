@@ -10,18 +10,14 @@ const title = `${t('moment.title')} · ${t('site.title')}`
 ---
 
 <BaseLayout title={title} description={t('moment.intro')}>
-  <main class="mx-auto w-full max-w-180 px-4 py-12">
-    <header class="mx-auto max-w-[42rem] space-y-3 text-center">
-      <div>
+  <main class="mx-auto w-full max-w-180 px-4 py-12 space-y-4">
+    <header class="mx-auto max-w-2xl flex justify-between items-center text-center">
+      <div class="space-y-2">
         <h1 class="text-h1 font-bold text-fg-strong">{t('moment.title')}</h1>
         <p class="text-small text-fg-muted">{t('moment.intro')}</p>
       </div>
-      <div class="flex justify-center pt-2">
-        <OrderFilter basePath="/moment/" />
-      </div>
+      <OrderFilter basePath="/moment/" />
     </header>
-    <div class="mx-auto mt-10 w-full max-w-[42rem]">
-      <MomentsFeed />
-    </div>
+    <MomentsFeed />
   </main>
 </BaseLayout>

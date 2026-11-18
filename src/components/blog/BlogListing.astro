@@ -18,19 +18,21 @@ const totalPages = Math.max(1, Math.ceil(posts.length / BLOG_PAGE_SIZE))
 const basePath = '/blog/'
 ---
 
-<main data-blog-listing data-page-size={BLOG_PAGE_SIZE} class="mx-auto w-full max-w-180 px-4 py-12">
-  <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-    <h1 class="m-0 text-h1 font-bold text-fg-strong">{t('blog.title')}</h1>
-    <OrderFilter basePath={basePath} />
-  </div>
-  <div class="mb-6">
+<main
+  data-blog-listing
+  data-page-size={BLOG_PAGE_SIZE}
+  class="space-y-4 mx-auto w-full max-w-180 px-4 py-12"
+>
+  <div class="space-y-2">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h1 class="text-h1 font-bold text-fg-strong">{t('blog.title')}</h1>
+      <OrderFilter basePath={basePath} />
+    </div>
     <BlogTagFilter />
   </div>
-  {notice && <p class="m-0 mb-6 text-small text-fg-muted">{notice}</p>}
-  <section>
-    <BlogPostList posts={posts} />
-    <BlogPagination totalPages={totalPages} basePath={basePath} />
-  </section>
+  {notice && <p class="text-small text-fg-muted">{notice}</p>}
+  <BlogPostList posts={posts} />
+  <BlogPagination totalPages={totalPages} basePath={basePath} />
 </main>
 
 <script>
