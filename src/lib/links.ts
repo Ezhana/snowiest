@@ -24,6 +24,7 @@ export const FRIEND_LINK_SLUGS = [
   'dkrain-com',
   'snowiest',
   'peter267',
+  'mashirl'
 ]
 
 /** The site's own link, featured as a reference card instead of a regular listing. */
