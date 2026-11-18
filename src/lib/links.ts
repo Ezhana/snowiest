@@ -23,6 +23,7 @@ export const FRIEND_LINK_SLUGS = [
   'dongyue-org',
   'dkrain-com',
   'snowiest',
+  'peter267',
 ]
 
 /** The site's own link, featured as a reference card instead of a regular listing. */
