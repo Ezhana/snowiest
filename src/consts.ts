@@ -8,6 +8,8 @@ export const SITE_DESCRIPTION_ZH = '簌雪（Snowiest）—— Ezhana 的个人�
 export const SITE_AUTHOR = 'Ezhana'
 export const SITE_GITHUB_PROFILE_URL = 'https://github.com/Ezhana'
 export const SITE_GITHUB_URL = 'https://github.com/Ezhana/snowiest'
+/** Where link exchanges are requested; the Links page points its exchange note here. */
+export const SITE_LINK_EXCHANGE_URL = 'https://github.com/Ezhana/snowiest/issues/1'
 export const SITE_URL = 'https://ezhana.github.io/snowiest/'
 
 // GitHub Pages serves this project site from the `/snowiest/` sub-path. Astro exposes the

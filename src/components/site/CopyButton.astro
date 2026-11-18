@@ -1,0 +1,61 @@
+---
+/**
+ * Copy-to-clipboard button.
+ *
+ * The component owns the icon, the transient "copied" label and the clipboard handling, so callers
+ * only decide what text to copy. `copy-button.ts` binds every rendered instance (including ones
+ * mounted by `<ClientRouter />`) and is idempotent.
+ */
+import { getLang, useTranslations } from '../../i18n/ui'
+
+interface Props {
+  /** Text written to the clipboard verbatim. */
+  text: string
+  /** Accessible name; worth setting whenever the visible label is generic like "Copy". */
+  ariaLabel?: string
+  /** Visible label, defaulting to the shared `common.copy` translation. */
+  label?: string
+  copiedLabel?: string
+  failedLabel?: string
+  class?: string
+}
+
+const { text, ariaLabel, label, copiedLabel, failedLabel, class: className } = Astro.props
+const t = useTranslations(getLang(Astro.currentLocale))
+---
+
+<button
+  type="button"
+  data-copy-button
+  data-copy-text={text}
+  data-copied-label={copiedLabel ?? t('common.copied')}
+  data-failed-label={failedLabel ?? t('common.copyFailed')}
+  aria-label={ariaLabel}
+  class:list={[
+    'inline-flex shrink-0 select-none items-center gap-1 rounded-control px-2 py-1 text-small text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg-strong data-[copied=true]:text-accent',
+    className,
+  ]}
+>
+  <svg
+    class="size-3.5"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.75"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+  </svg>
+  <span data-copy-label aria-live="polite" class="inline-block min-w-12 text-center">
+    {label ?? t('common.copy')}
+  </span>
+</button>
+
+<script>
+  import { setupCopyButtons } from './copy-button'
+
+  setupCopyButtons()
+</script>

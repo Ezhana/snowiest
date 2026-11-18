@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import Comment from '../comment/Comment.astro'
-import FriendLinks from '../links/FriendLinks.astro'
 import { aboutCopy } from '../../i18n/pages/about'
 import { getLang } from '../../i18n/ui'
 
@@ -39,10 +38,6 @@ const copy = aboutCopy[lang]
           <p set:html={copy.siteIntro} />
           <p set:html={copy.updates} />
         </div>
-
-        <FriendLinks lang={lang} />
-
-        <hr />
 
         <h2 class="text-h2 font-bold text-fg-strong">{copy.findMeHeading}</h2>
 

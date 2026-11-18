@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import Comment from '../comment/Comment.astro'
+import LinkListing from '../links/LinkListing.astro'
+import CopyButton from '../site/CopyButton.astro'
+import { SITE_LINK_EXCHANGE_URL } from '../../consts'
+import { linksCopy } from '../../i18n/pages/links'
+import { getLang, useTranslations } from '../../i18n/ui'
+import {
+  FRIEND_LINK_SLUGS,
+  SELF_LINK_SLUG,
+  getFriendLinks,
+  getLinks,
+  linkDescription,
+  linkName,
+} from '../../lib/links'
+
+const lang = getLang(Astro.currentLocale)
+const t = useTranslations(lang)
+const copy = linksCopy[lang]
+
+/**
+ * Two sections, no duplicated cards: "all links" carries every non-friend entry (the site's own
+ * link is featured as a reference card instead), and the curated friend list follows it. A
+ * missing self link fails the build rather than silently dropping the card.
+ */
+const allLinks = await getLinks()
+const friendLinks = await getFriendLinks()
+const friendSlugs = new Set<string>(FRIEND_LINK_SLUGS)
+const otherLinks = allLinks.filter(
+  (link) => link.data.slug !== SELF_LINK_SLUG && !friendSlugs.has(link.data.slug),
+)
+
+const selfLink = allLinks.find((link) => link.data.slug === SELF_LINK_SLUG)
+if (!selfLink) throw new Error(`Link "${SELF_LINK_SLUG}" is not defined in the links collection.`)
+
+const selfName = linkName(selfLink, lang)
+const selfDescription = linkDescription(selfLink, lang)
+
+/**
+ * The copy button writes the card's fields verbatim, one per line. Selecting the card by hand can
+ * pick up extra line breaks from the block markup, so the button copies this exact string instead.
+ * Labels own their trailing separator (English labels end with a space, Chinese with a full-width
+ * colon).
+ */
+const selfInfoText = [
+  `${copy.selfNameLabel}${selfName}`,
+  selfLink.data.icon ? `${copy.selfIconLabel}${selfLink.data.icon}` : null,
+  `${copy.selfLinkLabel}${selfLink.data.url}`,
+  selfDescription ? `${copy.selfDescriptionLabel}${selfDescription}` : null,
+]
+  .filter((part): part is string => Boolean(part))
+  .join('\n')
+
+const title = `${copy.title} · ${t('site.title')}`
+---
+
+<BaseLayout title={title} description={copy.description}>
+  <main class="mx-auto w-full max-w-6xl px-4 py-10 lg:py-14">
+    <div class="mx-auto w-full max-w-180">
+      <h1 class="text-center text-h1 font-bold text-fg-strong">{copy.title}</h1>
+      <p class="text-center text-small text-fg-muted">{copy.orderNote}</p>
+
+      <div class="mt-10 space-y-10">
+        {otherLinks.length > 0 && (
+          <section aria-labelledby="all-links-heading">
+            <LinkListing links={otherLinks} lang={lang} />
+          </section>
+        )}
+
+        <section class="space-y-4" aria-labelledby="friend-links-heading">
+          <h2 id="friend-links-heading" class="text-h2 font-bold text-fg-strong">
+            {copy.friendHeading}
+          </h2>
+          <p>{copy.intro}</p>
+          {friendLinks.length > 0 && <LinkListing links={friendLinks} lang={lang} />}
+
+          <p class="text-small text-fg-muted">
+            {copy.exchange}{' '}
+            <a class="copy-link" href={SITE_LINK_EXCHANGE_URL}>
+              {copy.exchangeLink}
+            </a>{' '}
+            {copy.exchangeTail}
+          </p>
+
+          <aside
+            class="rounded-surface border border-border bg-bg-subtle p-4"
+            aria-labelledby="self-link-heading"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <h3 id="self-link-heading" class="text-small font-semibold text-fg-strong">
+                {copy.selfLabel}
+              </h3>
+              <CopyButton text={selfInfoText} ariaLabel={copy.copyAriaLabel} />
+            </div>
+            <p class="mt-1 text-small text-fg-muted">{copy.selfNote}</p>
+            <dl class="mt-2 space-y-1 text-small">
+              <div>
+                <dt class="inline text-fg-muted">{copy.selfNameLabel}</dt>
+                <dd class="inline font-semibold text-fg-strong">{selfName}</dd>
+              </div>
+              <div>
+                <dt class="inline text-fg-muted">{copy.selfIconLabel}</dt>
+                <dd class="inline break-all select-all">{selfLink.data.icon}</dd>
+              </div>
+              <div>
+                <dt class="inline text-fg-muted">{copy.selfLinkLabel}</dt>
+                <dd class="inline break-all select-all">{selfLink.data.url}</dd>
+              </div>
+              {selfDescription && (
+                <div>
+                  <dt class="inline text-fg-muted">{copy.selfDescriptionLabel}</dt>
+                  <dd class="inline text-fg-muted">{selfDescription}</dd>
+                </div>
+              )}
+            </dl>
+          </aside>
+        </section>
+      </div>
+
+      <Comment />
+    </div>
+  </main>
+</BaseLayout>

@@ -21,6 +21,7 @@ const navItems = [
   { href: localeUrl(lang, '/'), label: t('nav.home') },
   { href: localeUrl(lang, '/blog/'), label: t('nav.blog') },
   { href: localeUrl(lang, '/moment/'), label: t('nav.moment') },
+  { href: localeUrl(lang, '/links/'), label: t('nav.links') },
   { href: localeUrl(lang, '/about/'), label: t('nav.about') },
 ]
 
@@ -58,14 +59,20 @@ const themeOptions = [
           <span class="text-body font-bold tracking-tight">{t('site.title')}</span>
         </a>
 
-        <div class="col-span-2 row-start-2 grid grid-cols-[1fr_auto_1fr] animate-fade-in items-center gap-1 [animation-delay:120ms] motion-reduce:animate-none md:col-span-1 md:col-start-2 md:row-start-1 md:block">
+        <div class="col-span-2 row-start-2 grid grid-cols-[auto_minmax(0,1fr)_auto] animate-fade-in items-center gap-1 [animation-delay:120ms] motion-reduce:animate-none md:col-span-1 md:col-start-2 md:row-start-1 md:block">
           <div class="justify-self-start md:hidden">
             <slot name="nav-start" />
           </div>
 
+          {/*
+            On phones the nav may not fit beside the post actions in the second row (five items
+            plus two slots). It becomes a horizontal scroller inside its own grid track, so the
+            page never gains a horizontal scrollbar; `safe center` keeps the first item reachable
+            once the content overflows. From `md` up the slots disappear and centring is exact.
+          */}
           <nav
             aria-label={t('nav.primary')}
-            class="flex items-center justify-center justify-self-center gap-1"
+            class="flex w-full min-w-0 items-center justify-self-center gap-0.5 overflow-x-auto [justify-content:safe_center] [scrollbar-width:none] sm:gap-1 md:w-auto md:overflow-visible [&::-webkit-scrollbar]:hidden"
           >
             {navItems.map((item) => (
               <HeaderLink href={item.href}>{item.label}</HeaderLink>

@@ -5,6 +5,29 @@ import type { TagId } from './tags'
 
 export type Link = CollectionEntry<'links'>
 
+/**
+ * Curated friend links, in display order. The Links page lists every other entry in its
+ * "all links" section first, so a friend never appears twice on the page.
+ */
+export const FRIEND_LINK_SLUGS = [
+  'bangumi',
+  'moegirl',
+  'umb-ink',
+  'shiyu-dev',
+  'imaegoo-s-blog',
+  'pinpe',
+  'blog-rainiar-top',
+  'canxin',
+  'notbigcake-net',
+  'blog-askrabbit-net',
+  'dongyue-org',
+  'dkrain-com',
+  'snowiest',
+]
+
+/** The site's own link, featured as a reference card instead of a regular listing. */
+export const SELF_LINK_SLUG = 'snowiest'
+
 /** Display name in `lang`, falling back to the other language; the schema guarantees one exists. */
 export function linkName(link: Link, lang: Lang): string {
   const name = localizedValue(link.data.names, lang)
@@ -32,7 +55,7 @@ function assertLinkConventions(links: Link[]): void {
 
 /**
  * All links in a stable display order. The order is deterministic (by slug) but carries no
- * meaning; the About page labels the list as unordered.
+ * meaning; the Links page labels the list as unordered.
  */
 export async function getLinks(): Promise<Link[]> {
   const links = await getCollection('links')
@@ -45,4 +68,17 @@ export async function getLinks(): Promise<Link[]> {
 /** Links carrying `tag`, in the same stable display order. */
 export async function getLinksByTag(tag: TagId): Promise<Link[]> {
   return (await getLinks()).filter((link) => link.data.tag === tag)
+}
+
+/**
+ * The curated friend links in `FRIEND_LINK_SLUGS` order. A slug with no matching entry fails the
+ * build instead of silently dropping a friend.
+ */
+export async function getFriendLinks(): Promise<Link[]> {
+  const links = await getLinks()
+  return FRIEND_LINK_SLUGS.map((slug) => {
+    const link = links.find((candidate) => candidate.data.slug === slug)
+    if (!link) throw new Error(`Friend link "${slug}" is not defined in the links collection.`)
+    return link
+  })
 }
