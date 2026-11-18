@@ -16,33 +16,18 @@ const t = useTranslations(lang)
 const allHref = localeUrl(lang, '/blog/')
 const tagHref = (tag: TagId) => localeUrl(lang, `/tag/${tag}/`)
 
-const chipClass =
-  'inline-flex items-center rounded-pill border px-3 py-1 text-small no-underline transition-colors'
+const chipClass = 'control chip inline-flex items-center rounded-pill px-3 py-1 text-small'
 ---
 
 <nav data-tag-filter aria-label={t('blog.tagsLabel')} class="flex flex-wrap items-center gap-2">
-  <a
-    href={allHref}
-    aria-current={activeTag ? undefined : 'page'}
-    class:list={[
-      chipClass,
-      activeTag
-        ? 'border-border text-fg-muted hover:bg-bg-subtle hover:text-fg-strong'
-        : 'border-accent/40 bg-accent-subtle font-medium text-accent',
-    ]}
-  >
+  <a href={allHref} aria-current={activeTag ? undefined : 'page'} class={chipClass}>
     {t('blog.allTags')}
   </a>
   {TAG_DEFINITIONS.map((tag) => (
     <a
       href={tagHref(tag.id)}
       aria-current={activeTag === tag.id ? 'page' : undefined}
-      class:list={[
-        chipClass,
-        activeTag === tag.id
-          ? 'border-accent/40 bg-accent-subtle font-medium text-accent'
-          : 'border-border text-fg-muted hover:bg-bg-subtle hover:text-fg-strong active:text-accent',
-      ]}
+      class={chipClass}
     >
       <Tag tag={tag.id} lang={lang} />
     </a>

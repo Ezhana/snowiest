@@ -1,0 +1,97 @@
+/**
+ * Shared interaction states for controls.
+ *
+ * This is the one vocabulary for every clickable control: nav links, tag chips, sort and pagination
+ * options, menu items, icon buttons and load-more buttons. Components keep owning size, shape and
+ * layout; this file owns how a control answers the pointer and the keyboard:
+ *
+ *   normal    fg-muted
+ *   hover     bg-subtle + fg-strong        (only where the pointer can actually hover)
+ *   pressed   accent                       (:active — an ink change, not a box change)
+ *   current   accent-subtle + accent       (aria-current / aria-pressed)
+ *   focus     the global :focus-visible ring in global.css; never re-declared per component
+ *
+ * A control's persistent state is read from ARIA, not from a class a script swapped in: scripts
+ * only set `aria-current` / `aria-pressed`, and the appearance follows. State never changes font
+ * weight, padding or size — the layout must stay put when the reader moves between pages/options.
+ *
+ * Shape stays a component decision. The default is `--radius-control`; `rounded-pill` (tag
+ * filters, floating controls), `rounded-small` (menu rows) and the segmented-item radius override
+ * it where the surrounding group calls for it.
+ *
+ * `.chip` adds the bordered option surface used by the tag filter. `.control-raised` is the
+ * surface + shadow variant used by the floating outline and back-to-top buttons.
+ */
+
+@layer components {
+  .control {
+    border-radius: var(--radius-control);
+    color: var(--color-fg-muted);
+    text-decoration: none;
+    transition:
+      color var(--motion-duration-fast) var(--motion-easing-standard),
+      background-color var(--motion-duration-fast) var(--motion-easing-standard),
+      border-color var(--motion-duration-fast) var(--motion-easing-standard);
+  }
+
+  .control[aria-current='page'],
+  .control[aria-current='true'],
+  .control[aria-pressed='true'] {
+    background-color: var(--color-accent-subtle);
+    color: var(--color-accent);
+  }
+
+  .chip {
+    border: 1px solid var(--color-border);
+  }
+
+  .chip[aria-current='page'],
+  .chip[aria-current='true'],
+  .chip[aria-pressed='true'] {
+    border-color: var(--color-accent-border);
+  }
+
+  .control-raised {
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  @media (hover: hover) {
+    .control:hover {
+      background-color: var(--color-bg-subtle);
+      color: var(--color-fg-strong);
+    }
+
+    .control[aria-current='page']:hover,
+    .control[aria-current='true']:hover,
+    .control[aria-pressed='true']:hover {
+      background-color: var(--color-accent-subtle);
+      color: var(--color-accent-hover);
+    }
+
+    .chip:hover {
+      border-color: var(--color-accent-border);
+    }
+
+    .control-raised:hover {
+      border-color: var(--color-accent-border);
+      background-color: var(--color-accent-subtle);
+      color: var(--color-accent);
+    }
+  }
+
+  .control:active {
+    color: var(--color-accent);
+  }
+
+  .control[aria-current='page']:active,
+  .control[aria-current='true']:active,
+  .control[aria-pressed='true']:active {
+    color: var(--color-accent-hover);
+  }
+
+  .control-raised:active {
+    color: var(--color-accent-hover);
+  }
+}

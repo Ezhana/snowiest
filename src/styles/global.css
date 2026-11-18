@@ -1,13 +1,15 @@
 /**
  * Global stylesheet.
  *
- * The site is composed from three style sources, each with one job:
+ * The site is composed from four style sources, each with one job:
  *
  *   1. Tailwind CSS       Preflight reset + utility classes (site layout and quick composition).
  *   2. Ezhana             Design tokens + the Cerulean theme: colour, type, shape, elevation and
  *                         the light/dark colour mode. This is what makes the site look like the
  *                         site; product CSS only reads semantic tokens.
- *   3. Blog styles        How long-form articles read: reading measure, article rhythm and
+ *   3. Interactions       Shared normal/hover/pressed/current states for every control
+ *                         (see ./interaction.css).
+ *   4. Blog styles        How long-form articles read: reading measure, article rhythm and
  *                         Markdown typography (see ./blog.css and @ezhana/typography-editorial).
  *
  * Layer order is declared before any @import so it wins over Tailwind's own declaration.
@@ -34,7 +36,10 @@
 /* 2 — Ezhana: design tokens + Cerulean theme, including the self-hosted Public Sans fonts. */
 @import '@ezhana/design-theme-cerulean/style.css';
 
-/* 3 — Blog styles: the editorial Markdown preset plus this blog's reading layout. */
+/* 3 — Interactions: the shared state vocabulary for clickable controls. */
+@import './interaction.css' layer(components);
+
+/* 4 — Blog styles: the editorial Markdown preset plus this blog's reading layout. */
 @import '@ezhana/typography-editorial/style.css' layer(blog);
 @import './blog.css' layer(blog);
 

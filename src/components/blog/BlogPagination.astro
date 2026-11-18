@@ -15,12 +15,8 @@ const base = localeUrl(lang, basePath)
 const pageHref = (page: number) => (page <= 1 ? base : `${base}?page=${page}`)
 const pages = Array.from({ length: totalPages }, (_, index) => index + 1)
 
-const activeClass = 'bg-accent-subtle font-semibold text-accent'
-const inactiveClass = 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong active:text-accent'
-const controlClass =
-  'inline-flex h-9 items-center justify-center rounded-control px-3 text-small no-underline transition-colors'
-const pageClass =
-  'inline-flex h-9 min-w-9 items-center justify-center rounded-control px-2 text-small no-underline transition-colors'
+const controlClass = 'control inline-flex h-9 items-center justify-center px-3 text-small'
+const pageClass = 'control inline-flex h-9 min-w-9 items-center justify-center px-2 text-small'
 ---
 
 <!-- Hidden until the listing script applies the query-string state; without it every post is shown. -->
@@ -31,12 +27,7 @@ const pageClass =
   class="flex flex-wrap items-center justify-center gap-1.5"
   hidden
 >
-  <a
-    data-pagination-prev
-    rel="prev"
-    href={base}
-    class:list={[controlClass, 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong']}
-  >
+  <a data-pagination-prev rel="prev" href={base} class={controlClass}>
     {t('pagination.previous')}
   </a>
 
@@ -47,9 +38,7 @@ const pageClass =
           href={pageHref(page)}
           aria-current={page === 1 ? 'page' : undefined}
           aria-label={`${t('pagination.page')} ${page}`}
-          data-state-active={activeClass}
-          data-state-inactive={inactiveClass}
-          class:list={[pageClass, page === 1 ? activeClass : inactiveClass]}
+          class={pageClass}
         >
           {page}
         </a>
@@ -57,12 +46,7 @@ const pageClass =
     ))}
   </ul>
 
-  <a
-    data-pagination-next
-    rel="next"
-    href={pageHref(2)}
-    class:list={[controlClass, 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong']}
-  >
+  <a data-pagination-next rel="next" href={pageHref(2)} class={controlClass}>
     {t('pagination.next')}
   </a>
 </nav>

@@ -11,8 +11,8 @@ const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
 const base = localeUrl(lang, basePath)
 
-const activeClass = 'bg-accent-subtle font-medium text-accent'
-const inactiveClass = 'text-fg-muted hover:bg-bg-subtle hover:text-fg-strong active:text-accent'
+// Inset items sit 2px inside the shell; 8px keeps the selected fill concentric with its border.
+const itemClass = 'control rounded-lg px-2.5 py-1.5 text-small'
 const options = [
   { order: 'newest', href: base, label: t('order.newest') },
   { order: 'oldest', href: `${base}?order=oldest`, label: t('order.oldest') },
@@ -27,13 +27,8 @@ const options = [
     <a
       href={option.href}
       data-order-link={option.order}
-      data-state-active={activeClass}
-      data-state-inactive={inactiveClass}
       aria-current={option.order === 'newest' ? 'page' : undefined}
-      class:list={[
-        'rounded-lg px-2.5 py-1.5 text-small no-underline transition-colors',
-        option.order === 'newest' ? activeClass : inactiveClass,
-      ]}
+      class={itemClass}
     >
       {option.label}
     </a>

@@ -32,7 +32,7 @@ const t = useTranslations(getLang(Astro.currentLocale))
   data-failed-label={failedLabel ?? t('common.copyFailed')}
   aria-label={ariaLabel}
   class:list={[
-    'inline-flex shrink-0 select-none items-center gap-1 rounded-control px-2 py-1 text-small text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg-strong data-[copied=true]:text-accent',
+    'control inline-flex shrink-0 select-none items-center gap-1 px-2 py-1 text-small data-[copied=true]:text-accent',
     className,
   ]}
 >

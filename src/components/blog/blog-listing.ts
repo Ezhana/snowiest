@@ -1,5 +1,5 @@
 import { onPageLoad } from '../../lib/runtime'
-import { applyOrderLinks, readOrder, setLinkState, type Order } from '../../lib/order'
+import { applyOrderLinks, readOrder, setCurrentLink, type Order } from '../../lib/order'
 
 function applyOrderState(order: Order): void {
   applyOrderLinks(order)
@@ -79,7 +79,7 @@ export function setupBlogListing(): void {
       const link = item.querySelector<HTMLAnchorElement>('a')
       if (link) {
         link.href = pageHref(target)
-        setLinkState(link, target === page)
+        setCurrentLink(link, target === page)
       }
 
       if (lastVisible > 0 && target - lastVisible > 1) {

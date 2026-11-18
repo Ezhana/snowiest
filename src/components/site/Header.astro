@@ -86,7 +86,7 @@ const themeOptions = [
         <div class="col-start-2 row-start-1 flex animate-fade-in items-center justify-self-end gap-1 [animation-delay:180ms] motion-reduce:animate-none md:col-start-3">
           <details class="relative" data-menu data-language-menu>
             <summary
-              class="inline-flex h-9 min-w-9 cursor-pointer list-none items-center justify-center gap-1.5 rounded-control px-2 text-small font-medium text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg-strong md:w-auto md:px-2.5 [&::-webkit-details-marker]:hidden"
+              class="control inline-flex h-9 min-w-9 cursor-pointer list-none items-center justify-center gap-1.5 px-2 text-small font-medium md:w-auto md:px-2.5 [&::-webkit-details-marker]:hidden"
               aria-label={t('language.label')}
               title={t('language.label')}
             >
@@ -132,12 +132,7 @@ const themeOptions = [
                   hreflang={option.code}
                   lang={option.code}
                   aria-current={option.isCurrent ? 'true' : undefined}
-                  class:list={[
-                    'flex items-center justify-between gap-2 rounded-small px-2.5 py-1.5 text-small no-underline transition-colors',
-                    option.isCurrent
-                      ? 'bg-bg-subtle text-fg-strong'
-                      : 'text-fg hover:bg-bg-subtle hover:text-fg-strong',
-                  ]}
+                  class="control flex items-center justify-between gap-2 rounded-small px-2.5 py-1.5 text-small"
                 >
                   <span>{option.label}</span>
                   {option.isCurrent && (
@@ -161,7 +156,7 @@ const themeOptions = [
 
           <details class="relative" data-menu data-theme-menu>
             <summary
-              class="grid size-9 cursor-pointer list-none place-items-center rounded-control text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg-strong [&::-webkit-details-marker]:hidden"
+              class="control grid size-9 cursor-pointer list-none place-items-center [&::-webkit-details-marker]:hidden"
               aria-label={t('theme.label')}
               title={t('theme.label')}
             >
@@ -182,7 +177,7 @@ const themeOptions = [
                   type="button"
                   data-theme-mode={option.mode}
                   aria-pressed={option.mode === 'system'}
-                  class="flex w-full items-center justify-between gap-2 rounded-small px-2.5 py-1.5 text-start text-small text-fg transition-colors hover:bg-bg-subtle hover:text-fg-strong aria-pressed:bg-bg-subtle aria-pressed:text-fg-strong"
+                  class="control flex w-full items-center justify-between gap-2 rounded-small px-2.5 py-1.5 text-start text-small"
                 >
                   <span class="flex items-center gap-2 whitespace-nowrap">
                     <ThemeModeIcon mode={option.mode} class="size-4" />
