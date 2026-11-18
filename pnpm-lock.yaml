@@ -18,8 +18,8 @@ importers:
         specifier: ^3.7.5
         version: 3.7.5
       '@ezhana/design-theme-cerulean':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: ^2.0.0
+        version: 2.0.0
       '@ezhana/theme':
         specifier: ^1.0.0
         version: 1.0.0
@@ -325,8 +325,8 @@ packages:
     resolution: {integrity: sha512-IkO+/KEUvwbVpiURZg+P7zF74z5Jxe0UgJxVni+RtoHQ6IZieXaO02kmadomap/q+l6bc/jdPGGqTjhuZnuz1Q==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@ezhana/design-theme-cerulean@1.0.0':
-    resolution: {integrity: sha512-Tljq1EnrjyLKEgK88Q0yQ8uuNoIbc/7efHPPlxefZjZvy6mTtUzQioXUrMCjAm7TNYVq3zh6HLTLfh7t9rTQhA==}
+  '@ezhana/design-theme-cerulean@2.0.0':
+    resolution: {integrity: sha512-r3BN0Inzla71B4vVWEdp7WclubvxFenRPD4V9HVwl9zLE0ixYXLZlG91tJkNOmsY9ToL2pzWZCcF5ccpKr9bCQ==}
     engines: {node: '>=24 <25'}
 
   '@ezhana/design-tokens@2.0.0':
@@ -2261,7 +2261,7 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  '@ezhana/design-theme-cerulean@1.0.0':
+  '@ezhana/design-theme-cerulean@2.0.0':
     dependencies:
       '@ezhana/design-tokens': 2.0.0
 

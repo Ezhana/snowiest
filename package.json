@@ -24,7 +24,7 @@
     "@astrojs/mdx": "^8.1.6",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.5",
-    "@ezhana/design-theme-cerulean": "^1.0.0",
+    "@ezhana/design-theme-cerulean": "^2.0.0",
     "@ezhana/theme": "^1.0.0",
     "@ezhana/typography-editorial": "^0.2.0",
     "@tailwindcss/vite": "^4.3.5",
