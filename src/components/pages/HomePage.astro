@@ -11,13 +11,13 @@ const copy = homeCopy[lang]
 <BaseLayout title={copy.title} description={copy.description}>
   <main class="mx-auto w-full max-w-6xl px-4 py-12">
     <section class="mx-auto w-full max-w-180 space-y-4">
-      <p class="flex items-center gap-2 text-caption font-semibold uppercase tracking-[0.18em] text-accent">
+      <p class="flex items-center gap-1 text-caption font-semibold uppercase tracking-[0.18em] text-accent">
         <span class="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
         {copy.eyebrow}
       </p>
       <div class="space-y-2">
         <h1 class="text-h1 font-bold text-fg-strong">{copy.title}</h1>
-        <p class="font-normal text-fg-muted">{copy.lead}</p>
+        <p class="text-small font-normal text-fg-muted">{copy.lead}</p>
       </div>
       <div class="space-y-2">
         <p class="leading-relaxed" set:html={copy.intro} />
