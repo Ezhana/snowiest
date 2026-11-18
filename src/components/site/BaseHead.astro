@@ -5,7 +5,7 @@ import '../../styles/global.css'
 import type { ImageMetadata } from 'astro'
 import FallbackImage from '../../assets/blog-placeholder-1.jpg'
 import { getLang, useTranslations, type Lang } from '../../i18n/ui'
-import { localeUrl, rssUrl, stripBase, stripLocale } from '../../i18n/routing'
+import { atomUrl, localeUrl, rssUrl, stripBase, stripLocale } from '../../i18n/routing'
 import { SITE_AUTHOR, withBase } from '../../consts'
 
 interface Props {
@@ -45,8 +45,14 @@ const hreflangCodes: Record<Lang, string> = { zh: 'zh-CN', en: 'en' }
 <link
   rel="alternate"
   type="application/rss+xml"
-  title={siteTitle}
+  title={`${siteTitle} (RSS)`}
   href={new URL(rssUrl(lang), Astro.site)}
+/>
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  title={`${siteTitle} (Atom)`}
+  href={new URL(atomUrl(lang), Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
 <meta name="author" content={SITE_AUTHOR} />

@@ -37,3 +37,8 @@ export function stripLocale(pathname: string, lang: Lang): string {
 export function rssUrl(lang: Lang): string {
   return localeUrl(lang, '/rss.xml').replace(/\/+$/, '')
 }
+
+/** Locale-aware Atom feed URL (file URL, so no trailing slash). */
+export function atomUrl(lang: Lang): string {
+  return localeUrl(lang, '/atom.xml').replace(/\/+$/, '')
+}

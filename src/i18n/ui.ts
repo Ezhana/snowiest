@@ -50,6 +50,7 @@ const en = {
   'theme.light': 'Light',
   'theme.dark': 'Dark',
   'rss.label': 'RSS feed',
+  'atom.label': 'Atom feed',
   'common.close': 'Close',
   'common.copy': 'Copy',
   'common.copied': 'Copied',
@@ -83,7 +84,8 @@ const en = {
   'timeline.label': 'Writing timeline',
   'common.loadMore': 'Load more',
   'footer.copyright': 'Ezhana. All rights reserved.',
-  'footer.license': 'Content license by',
+  'footer.license':
+    'Unless otherwise stated, all articles on this site are licensed under {license}.',
   'footer.source': 'Source on GitHub',
   'footer.hosted': 'Hosted on GitHub Pages',
 } as const
@@ -105,6 +107,7 @@ const zh: Record<UiKey, string> = {
   'theme.light': '浅色',
   'theme.dark': '深色',
   'rss.label': 'RSS 订阅',
+  'atom.label': 'Atom 订阅',
   'common.close': '关闭',
   'common.copy': '复制',
   'common.copied': '已复制',
@@ -136,7 +139,7 @@ const zh: Record<UiKey, string> = {
   'timeline.label': '文章时间轴',
   'common.loadMore': '加载更多',
   'footer.copyright': 'Ezhana，保留所有权利。',
-  'footer.license': '内容许可',
+  'footer.license': '未特殊声明，本站文章一律使用 {license} 许可。',
   'footer.source': 'GitHub 源码',
   'footer.hosted': '托管于 GitHub Pages',
 }

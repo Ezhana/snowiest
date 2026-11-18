@@ -12,6 +12,10 @@ export const SITE_GITHUB_URL = 'https://github.com/Ezhana/snowiest'
 export const SITE_LINK_EXCHANGE_URL = 'https://github.com/Ezhana/snowiest/issues/1'
 export const SITE_URL = 'https://ezhana.github.io/snowiest/'
 
+/** Content licence shown in the footer and in the feed metadata. See LICENSE-CONTENT. */
+export const CONTENT_LICENSE_NAME = 'CC BY-NC-SA 4.0'
+export const CONTENT_LICENSE_URL = 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
+
 // GitHub Pages serves this project site from the `/snowiest/` sub-path. Astro exposes the
 // configured `base` here, always with a trailing slash.
 export const BASE_PATH = import.meta.env.BASE_URL

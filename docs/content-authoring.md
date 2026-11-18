@@ -202,7 +202,7 @@ echo '来自管道的一句话' | pnpm content moment add
 
 分页和排序是 querystring，不是独立页面。GitHub Pages 是静态托管，构建时读不到 query，所以列表页会一次性渲染全部文章的元数据（标题、摘要、日期、标签、封面），由脚本按 query 只显示当前页；无 JavaScript 时所有文章都显示，分页控件隐藏。正文仍然只在 `/blog/<slug>/` 渲染。
 
-所有 query 状态的 canonical 都是各自的基础路径（`/blog/`、`/tag/<tag>/`），`?page=2` 不会作为独立页面被索引；文章本身仍通过列表 HTML、标签页、RSS 和 sitemap 被发现。标签页忽略分页参数，`?order=oldest` 与列表页一样由脚本按时间顺序重排。
+所有 query 状态的 canonical 都是各自的基础路径（`/blog/`、`/tag/<tag>/`），`?page=2` 不会作为独立页面被索引；文章本身仍通过列表 HTML、标签页、RSS / Atom 和 sitemap 被发现。标签页忽略分页参数，`?order=oldest` 与列表页一样由脚本按时间顺序重排。
 
 ## 正文规则
 
@@ -220,7 +220,7 @@ echo '来自管道的一句话' | pnpm content moment add
 
 ## 草稿与发布
 
-- `draft: true` 的文章在 `pnpm dev` 中可见，在 `pnpm build` 中不会生成任何页面，也不会进入列表、标签、时间轴、RSS 和 sitemap。
+- `draft: true` 的文章在 `pnpm dev` 中可见，在 `pnpm build` 中不会生成任何页面，也不会进入列表、标签、时间轴、RSS / Atom 和 sitemap。
 - `pnpm content blog publish <slug>` 会把该文章目录下所有语言版本的 `draft` 改成 `false`；它不修改 `pubDate`。
 - `pubDate` 晚于当前时间的文章同样只在开发服务器中可见。生产构建会过滤未来文章，GitHub Actions 每天 00:00 UTC 定时重建一次，因此文章会在到达日期后的下一次构建中自动上线。CLI 发布未来日期的文章时会提示这一点。
 - 删除文章目录等于下线，旧链接会 404；重命名目录也会改变 URL，发布后应尽量保持目录名稳定。文件名可以随时改，不影响路由。
@@ -245,7 +245,7 @@ pnpm format:check
 - 已翻译文章的 `/en/blog/<slug>/` 是否为英文，未翻译文章是否带原文提示；
 - 文章页的 canonical 与 hreflang 是否指向正确语言；
 - 首页时间轴；
-- `/rss.xml` 与 `/en/rss.xml`；
+- `/rss.xml`、`/atom.xml` 与 `/en/rss.xml`、`/en/atom.xml`；
 - 文章详情页的目录：桌面侧栏、手机 header、平板浮动按钮、抽屉、无 JS 兜底和回到顶部。
 - 长目录：`src/content/blog/long-toc-test/zh.md` 是一篇 `draft: true` 的测试文章，专门检查目录限高、内部滚动和回到顶部，正常发布时保持草稿即可。
 
@@ -257,6 +257,8 @@ pnpm format:check
 - 中文文章：`/blog/<slug>/`
 - 英文文章：`/en/blog/<slug>/`
 - 中文 RSS：`/rss.xml`
+- 中文 Atom：`/atom.xml`
 - 英文 RSS：`/en/rss.xml`
+- 英文 Atom：`/en/atom.xml`
 - 中文动态：`/moment/`
 - 英文动态：`/en/moment/`

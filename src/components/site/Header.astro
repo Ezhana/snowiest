@@ -11,7 +11,7 @@ import HeaderLink from './HeaderLink.astro'
 import ThemeModeIcon from './ThemeModeIcon.astro'
 import { withBase } from '../../consts'
 import { getLang, languages, useTranslations, type Lang } from '../../i18n/ui'
-import { localeUrl, rssUrl, stripBase, stripLocale } from '../../i18n/routing'
+import { localeUrl, stripBase, stripLocale } from '../../i18n/routing'
 
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
@@ -158,28 +158,6 @@ const themeOptions = [
               ))}
             </div>
           </details>
-
-          <a
-            href={rssUrl(lang)}
-            class="inline-flex size-9 items-center justify-center rounded-control text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg-strong"
-            aria-label={t('rss.label')}
-            title={t('rss.label')}
-          >
-            <svg
-              class="size-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.75"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M4 11a9 9 0 0 1 9 9"></path>
-              <path d="M4 4a16 16 0 0 1 16 16"></path>
-              <circle cx="5" cy="19" r="1"></circle>
-            </svg>
-          </a>
 
           <details class="relative" data-menu data-theme-menu>
             <summary
