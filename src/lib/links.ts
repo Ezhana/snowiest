@@ -28,6 +28,7 @@ export const FRIEND_LINK_SLUGS = [
   'zeora-s-blog',
   'fishcpy',
   'kioshiroi-s-cs-learning-road',
+  'yutong-s-site',
 ]
 
 /** The site's own link, featured as a reference card instead of a regular listing. */
