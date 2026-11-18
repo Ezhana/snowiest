@@ -26,6 +26,7 @@ export const FRIEND_LINK_SLUGS = [
   'peter267',
   'mashirl',
   'removeif',
+  'churk-s-blog',
 ]
 
 /** The site's own link, featured as a reference card instead of a regular listing. */
