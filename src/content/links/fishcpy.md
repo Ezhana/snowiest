@@ -1,9 +1,9 @@
 ---
 slug: fishcpy
 names:
-  zh: 'fishcpy'
+  zh: 'fishcpy的小破站'
 url: 'https://blog.fis.ink/'
 description:
-  zh: 'fishcpy的小破站'
+  zh: '人生漫长，不妨多解锁些鲜活体验'
 icon: 'https://file.fis.ink/img/fishcpy/logo.png'
 ---
