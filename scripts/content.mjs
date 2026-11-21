@@ -20,6 +20,7 @@ import {
   MOMENTS_CONTENT_DIR,
 } from '../src/lib/content-paths.ts'
 import { momentIdFromDate } from '../src/lib/moment-id.ts'
+import { parseSiteDate } from '../src/lib/site-date.ts'
 import {
   generateTags,
   GENERATED_FILE,
@@ -362,15 +363,20 @@ function splitFrontmatter(source, file) {
 }
 
 function warnIfFuturePubDate(frontmatter, file) {
-  const match = /^pubDate:[ \t]*['"]?(\d{4}-\d{2}-\d{2})/m.exec(frontmatter)
+  const match = /^pubDate:[ \t]*(?:'([^']+)'|"([^"]+)"|([^\s#]+))/m.exec(frontmatter)
   if (!match) return
 
-  const pubDate = new Date(`${match[1]}T00:00:00`)
-  if (Number.isNaN(pubDate.getTime()) || pubDate.getTime() <= Date.now()) return
+  const raw = (match[1] ?? match[2] ?? match[3] ?? '').trim()
+  const pubDate = parseSiteDate(raw)
+  if (Number.isNaN(pubDate.getTime())) {
+    log(
+      `注意：${relativeToRoot(file)} 的 pubDate（${raw}）不是合法日期。请用 YYYY-MM-DD 或带时区偏移的 ISO 8601。`,
+    )
+    return
+  }
+  if (pubDate.getTime() <= Date.now()) return
 
-  log(
-    `注意：${relativeToRoot(file)} 的 pubDate 是 ${match[1]}（未来日期），构建会在该日期之后才展示。`,
-  )
+  log(`注意：${relativeToRoot(file)} 的 pubDate 是 ${raw}（未来日期），构建会在该日期之后才展示。`)
 }
 
 async function momentAdd(argv) {

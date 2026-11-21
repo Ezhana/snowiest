@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
 import type { Lang } from '../i18n/ui'
 import { BLOG_CONTENT_DIR } from './content-paths'
+import { siteMonthKey, siteMonthStart } from './site-date'
 
 export const BLOG_PAGE_SIZE = 5
 
@@ -165,7 +166,8 @@ export function groupBlogPostsByMonth(posts: BlogPost[]): BlogMonthGroup[] {
 
   for (const post of posts) {
     const date = post.data.pubDate
-    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+    // Month boundaries follow the site time zone, matching how the dates are rendered.
+    const key = siteMonthKey(date)
     const existing = groups.get(key)
 
     if (existing) {
@@ -173,7 +175,7 @@ export function groupBlogPostsByMonth(posts: BlogPost[]): BlogMonthGroup[] {
     } else {
       groups.set(key, {
         key,
-        date: new Date(date.getFullYear(), date.getMonth(), 1),
+        date: siteMonthStart(date),
         posts: [post],
       })
     }

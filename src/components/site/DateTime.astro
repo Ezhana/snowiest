@@ -5,6 +5,7 @@
  * the moment feed, where timestamps line up in a column.
  */
 import { getLang } from '../../i18n/ui'
+import { SITE_TIME_ZONE, siteMonthKey } from '../../lib/site-date'
 
 type DateTimeFormat = 'date' | 'datetime' | 'month'
 
@@ -24,11 +25,14 @@ const options: Record<DateTimeFormat, Intl.DateTimeFormatOptions> = {
   datetime: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' },
   month: { year: 'numeric', month: 'long' },
 }
-const formatter = new Intl.DateTimeFormat(locale, options[format])
+// Rendered in the site time zone, not the build machine's: CI builds in UTC while content times
+// are written in +08:00. `datetime` keeps the machine-readable instant (or `YYYY-MM` for months).
+const formatter = new Intl.DateTimeFormat(locale, { ...options[format], timeZone: SITE_TIME_ZONE })
+const machineValue = format === 'month' ? siteMonthKey(date) : date.toISOString()
 ---
 
 <time
-  datetime={date.toISOString()}
+  datetime={machineValue}
   class:list={['whitespace-nowrap', tabular && 'tabular-nums', className]}
 >
   {formatter.format(date)}

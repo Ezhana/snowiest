@@ -29,18 +29,29 @@ export interface ScrollToHashOptions {
   behavior?: ScrollBehavior
 }
 
+function decodeHash(hash: string): string {
+  try {
+    return decodeURIComponent(hash)
+  } catch {
+    return hash
+  }
+}
+
 /** Scroll to a `#fragment`, updating the URL and (optionally) the focus. */
 export function scrollToHash(hash: string, options: ScrollToHashOptions = {}): void {
   const id = hash.replace(/^#/, '')
   if (!id) return
 
   const behavior = options.behavior ?? (prefersReducedMotion() ? 'auto' : 'smooth')
+  // The client router stores its scroll/index bookkeeping in `history.state`. Replacing or pushing
+  // a `null` state makes the router ignore the entry on popstate, so keep the existing state.
+  const state = history.state
 
   // `#page-top` is <main>, which starts below the header. Returning to the top of the document
   // means scrollY = 0, not "align <main> with the scroll padding".
   if (id === 'page-top') {
     window.scrollTo({ top: 0, behavior })
-    history.replaceState(null, '', `${location.pathname}${location.search}`)
+    history.replaceState(state, '', `${location.pathname}${location.search}`)
     return
   }
 
@@ -49,8 +60,10 @@ export function scrollToHash(hash: string, options: ScrollToHashOptions = {}): v
 
   target.scrollIntoView({ behavior, block: 'start' })
 
+  // `location.hash` is percent-encoded for non-ASCII heading ids; compare the decoded form so
+  // repeated clicks do not push duplicate entries.
   const nextHash = `#${id}`
-  if (location.hash !== nextHash) history.pushState(null, '', nextHash)
+  if (decodeHash(location.hash) !== nextHash) history.pushState(state, '', nextHash)
 
   if (options.focus !== false) focusTarget(target)
 }

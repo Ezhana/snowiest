@@ -1,7 +1,7 @@
 ---
 title: 'After Moving the Blog to Astro'
 description: 'From a static template to Astro content collections, routing, and image handling — and the parts that actually got easier afterward.'
-pubDate: '2026-6-12'
+pubDate: '2026-06-12'
 tags:
   - engineering
   - design

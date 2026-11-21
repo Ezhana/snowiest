@@ -4,26 +4,49 @@ import { z } from 'astro/zod'
 import type { Lang } from './i18n/ui'
 import { BLOG_CONTENT_DIR, LINKS_CONTENT_DIR, MOMENTS_CONTENT_DIR } from './lib/content-paths'
 import { momentDateFromId } from './lib/moment-id'
+import { parseSiteDate } from './lib/site-date'
 import { TAG_IDS } from './lib/tags'
+
+/**
+ * Publication dates are either `YYYY-MM-DD` (site-time-zone midnight) or ISO 8601 with an explicit
+ * offset. Rejecting offset-less and non-ISO strings keeps the instant independent of the build
+ * machine's time zone; see `src/lib/site-date.ts`.
+ */
+const frontmatterDate = z
+  .string()
+  .transform((value) => parseSiteDate(value))
+  .refine((date) => !Number.isNaN(date.getTime()), {
+    message:
+      'must be YYYY-MM-DD (site time zone) or ISO 8601 with an explicit UTC offset, e.g. 2026-11-17T18:30:00+08:00',
+  })
 
 const blog = defineCollection({
   // Load Markdown and MDX files in the `src/content/blog/` directory.
   loader: glob({ base: `./${BLOG_CONTENT_DIR}`, pattern: '**/*.{md,mdx}' }),
   // Type-check frontmatter using a schema
   schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      description: z.string(),
-      // Transform string to Date object
-      pubDate: z.coerce.date(),
-      updatedDate: z.coerce.date().optional(),
-      heroImage: z.optional(image()),
-      tags: z.array(z.enum(TAG_IDS)).default([]),
-      draft: z.boolean().default(false),
-      // Language of the post body. Every language version lives in the post's folder, e.g.
-      // `hello-astro/zh.md` and `hello-astro/en.md`; see docs/content-authoring.md.
-      lang: z.enum(['zh', 'en']).default('zh'),
-    }),
+    z
+      .object({
+        title: z.string(),
+        description: z.string(),
+        pubDate: frontmatterDate,
+        updatedDate: frontmatterDate.optional(),
+        heroImage: z.optional(image()),
+        tags: z.array(z.enum(TAG_IDS)).default([]),
+        draft: z.boolean().default(false),
+        // Language of the post body. Every language version lives in the post's folder, e.g.
+        // `hello-astro/zh.md` and `hello-astro/en.md`; see docs/content-authoring.md.
+        lang: z.enum(['zh', 'en']).default('zh'),
+      })
+      .superRefine((data, ctx) => {
+        if (data.updatedDate && data.updatedDate.getTime() < data.pubDate.getTime()) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['updatedDate'],
+            message: 'updatedDate must not be earlier than pubDate',
+          })
+        }
+      }),
 })
 
 /** A link slug is a stable identifier, so keep it URL-safe. */

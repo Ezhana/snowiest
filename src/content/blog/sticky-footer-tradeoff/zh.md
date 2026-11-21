@@ -1,7 +1,7 @@
 ---
 title: '页脚与正文之间，那段空白该由谁承担'
 description: 'sticky footer 能让短页面不露底，却会在长屏幕上把正文和页脚隔开一整屏。这次我把站点改回普通文档流，并保留了 min-height——它还有别的作用。'
-pubDate: '2026-7-17'
+pubDate: '2026-07-17'
 tags:
   - design
   - engineering

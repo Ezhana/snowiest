@@ -40,8 +40,8 @@ const en: HomeCopy = {
   eyebrow: 'Snowiest · 簌雪',
   lead: 'Snowflakes fall, then rise and roam—what might they be likened to?',
   intro: `I'm <strong>${SITE_AUTHOR}</strong>. This site is where I share articles, collect little moments of everyday life, and make room for the occasional rant, amusing anecdote, interesting find, or half-formed thought.`,
-  contact: `Sometimes amusing, sometimes absurd. You're welcome to get in touch—or simply wander around. Subscribe to <a class="copy-link" href="${rssUrl('zh')}">RSS</a> and quietly cheer me on; or, if you'd like to talk, find me on <a class="copy-link" href="${SITE_GITHUB_PROFILE_URL}">GitHub</a> and let's share what's on our minds!`,
-  about: `Want to get to know me a little better? Looking for the <a class="copy-link" href="${localeUrl('zh', '/about/')}">About page</a>?`,
+  contact: `Sometimes amusing, sometimes absurd. You're welcome to get in touch—or simply wander around. Subscribe to <a class="copy-link" href="${rssUrl('en')}">RSS</a> and quietly cheer me on; or, if you'd like to talk, find me on <a class="copy-link" href="${SITE_GITHUB_PROFILE_URL}">GitHub</a> and let's share what's on our minds!`,
+  about: `Want to get to know me a little better? Looking for the <a class="copy-link" href="${localeUrl('en', '/about/')}">About page</a>?`,
 }
 
 export const homeCopy: Record<Lang, HomeCopy> = { zh, en }

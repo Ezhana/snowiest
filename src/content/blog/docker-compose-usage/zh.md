@@ -1,8 +1,8 @@
 ---
 title: '一些常用 Docker Compose 使用技巧'
 description: '常用的 Docker Compose 操作和技巧备忘录'
-pubDate: '2026-11-17T16:30'
-updatedDate: '2026-11-17T16:35'
+pubDate: '2026-11-17T16:30:00+08:00'
+updatedDate: '2026-11-17T16:35:00+08:00'
 tags:
   - notes
 ---
