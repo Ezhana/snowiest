@@ -51,7 +51,12 @@ export const FRIEND_LINK_SLUGS = [
  * record, but render dimmed and non-interactive so the list does not imply a reciprocal link.
  * Slugs must also be listed in `FRIEND_LINK_SLUGS`.
  */
-export const ONE_WAY_FRIEND_LINK_SLUGS = ['umb-ink'] as const
+export const ONE_WAY_FRIEND_LINK_SLUGS = [
+  'umb-ink',
+  'dkrain-com',
+  'notbigcake-net',
+  'removeif',
+] as const
 
 /** The site's own link, also featured in the "this site" reference panel. */
 export const SELF_LINK_SLUG = 'snowiest'
