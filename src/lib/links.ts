@@ -8,6 +8,10 @@ export type Link = CollectionEntry<'links'>
 /**
  * Curated friend links, in display order. The Links page lists every other entry in its
  * "all links" section first, so a friend never appears twice on the page.
+ *
+ * The site's own link (`SELF_LINK_SLUG`) stays in this list on purpose: its card is styled by the
+ * same listing, and a fork can keep the original site as a friend without editing the page. The
+ * "this site" reference panel below the list is a separate, copyable summary for link exchanges.
  */
 export const FRIEND_LINK_SLUGS = [
   'umb-ink',
@@ -31,7 +35,14 @@ export const FRIEND_LINK_SLUGS = [
   'yutong-s-site',
 ]
 
-/** The site's own link, featured as a reference card instead of a regular listing. */
+/**
+ * Friend links whose site does not link back to this site. They remain in the friend list as a
+ * record, but render dimmed and non-interactive so the list does not imply a reciprocal link.
+ * Slugs must also be listed in `FRIEND_LINK_SLUGS`.
+ */
+export const ONE_WAY_FRIEND_LINK_SLUGS = ['umb-ink'] as const
+
+/** The site's own link, also featured in the "this site" reference panel. */
 export const SELF_LINK_SLUG = 'snowiest'
 
 /** Display name in `lang`, falling back to the other language; the schema guarantees one exists. */

@@ -8,6 +8,7 @@ import { linksCopy } from '../../i18n/pages/links'
 import { getLang, useTranslations } from '../../i18n/ui'
 import {
   FRIEND_LINK_SLUGS,
+  ONE_WAY_FRIEND_LINK_SLUGS,
   SELF_LINK_SLUG,
   getFriendLinks,
   getLinks,
@@ -20,16 +21,15 @@ const t = useTranslations(lang)
 const copy = linksCopy[lang]
 
 /**
- * Two sections, no duplicated cards: "all links" carries every non-friend entry (the site's own
- * link is featured as a reference card instead), and the curated friend list follows it. A
- * missing self link fails the build rather than silently dropping the card.
+ * Two sections, no duplicated cards: "all links" carries every non-friend entry, and the curated
+ * friend list follows it. The site's own link is part of the friend list and also has a copyable
+ * reference panel below it; a missing self link fails the build rather than silently dropping the
+ * panel.
  */
 const allLinks = await getLinks()
 const friendLinks = await getFriendLinks()
 const friendSlugs = new Set<string>(FRIEND_LINK_SLUGS)
-const otherLinks = allLinks.filter(
-  (link) => link.data.slug !== SELF_LINK_SLUG && !friendSlugs.has(link.data.slug),
-)
+const otherLinks = allLinks.filter((link) => !friendSlugs.has(link.data.slug))
 
 const selfLink = allLinks.find((link) => link.data.slug === SELF_LINK_SLUG)
 if (!selfLink) throw new Error(`Link "${SELF_LINK_SLUG}" is not defined in the links collection.`)
@@ -63,7 +63,10 @@ const title = `${copy.title} · ${t('site.title')}`
         <p class="text-small text-fg-muted">{copy.orderNote}</p>
       </div>
       {otherLinks.length > 0 && (
-        <section aria-labelledby="all-links-heading">
+        <section class="space-y-4" aria-labelledby="all-links-heading">
+          <h2 id="all-links-heading" class="text-h2 font-bold text-fg-strong">
+            {copy.allLinksHeading}
+          </h2>
           <LinkListing links={otherLinks} lang={lang} />
         </section>
       )}
@@ -75,7 +78,9 @@ const title = `${copy.title} · ${t('site.title')}`
           </h2>
           <p>{copy.intro}</p>
         </div>
-        {friendLinks.length > 0 && <LinkListing links={friendLinks} lang={lang} />}
+        {friendLinks.length > 0 && (
+          <LinkListing links={friendLinks} lang={lang} oneWaySlugs={ONE_WAY_FRIEND_LINK_SLUGS} />
+        )}
 
         <p class="text-small text-fg-muted">
           {copy.exchange}{' '}

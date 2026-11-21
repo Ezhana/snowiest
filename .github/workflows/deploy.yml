@@ -47,6 +47,15 @@ jobs:
       - name: Check generated tags
         run: pnpm tags:check
 
+      - name: Lint
+        run: pnpm lint:check
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Type check
+        run: pnpm check
+
       - name: Build
         run: pnpm build
 

@@ -2,6 +2,7 @@
   "name": "snowiest",
   "type": "module",
   "version": "0.0.1",
+  "license": "MIT",
   "packageManager": "pnpm@10.27.0",
   "engines": {
     "node": ">=22.23.4"
@@ -10,6 +11,7 @@
     "dev": "pnpm tags:generate && astro dev",
     "build": "pnpm tags:generate && astro build",
     "preview": "astro preview",
+    "check": "astro check",
     "astro": "astro",
     "content": "node scripts/content.mjs",
     "tags:generate": "node scripts/generate-tags.mjs",
@@ -34,6 +36,7 @@
     "tailwindcss": "^4.3.5"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
     "@ezhana/eslint-config-astro": "^0.2.0",
     "@ezhana/prettier-config": "^0.2.0",
     "eslint": "10.10.0",

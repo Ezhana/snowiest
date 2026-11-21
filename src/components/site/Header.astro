@@ -13,9 +13,15 @@ import { withBase } from '../../consts'
 import { getLang, languages, useTranslations, type Lang } from '../../i18n/ui'
 import { localeUrl, stripBase, stripLocale } from '../../i18n/routing'
 
+interface Props {
+  /** Locale-less path to keep when switching language; defaults to the current pathname. */
+  languagePath?: string
+}
+
+const { languagePath } = Astro.props
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
-const currentPath = stripLocale(stripBase(Astro.url.pathname), lang)
+const currentPath = languagePath ?? stripLocale(stripBase(Astro.url.pathname), lang)
 
 const navItems = [
   { href: localeUrl(lang, '/'), label: t('nav.home') },

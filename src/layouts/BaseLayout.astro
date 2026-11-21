@@ -17,9 +17,13 @@ interface Props {
   canonical?: string
   /** Absolute URLs per language. Pass an empty object to suppress hreflang entirely. */
   alternates?: Partial<Record<Lang, string>>
+  /** Exclude the page from search indexes (used by the 404 page). */
+  noindex?: boolean
+  /** Locale-less path kept by the header's language switcher; defaults to the current pathname. */
+  languagePath?: string
 }
 
-const { title, description, image, canonical, alternates } = Astro.props
+const { title, description, image, canonical, alternates, noindex, languagePath } = Astro.props
 const lang = getLang(Astro.currentLocale)
 
 /**
@@ -45,6 +49,7 @@ const lang = getLang(Astro.currentLocale)
       image={image}
       canonical={canonical}
       alternates={alternates}
+      noindex={noindex}
     />
     <ClientRouter />
     {import.meta.env.PROD && GTM_IDS.map((id) => <GoogleTagManager id={id} />)}
@@ -68,7 +73,7 @@ const lang = getLang(Astro.currentLocale)
       data-page-progress
       aria-hidden="true"
     ></div>
-    <Header>
+    <Header languagePath={languagePath}>
       <slot name="header-nav-start" slot="nav-start" />
       <slot name="header-nav-end" slot="nav-end" />
     </Header>

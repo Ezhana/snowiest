@@ -362,6 +362,48 @@ function splitFrontmatter(source, file) {
   }
 }
 
+/**
+ * Flip the `draft` flag of a frontmatter block.
+ *
+ * Line-based on purpose: rewriting the block through a YAML serialiser would drop comments and
+ * reorder fields. Quoted booleans and trailing comments (`draft: true # 草稿`) are still valid YAML,
+ * so they must be recognised instead of being reported as "already published".
+ */
+function publishFrontmatter(frontmatter) {
+  const DRAFT_LINE = /^draft:[ \t]*(.*)$/i
+  const TRAILING_COMMENT = /[ \t]+#.*$/
+  let state = 'missing'
+
+  const lines = frontmatter.split('\n').map((line) => {
+    const lineEnding = line.endsWith('\r') ? '\r' : ''
+    const content = lineEnding ? line.slice(0, -1) : line
+    const match = DRAFT_LINE.exec(content)
+    if (!match) return line
+
+    const commentMatch = TRAILING_COMMENT.exec(match[1])
+    const comment = commentMatch ? commentMatch[0] : ''
+    const value = match[1]
+      .replace(TRAILING_COMMENT, '')
+      .trim()
+      .replace(/^['"]|['"]$/g, '')
+      .toLowerCase()
+
+    if (value === 'true') {
+      state = 'changed'
+      return `draft: false${comment}${lineEnding}`
+    }
+    if (value === 'false') {
+      if (state !== 'changed') state = 'published'
+      return line
+    }
+
+    state = 'unknown'
+    return line
+  })
+
+  return { frontmatter: lines.join('\n'), state }
+}
+
 function warnIfFuturePubDate(frontmatter, file) {
   const match = /^pubDate:[ \t]*(?:'([^']+)'|"([^"]+)"|([^\s#]+))/m.exec(frontmatter)
   if (!match) return
@@ -487,13 +529,20 @@ async function blogPublish(argv) {
     const file = join(directory, name)
     const source = await readFile(file, 'utf8')
     const { frontmatter, body } = splitFrontmatter(source, file)
-    const nextFrontmatter = frontmatter.replace(/^draft:[ \t]*true[ \t]*$/m, 'draft: false')
+    const { frontmatter: nextFrontmatter, state } = publishFrontmatter(frontmatter)
 
     warnIfFuturePubDate(frontmatter, file)
 
-    if (nextFrontmatter === frontmatter) {
+    if (state === 'missing') {
+      log(`没有 draft 字段（默认已发布）→ ${relativeToRoot(file)}`)
+      continue
+    }
+    if (state === 'published') {
       log(`已是发布状态 → ${relativeToRoot(file)}`)
       continue
+    }
+    if (state === 'unknown') {
+      fail(`无法识别的 draft 值（应为 true 或 false）：${relativeToRoot(file)}`)
     }
 
     const nextBody = body ? `${body}\n` : ''

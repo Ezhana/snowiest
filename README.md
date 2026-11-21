@@ -76,4 +76,4 @@ base: '/snowiest',
 
 ## 许可
 
-© Ezhana. All rights reserved.
+本站代码使用 [MIT](LICENSE) 许可；除另有说明外，原创文章内容使用 [CC BY-NC-SA 4.0](LICENSE-CONTENT) 许可。

@@ -8,6 +8,7 @@ interface LinksCopy {
   /** Document title and page heading. */
   title: string
   description: string
+  allLinksHeading: string
   friendHeading: string
   /** Intro for the friend list; the all-links section is self-explanatory. */
   intro: string
@@ -28,6 +29,7 @@ interface LinksCopy {
 const zh: LinksCopy = {
   title: '链接',
   description: '友情链接、工具与常逛的站点。',
+  allLinksHeading: '全部链接',
   friendHeading: '友情链接',
   intro: '标记了几处世外桃源。',
   orderNote: '以下链接不分先后。',
@@ -46,6 +48,7 @@ const zh: LinksCopy = {
 const en: LinksCopy = {
   title: 'Links',
   description: 'Friend links, tools, and sites worth a detour.',
+  allLinksHeading: 'All links',
   friendHeading: 'Friend links',
   intro: 'Places I keep coming back to.',
   orderNote: 'Listed below in no particular order.',

@@ -10,7 +10,8 @@ const lang = getLang(Astro.currentLocale)
 const pathname = stripBase(Astro.url.pathname)
 const normalize = (path: string) => path.replace(/\/+$/, '') || '/'
 const current = normalize(pathname)
-const target = normalize(stripBase(href ?? '/'))
+const hrefPath = typeof href === 'string' ? href : (href?.pathname ?? '/')
+const target = normalize(stripBase(hrefPath))
 const homeTargets = lang === defaultLang ? ['/'] : ['/', `/${lang}`]
 const isHome = homeTargets.includes(target)
 const isActive = isHome

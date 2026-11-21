@@ -16,13 +16,22 @@ interface Props {
   canonical?: string
   /** Absolute URLs per language. An empty object suppresses hreflang entirely. */
   alternates?: Partial<Record<Lang, string>>
+  /** Exclude the page from search indexes (used by the 404 page). */
+  noindex?: boolean
 }
 
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
 const siteTitle = t('site.title')
 
-const { title, description, image = FallbackImage, canonical, alternates } = Astro.props
+const {
+  title,
+  description,
+  image = FallbackImage,
+  canonical,
+  alternates,
+  noindex = false,
+} = Astro.props
 const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).toString()
 
 // Symmetric pages (listings, tags, pagination, static pages) exist in both locales, so their
@@ -70,6 +79,7 @@ const hreflangCodes: Record<Lang, string> = { zh: 'zh-CN', en: 'en' }
 <!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="description" content={description} />
+{noindex && <meta name="robots" content="noindex" />}
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />

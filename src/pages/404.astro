@@ -1,0 +1,47 @@
+---
+/**
+ * Static 404 page. GitHub Pages serves this file for unknown paths under the project site, so it
+ * renders both locales and lets the reader pick a language. It is excluded from indexing and from
+ * hreflang (there is no per-locale 404 URL to pair).
+ */
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { useTranslations } from '../i18n/ui'
+import { localeUrl } from '../i18n/routing'
+
+const zh = useTranslations('zh')
+const en = useTranslations('en')
+const title = `404 · ${zh('site.title')}`
+---
+
+<BaseLayout
+  title={title}
+  description={`${zh('common.pageNotFound')} / ${en('common.pageNotFound')}`}
+  alternates={{}}
+  noindex
+  languagePath="/"
+>
+  <main class="mx-auto flex min-h-[60vh] w-full max-w-180 flex-col items-center justify-center gap-3 px-4 py-16 text-center">
+    <p class="m-0 text-caption font-semibold uppercase tracking-[0.18em] text-accent">404</p>
+    <h1 class="m-0 text-h1 font-bold text-fg-strong">{zh('common.pageNotFound')}</h1>
+    <p class="m-0 text-small text-fg-muted">{zh('common.pageNotFoundHint')}</p>
+    <p class="m-0 text-small text-fg-muted" lang="en">
+      {en('common.pageNotFound')} — {en('common.pageNotFoundHint')}
+    </p>
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+      <a class="control chip rounded-pill px-3 py-1.5 text-small" href={localeUrl('zh', '/')}>
+        {zh('common.backHome')}
+      </a>
+      <a
+        class="control chip rounded-pill px-3 py-1.5 text-small"
+        href={localeUrl('en', '/')}
+        hreflang="en"
+        lang="en"
+      >
+        {en('common.backHome')}
+      </a>
+      <a class="control chip rounded-pill px-3 py-1.5 text-small" href={localeUrl('zh', '/blog/')}>
+        {zh('nav.blog')}
+      </a>
+    </div>
+  </main>
+</BaseLayout>
