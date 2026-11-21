@@ -37,13 +37,6 @@
   --ez-editorial-block-spacing: 1em;
 }
 
-/* A comfortable long-form measure (~45rem of text), independent of the page shell. */
-.reading-column {
-  width: min(45rem, calc(100% - 2rem));
-  margin-inline: auto;
-  padding-block: 3rem 4rem;
-}
-
 /* The reading column is the anchor for the floating controls. */
 .post-column {
   anchor-name: --post-column;
@@ -101,12 +94,6 @@
 .article-meta .article-updated {
   display: block;
   font-style: italic;
-}
-
-@media (max-width: 720px) {
-  .reading-column {
-    padding-block: 1.5rem 3rem;
-  }
 }
 
 /*

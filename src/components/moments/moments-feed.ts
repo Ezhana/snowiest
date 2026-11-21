@@ -2,20 +2,14 @@ import { initInfiniteList } from '../../lib/infinite-list'
 import { applyOrderLinks, readOrder } from '../../lib/order'
 import { onPageLoad } from '../../lib/runtime'
 
-function reverseChildren(element: HTMLElement): void {
-  for (const child of Array.from(element.children).reverse()) element.append(child)
-}
-
 /**
- * Reorder whole batches and their items. The server renders batches as contiguous newest-first
- * chunks, so reversing the batch order and every batch's contents yields the oldest-first list.
+ * The server renders the moments newest-first; reversing the list items yields the oldest-first
+ * feed. Each moment is one item, so no nested content has to be reordered.
  */
 function applyOldestOrder(root: HTMLElement): void {
-  const batches = Array.from(root.querySelectorAll<HTMLElement>('[data-infinite-batch]'))
-  for (const batch of batches) reverseChildren(batch)
-
-  const container = batches[0]?.parentElement
-  if (container) container.append(...batches.reverse())
+  const items = Array.from(root.querySelectorAll<HTMLElement>('[data-infinite-batch]'))
+  const container = items[0]?.parentElement
+  if (container) container.append(...items.reverse())
 }
 
 /** Moment feed: apply `?order` before the infinite list decides which batches to hide. */

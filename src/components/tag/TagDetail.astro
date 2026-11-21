@@ -20,12 +20,12 @@ const t = useTranslations(lang)
 const tagLabel = getTagLabel(tag, lang)
 const { posts, links, moments } = await getTagResources(tag, lang)
 
-const heading = `#${tagLabel}`
-const title = `${heading} · ${t('site.title')}`
+const title = `#${tagLabel}`
+const description = t('tag.description').replace('{tag}', tagLabel)
 ---
 
-<BaseLayout title={title} description={title}>
-  <main data-blog-listing class="mx-auto w-full max-w-180 px-4 py-12">
+<BaseLayout title={title} description={description}>
+  <main id="page-top" tabindex="-1" data-blog-listing class="mx-auto w-full max-w-180 px-4 py-12">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h1 class="m-0 text-h1 font-bold text-fg-strong">
         <Tag tag={tag} lang={lang} />

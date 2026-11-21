@@ -1,14 +1,10 @@
 ---
 import TagDetail from '../../components/tag/TagDetail.astro'
-import { TAG_DEFINITIONS, type TagId } from '../../lib/tags'
+import { getTagStaticPaths, type TagRouteProps } from '../../lib/tags'
 
-export function getStaticPaths() {
-  return TAG_DEFINITIONS.map((tag) => ({ params: { tag: tag.id }, props: { tag: tag.id } }))
-}
+export const getStaticPaths = getTagStaticPaths
 
-interface Props {
-  tag: TagId
-}
+type Props = TagRouteProps
 
 const { tag } = Astro.props
 ---

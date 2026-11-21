@@ -7,10 +7,8 @@ import { getLang, useTranslations } from '../../i18n/ui'
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
 const posts = (await getBlogPosts(lang)).map(toBlogPostSummary)
-
-const title = `${t('blog.title')} · ${t('site.title')}`
 ---
 
-<BaseLayout title={title} description={t('site.description')}>
+<BaseLayout title={t('blog.title')} description={t('blog.description')}>
   <BlogListing posts={posts} />
 </BaseLayout>

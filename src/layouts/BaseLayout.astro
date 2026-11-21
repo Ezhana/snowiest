@@ -1,13 +1,14 @@
 ---
 import type { ImageMetadata } from 'astro'
 import { ClientRouter } from 'astro:transitions'
+import { theme as cerulean } from '@ezhana/design-theme-cerulean'
 import BaseHead from '../components/site/BaseHead.astro'
 import Footer from '../components/site/Footer.astro'
 import GoogleTagManager from '../components/site/GoogleTagManager.astro'
 import Header from '../components/site/Header.astro'
 import themeBootstrap from '../components/site/theme-bootstrap.js?raw'
 import { GTM_IDS } from '../lib/analytics'
-import { getLang, type Lang } from '../i18n/ui'
+import { getLang, useTranslations, type Lang } from '../i18n/ui'
 
 interface Props {
   title: string
@@ -21,10 +22,27 @@ interface Props {
   noindex?: boolean
   /** Locale-less path kept by the header's language switcher; defaults to the current pathname. */
   languagePath?: string
+  /** Open Graph page type forwarded to `<BaseHead />`; posts declare `article`. */
+  type?: 'website' | 'article'
+  /** Article publication / modification times forwarded to `<BaseHead />`. */
+  publishedTime?: Date
+  modifiedTime?: Date
 }
 
-const { title, description, image, canonical, alternates, noindex, languagePath } = Astro.props
+const {
+  title,
+  description,
+  image,
+  canonical,
+  alternates,
+  noindex,
+  languagePath,
+  type,
+  publishedTime,
+  modifiedTime,
+} = Astro.props
 const lang = getLang(Astro.currentLocale)
+const t = useTranslations(lang)
 
 /**
  * The document shell lives here exactly once: the Ezhana theme, the colour mode and the shared
@@ -41,7 +59,7 @@ const lang = getLang(Astro.currentLocale)
  */
 ---
 
-<html lang={lang} data-theme="cerulean">
+<html lang={lang} data-theme={cerulean.id}>
   <head>
     <BaseHead
       title={title}
@@ -50,12 +68,18 @@ const lang = getLang(Astro.currentLocale)
       canonical={canonical}
       alternates={alternates}
       noindex={noindex}
+      type={type}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
     />
     <ClientRouter />
     {import.meta.env.PROD && GTM_IDS.map((id) => <GoogleTagManager id={id} />)}
     <script is:inline set:html={themeBootstrap}></script>
   </head>
   <body>
+    <a class="skip-link" href="#page-top">
+      {t('a11y.skipToContent')}
+    </a>
     {import.meta.env.PROD &&
       GTM_IDS.map((id) => (
         <noscript>

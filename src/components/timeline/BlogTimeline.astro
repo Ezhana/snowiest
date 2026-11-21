@@ -13,14 +13,14 @@ const months = groupBlogPostsByMonth(posts)
 const t = useTranslations(lang)
 ---
 
-<section class="mt-12" aria-labelledby="timeline-heading">
+<section aria-labelledby="timeline-heading">
   <h2 id="timeline-heading" class="sr-only">
     {t('timeline.label')}
   </h2>
   {months.length === 0 ? (
     <p class="text-center text-fg-muted">{t('timeline.empty')}</p>
   ) : (
-    <div data-home-timeline class="relative mx-auto w-full max-w-[64rem]">
+    <div data-home-timeline class="relative w-full">
       <div class="absolute inset-y-0 left-4 w-px bg-border md:left-1/2" aria-hidden="true"></div>
       <ol class="m-0 list-none p-0">
         {months.map((month, index) => (

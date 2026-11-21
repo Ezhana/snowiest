@@ -114,8 +114,24 @@ export function setupSiteHeader(): void {
     applyThemeToDocument(document)
   })
 
+  /**
+   * The header is static HTML, so the current query string is not part of the language links.
+   * Copy it on the client so a listing opened as `?page=2&order=oldest` switches to the same slice
+   * in the other language; pages without query state are left unchanged.
+   */
+  const syncLanguageQuery = () => {
+    const { search } = window.location
+    for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-language-menu] a')) {
+      const url = new URL(link.href, window.location.origin)
+      if (url.search === search) continue
+      url.search = search
+      link.href = `${url.pathname}${url.search}${url.hash}`
+    }
+  }
+
   themeManager.subscribe(syncThemeButtons)
   syncThemeButtons()
+  syncLanguageQuery()
 
   document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element)) return
@@ -174,5 +190,6 @@ export function setupSiteHeader(): void {
     observeHeader()
     updateScrolledState()
     syncThemeButtons()
+    syncLanguageQuery()
   })
 }

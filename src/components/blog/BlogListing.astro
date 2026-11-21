@@ -13,13 +13,14 @@ interface Props {
 const { posts } = Astro.props
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
-const notice = t('blog.notice')
 const hasPosts = posts.length > 0
 const totalPages = Math.max(1, Math.ceil(posts.length / BLOG_PAGE_SIZE))
 const basePath = '/blog/'
 ---
 
 <main
+  id="page-top"
+  tabindex="-1"
   data-blog-listing
   data-page-size={BLOG_PAGE_SIZE}
   class="space-y-4 md:space-y-6 lg:space-y-8 mx-auto w-full max-w-180 px-4 py-12"
@@ -31,7 +32,6 @@ const basePath = '/blog/'
     </div>
     {hasPosts && <BlogTagFilter />}
   </header>
-  {notice && <p class="text-small text-fg-muted">{notice}</p>}
   {hasPosts ? (
     <BlogPostList posts={posts} />
   ) : (

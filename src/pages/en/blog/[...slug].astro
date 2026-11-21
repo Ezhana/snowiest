@@ -1,40 +1,15 @@
 ---
-import { type CollectionEntry, render } from 'astro:content'
+import { render } from 'astro:content'
 import BlogPost from '../../../layouts/BlogPost.astro'
 import {
-  getAllBlogPosts,
-  getBlogPosts,
-  postLang,
-  postSlug,
+  getBlogPostStaticPaths,
   toBlogPostDetail,
+  type BlogPostRouteProps,
 } from '../../../lib/blog'
 
-export async function getStaticPaths() {
-  const [posts, allPosts] = await Promise.all([getBlogPosts('en'), getAllBlogPosts()])
-  const langsBySlug = new Map<string, Set<string>>()
+export const getStaticPaths = () => getBlogPostStaticPaths('en')
 
-  for (const post of allPosts) {
-    const slug = postSlug(post)
-    const langs = langsBySlug.get(slug) ?? new Set<string>()
-    langs.add(postLang(post))
-    langsBySlug.set(slug, langs)
-  }
-
-  return posts.map((post) => {
-    const slug = postSlug(post)
-    const langs = langsBySlug.get(slug)
-
-    return {
-      params: { slug },
-      props: { post, hasTranslation: Boolean(langs?.has('zh') && langs.has('en')) },
-    }
-  })
-}
-
-interface Props {
-  post: CollectionEntry<'blog'>
-  hasTranslation: boolean
-}
+type Props = BlogPostRouteProps
 
 const { post, hasTranslation } = Astro.props
 const { Content, headings } = await render(post)

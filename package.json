@@ -1,7 +1,8 @@
 {
   "name": "snowiest",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "private": true,
   "license": "MIT",
   "packageManager": "pnpm@10.27.0",
   "engines": {

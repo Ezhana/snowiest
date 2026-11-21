@@ -31,6 +31,8 @@ const navItems = [
   { href: localeUrl(lang, '/about/'), label: t('nav.about') },
 ]
 
+// The static HTML cannot know the visitor's query string; `header.ts` copies it onto these links
+// on the client so pagination and sort survive a language switch.
 const languageOptions = (Object.keys(languages) as Lang[]).map((code) => ({
   code,
   label: languages[code].label,
@@ -211,6 +213,15 @@ const themeOptions = [
     </div>
   </div>
 </header>
+
+<noscript>
+  <style is:inline>
+    /* The colour-mode menu only works with JavaScript; without it the page follows the OS. */
+    [data-theme-menu] {
+      display: none !important;
+    }
+  </style>
+</noscript>
 
 <script>
   import { setupSiteHeader } from './header'

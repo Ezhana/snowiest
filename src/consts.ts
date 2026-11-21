@@ -10,7 +10,6 @@ export const SITE_GITHUB_PROFILE_URL = 'https://github.com/Ezhana'
 export const SITE_GITHUB_URL = 'https://github.com/Ezhana/snowiest'
 /** Where link exchanges are requested; the Links page points its exchange note here. */
 export const SITE_LINK_EXCHANGE_URL = 'https://github.com/Ezhana/snowiest/issues/1'
-export const SITE_URL = 'https://ezhana.github.io/snowiest/'
 
 /** Content licence shown in the footer and in the feed metadata. See LICENSE-CONTENT. */
 export const CONTENT_LICENSE_NAME = 'CC BY-NC-SA 4.0'
@@ -19,6 +18,15 @@ export const CONTENT_LICENSE_URL = 'https://creativecommons.org/licenses/by-nc-s
 // GitHub Pages serves this project site from the `/snowiest/` sub-path. Astro exposes the
 // configured `base` here, always with a trailing slash.
 export const BASE_PATH = import.meta.env.BASE_URL
+
+/**
+ * Absolute URL of the site root. Derived from the `site` and `base` values in `astro.config.mjs`
+ * so the constant cannot drift from the deployment configuration.
+ */
+export const SITE_URL = new URL(
+  `${BASE_PATH.replace(/\/+$/, '')}/`,
+  import.meta.env.SITE,
+).toString()
 
 /** Prefix a site-absolute path with the configured base path. */
 export function withBase(path: string): string {

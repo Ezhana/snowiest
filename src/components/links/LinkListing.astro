@@ -29,24 +29,29 @@ const oneWay = new Set(oneWaySlugs)
       <>
         <span class="flex items-center justify-between gap-3">
           <span class="flex min-w-0 items-center gap-2.5">
-            {link.icon ? (
-              <img
-                src={link.icon}
-                alt=""
-                width="32"
-                height="32"
-                loading="lazy"
-                decoding="async"
-                class="size-8 shrink-0 rounded-control bg-accent-subtle object-cover"
-              />
-            ) : (
+            <span class="relative grid size-8 shrink-0 place-items-center overflow-hidden rounded-control bg-accent-subtle">
+              {link.icon && (
+                <img
+                  data-link-icon
+                  src={link.icon}
+                  alt=""
+                  width="32"
+                  height="32"
+                  loading="lazy"
+                  decoding="async"
+                  class="absolute inset-0 size-8 object-cover"
+                />
+              )}
+              {/* Broken or missing external icons fall back to the name's first character. */}
               <span
-                class="grid size-8 shrink-0 place-items-center rounded-control bg-accent-subtle text-small font-semibold text-accent"
+                data-link-icon-fallback
+                class="text-small font-semibold text-accent"
                 aria-hidden="true"
+                hidden={Boolean(link.icon)}
               >
                 {link.name.slice(0, 1)}
               </span>
-            )}
+            </span>
             <span class={nameClass}>{link.name}</span>
           </span>
           {showTag && link.tag && (
@@ -74,3 +79,9 @@ const oneWay = new Set(oneWaySlugs)
     )
   })}
 </ul>
+
+<script>
+  import { setupLinkIcons } from './link-icon'
+
+  setupLinkIcons()
+</script>

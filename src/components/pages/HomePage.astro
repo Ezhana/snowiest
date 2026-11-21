@@ -9,7 +9,7 @@ const copy = homeCopy[lang]
 ---
 
 <BaseLayout title={copy.title} description={copy.description}>
-  <main class="mx-auto w-full max-w-6xl px-4 py-12">
+  <main id="page-top" tabindex="-1" class="mx-auto w-full max-w-6xl px-4 py-12">
     <section class="mx-auto w-full max-w-180 space-y-4">
       <p class="flex items-center gap-1 text-caption font-semibold uppercase tracking-[0.18em] text-accent">
         <span class="inline-block size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
@@ -25,6 +25,8 @@ const copy = homeCopy[lang]
       </div>
       <p class="text-small text-fg-muted" set:html={copy.about} />
     </section>
-    <BlogTimeline />
+    <div class="mx-auto mt-12 w-full max-w-[64rem]">
+      <BlogTimeline />
+    </div>
   </main>
 </BaseLayout>

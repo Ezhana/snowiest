@@ -10,7 +10,7 @@ import { localeUrl } from '../i18n/routing'
 
 const zh = useTranslations('zh')
 const en = useTranslations('en')
-const title = `404 · ${zh('site.title')}`
+const title = '404'
 ---
 
 <BaseLayout
@@ -20,7 +20,11 @@ const title = `404 · ${zh('site.title')}`
   noindex
   languagePath="/"
 >
-  <main class="mx-auto flex min-h-[60vh] w-full max-w-180 flex-col items-center justify-center gap-3 px-4 py-16 text-center">
+  <main
+    id="page-top"
+    tabindex="-1"
+    class="mx-auto flex min-h-[60vh] w-full max-w-180 flex-col items-center justify-center gap-3 px-4 py-16 text-center"
+  >
     <p class="m-0 text-caption font-semibold uppercase tracking-[0.18em] text-accent">404</p>
     <h1 class="m-0 text-h1 font-bold text-fg-strong">{zh('common.pageNotFound')}</h1>
     <p class="m-0 text-small text-fg-muted">{zh('common.pageNotFoundHint')}</p>

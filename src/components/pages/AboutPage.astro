@@ -9,7 +9,7 @@ const copy = aboutCopy[lang]
 ---
 
 <BaseLayout title={copy.title} description={copy.description}>
-  <main class="mx-auto w-full max-w-6xl px-4 py-10 lg:py-14">
+  <main id="page-top" tabindex="-1" class="mx-auto w-full max-w-6xl px-4 py-10 lg:py-14">
     <div class="mx-auto w-full max-w-180">
       <h1 class="text-center text-h1 font-bold text-fg-strong">{copy.title}</h1>
       <div class="mt-8 space-y-4 leading-relaxed">
@@ -17,9 +17,7 @@ const copy = aboutCopy[lang]
 
         <p>{copy.threeWordsPrompt}</p>
 
-        <br />
-        <p class="text-display font-bold text-fg-strong">{copy.threeWords}</p>
-        <br />
+        <p class="my-2 text-display font-bold text-fg-strong">{copy.threeWords}</p>
 
         <p set:html={copy.fun} />
 
@@ -46,7 +44,9 @@ const copy = aboutCopy[lang]
         <p class="text-small text-fg-muted" set:html={copy.ps} />
       </div>
 
-      <Comment />
+      <div class="mt-12">
+        <Comment />
+      </div>
     </div>
   </main>
 </BaseLayout>

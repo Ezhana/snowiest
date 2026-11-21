@@ -7,11 +7,7 @@ const giscusLang = lang === 'zh' ? 'zh-CN' : 'en'
 const discussionsUrl = 'https://github.com/Ezhana/snowiest/discussions'
 ---
 
-<section
-  data-giscus-section
-  class="mt-12 border-t border-border pt-8"
-  aria-label={t('comment.heading')}
->
+<section data-giscus-section class="border-t border-border pt-8" aria-label={t('comment.heading')}>
   {/*
     The giscus client script reads these options; `giscus.ts` mounts it so the theme can be
     resolved on the client and the widget can be re-created after each ClientRouter navigation.

@@ -243,6 +243,35 @@
  * - the about page redaction hides a sentence visually but keeps it in the accessibility tree.
  */
 @layer components {
+  /* Keyboard escape hatch past the repeated header chrome; off-screen until focused. */
+  .skip-link {
+    position: fixed;
+    inset-block-start: 0.75rem;
+    inset-inline-start: 0.75rem;
+    z-index: 70;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface-elevated);
+    color: var(--color-fg-strong);
+    font-size: var(--font-size-small);
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-200%);
+    transition: transform 150ms ease;
+  }
+
+  .skip-link:focus {
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skip-link {
+      transition: none;
+    }
+  }
+
   /*
    * Page entrance. Deliberately has no `animation-fill-mode`: the final keyframe equals the base
    * styles, and a filled transform (even an identity matrix) would make this wrapper the containing

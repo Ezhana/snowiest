@@ -57,6 +57,9 @@ const hasToc = headings.some((heading) => heading.depth === 2 || heading.depth =
   image={heroImage}
   canonical={canonical}
   alternates={alternates}
+  type="article"
+  publishedTime={pubDate}
+  modifiedTime={updatedDate}
 >
   <Fragment slot="header-nav-start">
     {hasToc && <TocTrigger label={t('post.toc')} targetId={tocId} variant="header" />}
@@ -85,7 +88,7 @@ const hasToc = headings.some((heading) => heading.depth === 2 || heading.depth =
     )}
   </Fragment>
 
-  <main id="page-top" class="mx-auto w-full max-w-[72rem] px-4 py-10 lg:py-14">
+  <main id="page-top" tabindex="-1" class="mx-auto w-full max-w-[72rem] px-4 py-10 lg:py-14">
     <div class="post-column relative mx-auto w-full max-w-[45rem]">
       {/*
         The floating controls are part of main now. The fixed containing block is still the
@@ -113,10 +116,16 @@ const hasToc = headings.some((heading) => heading.depth === 2 || heading.depth =
 
       <article lang={sourceLang}>
         {heroImage && (
-          <Image class="article-hero" width={1020} height={510} src={heroImage} alt="" />
+          <Image
+            class="article-hero"
+            widths={[640, 1024, 1600]}
+            sizes="(min-width: 45rem) 45rem, calc(100vw - 2rem)"
+            src={heroImage}
+            alt=""
+          />
         )}
         <header class="article-header">
-          <p class="article-meta">
+          <p class="article-meta" lang={currentLang}>
             <DateTime date={pubDate} />
             {updatedDate && (
               <span class="article-updated">
@@ -129,7 +138,10 @@ const hasToc = headings.some((heading) => heading.depth === 2 || heading.depth =
           </h1>
         </header>
         {isFallback && (
-          <p class="mb-6 rounded-panel border border-border bg-bg-subtle px-4 py-3 text-small text-fg-muted">
+          <p
+            lang={currentLang}
+            class="mb-6 rounded-panel border border-border bg-bg-subtle px-4 py-3 text-small text-fg-muted"
+          >
             {t(sourceLang === 'zh' ? 'post.fallbackFromZh' : 'post.fallbackFromEn')}
           </p>
         )}
@@ -172,7 +184,9 @@ const hasToc = headings.some((heading) => heading.depth === 2 || heading.depth =
           <slot />
         </div>
       </article>
-      <Comment />
+      <div class="mt-12">
+        <Comment />
+      </div>
       <aside class="absolute left-full top-0 ms-8 hidden h-full w-52 xl:block">
         {/*
           The rail is flush to the reading column: the outline and the back-to-top button share the

@@ -3,34 +3,29 @@ import { getLang, useTranslations } from '../../i18n/ui'
 import { getRenderedMoments } from '../../lib/moments'
 import MomentCard from './MomentCard.astro'
 
-/** Moments are short; several fit in one infinite-scroll batch. */
-const MOMENT_BATCH_SIZE = 4
+/**
+ * Each moment is its own list item; the infinite list reveals the first eight and then four at a
+ * time, so screen readers count moments rather than implementation batches.
+ */
+const INITIAL_MOMENTS = 8
+const LOAD_MOMENTS = 4
 
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
 const entries = await getRenderedMoments()
-const batches = Array.from(
-  { length: Math.ceil(entries.length / MOMENT_BATCH_SIZE) },
-  (_, batchIndex) => {
-    const start = batchIndex * MOMENT_BATCH_SIZE
-    return entries.slice(start, start + MOMENT_BATCH_SIZE)
-  },
-)
 ---
 
 {entries.length === 0 ? (
   <p class="text-center text-fg-muted">{t('moment.empty')}</p>
 ) : (
   <section aria-label={t('moment.title')}>
-    <div data-moments-feed data-initial-batches="2" data-load-batches="1">
+    <div data-moments-feed data-initial-batches={INITIAL_MOMENTS} data-load-batches={LOAD_MOMENTS}>
       <ol class="m-0 list-none space-y-4 p-0">
-        {batches.map((batch) => (
-          <li data-infinite-batch class="space-y-4">
-            {batch.map(({ moment, Content }) => (
-              <MomentCard moment={moment}>
-                <Content />
-              </MomentCard>
-            ))}
+        {entries.map(({ moment, Content }) => (
+          <li data-infinite-batch>
+            <MomentCard moment={moment}>
+              <Content />
+            </MomentCard>
           </li>
         ))}
       </ol>

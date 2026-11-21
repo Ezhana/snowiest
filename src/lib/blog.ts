@@ -174,6 +174,39 @@ export async function getBlogPosts(
   return sortByPubDate(view, options.order ?? 'newest')
 }
 
+export interface BlogPostRouteProps {
+  post: BlogPost
+  hasTranslation: boolean
+}
+
+/**
+ * `getStaticPaths` data for one language view. Both locale route files share this so the
+ * translation pairing logic exists once.
+ */
+export async function getBlogPostStaticPaths(
+  lang: Lang,
+): Promise<Array<{ params: { slug: string }; props: BlogPostRouteProps }>> {
+  const [posts, allPosts] = await Promise.all([getBlogPosts(lang), getAllBlogPosts()])
+  const langsBySlug = new Map<string, Set<Lang>>()
+
+  for (const post of allPosts) {
+    const slug = postSlug(post)
+    const langs = langsBySlug.get(slug) ?? new Set<Lang>()
+    langs.add(postLang(post))
+    langsBySlug.set(slug, langs)
+  }
+
+  return posts.map((post) => {
+    const slug = postSlug(post)
+    const langs = langsBySlug.get(slug)
+
+    return {
+      params: { slug },
+      props: { post, hasTranslation: Boolean(langs?.has('zh') && langs.has('en')) },
+    }
+  })
+}
+
 /** Exact language version of `slug`; `undefined` when that language has no version. */
 export async function getBlogPostBySlug(slug: string, lang: Lang): Promise<BlogPost | undefined> {
   const posts = await readVisibleBlogPosts()
