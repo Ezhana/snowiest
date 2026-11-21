@@ -4,13 +4,29 @@ import { getLang, useTranslations } from '../../i18n/ui'
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
 const giscusLang = lang === 'zh' ? 'zh-CN' : 'en'
+const discussionsUrl = 'https://github.com/Ezhana/snowiest/discussions'
 ---
 
-<section class="mt-12 border-t border-border pt-8" aria-label={t('comment.heading')}>
+<section
+  data-giscus-section
+  class="mt-12 border-t border-border pt-8"
+  aria-label={t('comment.heading')}
+>
   {/*
     The giscus client script reads these options; `giscus.ts` mounts it so the theme can be
     resolved on the client and the widget can be re-created after each ClientRouter navigation.
+    The status and fallback lines are toggled by that script: a blocked or slow giscus.app must not
+    leave an empty section behind.
   */}
+  <p data-giscus-status hidden role="status" class="m-0 mb-4 text-small text-fg-muted">
+    {t('comment.loading')}
+  </p>
+  <p data-giscus-fallback hidden class="m-0 mb-4 text-small text-fg-muted">
+    {t('comment.failed')}{' '}
+    <a class="copy-link" href={discussionsUrl} target="_blank" rel="noopener noreferrer">
+      {t('comment.openDiscussions')}
+    </a>
+  </p>
   <div
     data-giscus
     data-repo="Ezhana/snowiest"
@@ -25,6 +41,14 @@ const giscusLang = lang === 'zh' ? 'zh-CN' : 'en'
     data-lang={giscusLang}
     data-loading="lazy"
   ></div>
+  <noscript>
+    <p class="m-0 text-small text-fg-muted">
+      {t('comment.failed')}{' '}
+      <a class="copy-link" href={discussionsUrl} target="_blank" rel="noopener noreferrer">
+        {t('comment.openDiscussions')}
+      </a>
+    </p>
+  </noscript>
 </section>
 
 <script>

@@ -27,8 +27,8 @@ const blog = defineCollection({
   schema: ({ image }) =>
     z
       .object({
-        title: z.string(),
-        description: z.string(),
+        title: z.string().trim().min(1),
+        description: z.string().trim().min(1),
         pubDate: frontmatterDate,
         updatedDate: frontmatterDate.optional(),
         heroImage: z.optional(image()),
@@ -58,8 +58,8 @@ const LINK_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
  */
 const localizedText = z
   .object({
-    zh: z.string().optional(),
-    en: z.string().optional(),
+    zh: z.string().trim().min(1).optional(),
+    en: z.string().trim().min(1).optional(),
   } satisfies Record<Lang, z.ZodOptional<z.ZodString>>)
   .refine((text) => Boolean(text.zh || text.en), {
     message: 'must provide zh, en, or both',

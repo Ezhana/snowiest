@@ -10,10 +10,15 @@
  * - the interface language follows the page locale instead of a fixed value.
  *
  * giscus reads its configuration from the `data-*` attributes of `client.js`. The component renders
- * those options on the container and this module forwards them to the script element.
+ * those options on the container and this module forwards them to the script element. The component
+ * also renders a loading line and a GitHub Discussions fallback; this module owns their visibility,
+ * so a blocked or unreachable giscus.app never leaves an unexplained empty section.
  */
 
 const GISCUS_ORIGIN = 'https://giscus.app'
+
+/** How long a visible comment section may stay without a loaded iframe before showing the fallback. */
+const LOAD_TIMEOUT_MS = 12_000
 
 /** Options forwarded from the component's container to the giscus script. */
 const GISCUS_OPTIONS = [
@@ -66,11 +71,21 @@ function syncAllThemes(): void {
   }
 }
 
+function statusElement(container: HTMLElement): HTMLElement | null {
+  const section = container.closest('[data-giscus-section]')
+  return section?.querySelector<HTMLElement>('[data-giscus-status]') ?? null
+}
+
+function fallbackElement(container: HTMLElement): HTMLElement | null {
+  const section = container.closest('[data-giscus-section]')
+  return section?.querySelector<HTMLElement>('[data-giscus-fallback]') ?? null
+}
+
 /**
  * giscus creates the iframe asynchronously after `client.js` runs, and again if it clears a stale
  * session. Track each iframe so a lazily loaded one picks up the latest theme before it starts.
  */
-function watchIframes(container: HTMLElement): void {
+function watchIframes(container: HTMLElement, onReady: () => void): void {
   const watched = new WeakSet<HTMLIFrameElement>()
   const observer = new MutationObserver(() => {
     const iframe = container.querySelector<HTMLIFrameElement>('iframe.giscus-frame')
@@ -81,6 +96,7 @@ function watchIframes(container: HTMLElement): void {
       'load',
       () => {
         loadedIframes.add(iframe)
+        onReady()
         syncTheme(container)
       },
       { once: true },
@@ -96,6 +112,29 @@ function mount(container: HTMLElement): void {
   if (container.dataset.giscusMounted !== undefined) return
   container.dataset.giscusMounted = ''
 
+  const status = statusElement(container)
+  const fallback = fallbackElement(container)
+  let settled = false
+  let timeoutId = 0
+
+  const markReady = () => {
+    settled = true
+    window.clearTimeout(timeoutId)
+    if (status) status.hidden = true
+    if (fallback) fallback.hidden = true
+  }
+
+  const markFailed = () => {
+    if (settled) return
+    settled = true
+    window.clearTimeout(timeoutId)
+    if (status) status.hidden = true
+    if (fallback) fallback.hidden = false
+  }
+
+  if (status) status.hidden = false
+  if (fallback) fallback.hidden = true
+
   const script = document.createElement('script')
   script.src = `${GISCUS_ORIGIN}/client.js`
   script.async = true
@@ -107,8 +146,26 @@ function mount(container: HTMLElement): void {
     if (value !== undefined) script.dataset[option] = value
   }
 
+  script.addEventListener('error', markFailed, { once: true })
   container.append(script)
-  watchIframes(container)
+  watchIframes(container, markReady)
+
+  // Lazily loaded widgets below the fold do not start before they are visible, so the timeout only
+  // begins when the section approaches the viewport and a working-but-slow load is not reported.
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return
+      observer.disconnect()
+      if (settled) return
+
+      timeoutId = window.setTimeout(() => {
+        const iframe = container.querySelector<HTMLIFrameElement>('iframe.giscus-frame')
+        if (!iframe || !loadedIframes.has(iframe)) markFailed()
+      }, LOAD_TIMEOUT_MS)
+    },
+    { rootMargin: '200px' },
+  )
+  observer.observe(container)
 }
 
 let themeWatchersInstalled = false

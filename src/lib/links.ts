@@ -3,7 +3,18 @@ import { localizedValue } from '../i18n/localized'
 import type { Lang } from '../i18n/ui'
 import type { TagId } from './tags'
 
+/** Content record behind a link; pages and components consume `LinkView` instead. */
 export type Link = CollectionEntry<'links'>
+
+/** What a link card needs, with its localized text already resolved. */
+export interface LinkView {
+  slug: string
+  url: string
+  name: string
+  description?: string
+  tag?: TagId
+  icon?: string
+}
 
 /**
  * Curated friend links, in display order. The Links page lists every other entry in its
@@ -57,6 +68,18 @@ export function linkDescription(link: Link, lang: Lang): string | undefined {
   return localizedValue(link.data.description, lang)
 }
 
+/** Map a content record to the localized card model. */
+export function toLinkView(link: Link, lang: Lang): LinkView {
+  return {
+    slug: link.data.slug,
+    url: link.data.url,
+    name: linkName(link, lang),
+    description: linkDescription(link, lang),
+    tag: link.data.tag,
+    icon: link.data.icon,
+  }
+}
+
 /** A slug is the link's stable identity, so duplicates would make the order ambiguous. */
 function assertLinkConventions(links: Link[]): void {
   const seen = new Set<string>()
@@ -98,4 +121,19 @@ export async function getFriendLinks(): Promise<Link[]> {
     if (!link) throw new Error(`Friend link "${slug}" is not defined in the links collection.`)
     return link
   })
+}
+
+/** All links as localized cards, in the same stable display order as `getLinks`. */
+export async function getLinkViews(lang: Lang): Promise<LinkView[]> {
+  return (await getLinks()).map((link) => toLinkView(link, lang))
+}
+
+/** Links carrying `tag` as localized cards. */
+export async function getLinkViewsByTag(tag: TagId, lang: Lang): Promise<LinkView[]> {
+  return (await getLinksByTag(tag)).map((link) => toLinkView(link, lang))
+}
+
+/** Curated friend links as localized cards, in `FRIEND_LINK_SLUGS` order. */
+export async function getFriendLinkViews(lang: Lang): Promise<LinkView[]> {
+  return (await getFriendLinks()).map((link) => toLinkView(link, lang))
 }

@@ -6,7 +6,6 @@ import LinkListing from '../links/LinkListing.astro'
 import MomentCard from '../moments/MomentCard.astro'
 import OrderFilter from '../site/OrderFilter.astro'
 import Tag from './Tag.astro'
-import { renderMoments } from '../../lib/moments'
 import { getTagResources } from '../../lib/tag-resources'
 import { getTagLabel, type TagId } from '../../lib/tags'
 import { getLang, useTranslations } from '../../i18n/ui'
@@ -20,7 +19,6 @@ const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
 const tagLabel = getTagLabel(tag, lang)
 const { posts, links, moments } = await getTagResources(tag, lang)
-const renderedMoments = await renderMoments(moments)
 
 const heading = `#${tagLabel}`
 const title = `${heading} · ${t('site.title')}`
@@ -32,7 +30,7 @@ const title = `${heading} · ${t('site.title')}`
       <h1 class="m-0 text-h1 font-bold text-fg-strong">
         <Tag tag={tag} lang={lang} />
       </h1>
-      <OrderFilter basePath={`/tag/${tag}/`} />
+      {posts.length > 0 && <OrderFilter basePath={`/tag/${tag}/`} />}
     </div>
     <div class="mt-4 mb-6">
       <BlogTagFilter activeTag={tag} />
@@ -58,7 +56,7 @@ const title = `${heading} · ${t('site.title')}`
           {t('tag.momentsHeading')}
         </h2>
         <div class="space-y-3">
-          {renderedMoments.map(({ moment, Content }) => (
+          {moments.map(({ moment, Content }) => (
             <MomentCard moment={moment} showTags={false}>
               <Content />
             </MomentCard>

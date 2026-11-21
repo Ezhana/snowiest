@@ -1,5 +1,5 @@
 ---
-import type { ImageMetadata, MarkdownHeading } from 'astro'
+import type { MarkdownHeading } from 'astro'
 import { Image } from 'astro:assets'
 import BaseLayout from './BaseLayout.astro'
 import Comment from '../components/comment/Comment.astro'
@@ -10,22 +10,13 @@ import Drawer from '../components/site/Drawer.astro'
 import TableOfContents from '../components/TableOfContents.astro'
 import { getLang, useTranslations, type Lang } from '../i18n/ui'
 import { localeUrl } from '../i18n/routing'
-import type { BlogPostTranslations } from '../lib/blog'
+import type { BlogPostDetail } from '../lib/blog'
 import { postTitleTransitionName } from '../lib/view-transitions'
 import BackToTop from '../components/BackToTop.astro'
 
-interface Props {
-  title: string
-  description: string
-  pubDate?: Date
-  updatedDate?: Date
-  heroImage?: ImageMetadata
-  /** Shared post slug, used for the view-transition name and the canonical URLs. */
-  slug?: string
-  /** Language of the rendered body (may differ from the page locale when untranslated). */
-  langOfPost?: Lang
-  /** Existing language versions of this slug. */
-  translations?: BlogPostTranslations
+interface Props extends BlogPostDetail {
+  /** Both language versions exist, so the page can declare hreflang alternates. */
+  hasTranslation: boolean
   headings?: MarkdownHeading[]
 }
 
@@ -36,29 +27,25 @@ const {
   updatedDate,
   heroImage,
   slug,
-  langOfPost,
-  translations,
+  lang: sourceLang,
+  hasTranslation,
   headings = [],
 } = Astro.props
 const currentLang = getLang(Astro.currentLocale)
-const sourceLang = langOfPost ?? currentLang
 const isFallback = sourceLang !== currentLang
 const t = useTranslations(currentLang)
 
-const postPath = slug ? `/blog/${slug}/` : null
-const postUrl = (lang: Lang) => new URL(localeUrl(lang, postPath ?? '/'), Astro.site).toString()
-const hasTranslation = Boolean(translations?.zh && translations?.en)
+const postPath = `/blog/${slug}/`
+const postUrl = (lang: Lang) => new URL(localeUrl(lang, postPath), Astro.site).toString()
 
 // A fallback page shows the other language's body, so point search engines at the URL where that
 // body actually lives instead of declaring two equivalents.
-const canonical = postPath ? postUrl(isFallback ? sourceLang : currentLang) : undefined
-const alternates: Partial<Record<Lang, string>> | undefined = !postPath
-  ? undefined
-  : hasTranslation
-    ? { zh: postUrl('zh'), en: postUrl('en') }
-    : {}
+const canonical = postUrl(isFallback ? sourceLang : currentLang)
+const alternates: Partial<Record<Lang, string>> = hasTranslation
+  ? { zh: postUrl('zh'), en: postUrl('en') }
+  : {}
 
-const titleTransitionName = slug ? postTitleTransitionName(slug) : undefined
+const titleTransitionName = postTitleTransitionName(slug)
 
 const tocId = 'post-toc'
 const hasToc = headings.some((heading) => heading.depth === 2 || heading.depth === 3)
@@ -129,23 +116,17 @@ const hasToc = headings.some((heading) => heading.depth === 2 || heading.depth =
           <Image class="article-hero" width={1020} height={510} src={heroImage} alt="" />
         )}
         <header class="article-header">
-          {(pubDate || updatedDate) && (
-            <p class="article-meta">
-              {pubDate && <DateTime date={pubDate} />}
-              {updatedDate && (
-                <span class="article-updated">
-                  {t('post.updated')} <DateTime date={updatedDate} />
-                </span>
-              )}
-            </p>
-          )}
-          {titleTransitionName ? (
-            <h1 class="text-display font-bold text-fg-strong" transition:name={titleTransitionName}>
-              {title}
-            </h1>
-          ) : (
-            <h1 class="text-display font-bold text-fg-strong">{title}</h1>
-          )}
+          <p class="article-meta">
+            <DateTime date={pubDate} />
+            {updatedDate && (
+              <span class="article-updated">
+                {t('post.updated')} <DateTime date={updatedDate} />
+              </span>
+            )}
+          </p>
+          <h1 class="text-display font-bold text-fg-strong" transition:name={titleTransitionName}>
+            {title}
+          </h1>
         </header>
         {isFallback && (
           <p class="mb-6 rounded-panel border border-border bg-bg-subtle px-4 py-3 text-small text-fg-muted">

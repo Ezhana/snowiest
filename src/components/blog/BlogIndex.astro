@@ -1,12 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import BlogListing from './BlogListing.astro'
-import { getBlogPosts } from '../../lib/blog'
+import { getBlogPosts, toBlogPostSummary } from '../../lib/blog'
 import { getLang, useTranslations } from '../../i18n/ui'
 
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
-const posts = await getBlogPosts(lang)
+const posts = (await getBlogPosts(lang)).map(toBlogPostSummary)
 
 const title = `${t('blog.title')} · ${t('site.title')}`
 ---

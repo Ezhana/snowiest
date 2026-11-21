@@ -127,6 +127,13 @@ export function setupSiteHeader(): void {
       if (menu.open) {
         event.preventDefault()
         closeMenu(menu)
+        return
+      }
+
+      // Opening a menu closes its sibling immediately: two panels anchored to the same corner would
+      // otherwise expand on top of each other.
+      for (const openMenu of document.querySelectorAll<HTMLDetailsElement>('[data-menu]')) {
+        if (openMenu !== menu && openMenu.open) openMenu.open = false
       }
       return
     }
@@ -138,7 +145,12 @@ export function setupSiteHeader(): void {
         themeManager.setMode(mode)
       }
       const themeMenu = modeButton.closest<HTMLDetailsElement>('[data-theme-menu]')
-      if (themeMenu) closeMenu(themeMenu)
+      if (themeMenu) {
+        closeMenu(themeMenu)
+        // The panel becomes display:none after the close animation; keep keyboard focus on the
+        // menu trigger instead of letting it fall back to <body>.
+        themeMenu.querySelector('summary')?.focus({ preventScroll: true })
+      }
       return
     }
 

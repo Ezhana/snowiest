@@ -4,8 +4,10 @@
  * `src/content/tags.json` is the only source of truth. The site consumes
  * `src/lib/tags.generated.ts`, which this module derives; edit the JSON, not the generated file.
  */
-import { readFile, writeFile } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
+import { readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 
 const LANGUAGES = ['zh', 'en']
@@ -92,7 +94,18 @@ export async function readTags() {
 
 /** Persist the tag registry, keeping the JSON stable and Prettier-compatible. */
 export async function writeTags(tags) {
-  await writeFile(TAGS_FILE, await formatSource(serializeTags(tags), 'json', TAGS_FILE), 'utf8')
+  const source = await formatSource(serializeTags(tags), 'json', TAGS_FILE)
+  const temporaryFile = `${TAGS_FILE}.${process.pid}-${randomUUID()}.tmp`
+
+  // Rename within the same directory so readers see either the old or the new registry, never a
+  // partially written file.
+  try {
+    await writeFile(temporaryFile, source, 'utf8')
+    await rename(temporaryFile, TAGS_FILE)
+  } catch (error) {
+    await rm(temporaryFile, { force: true }).catch(() => {})
+    throw error
+  }
 }
 
 async function renderTagsModule(tags) {

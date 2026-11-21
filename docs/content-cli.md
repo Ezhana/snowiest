@@ -8,8 +8,8 @@
 
 ```sh
 pnpm content moment add [内容...] [--tag <id>]... [--lang zh|en]
-pnpm content blog new [slug] [--title <标题>] [--description <摘要>] [--tag <id>]...
-                      [--lang zh|en] [--no-edit]
+pnpm content blog new [slug] [--slug <id>] [--title <标题>] [--description <摘要>]
+                      [--tag <id>]... [--lang zh|en] [--no-edit]
 pnpm content blog publish <slug>
 pnpm content link add <url> [--name <中文名>] [--name-en <英文名>] [--slug <id>]
                           [--description <中文介绍>] [--description-en <英文介绍>] [--tag <id>]
@@ -65,8 +65,8 @@ pnpm content blog new content-cli \
   --no-edit
 ```
 
-- slug 规则：小写英文字母、数字和连字符（`^[a-z0-9]+(-[a-z0-9]+)*$`）。
-- slug 已存在时命令报错，不会覆盖。
+- slug 规则：小写英文字母、数字和连字符（`^[a-z0-9]+(-[a-z0-9]+)*$`）。可以用位置参数或 `--slug` 指定，位置参数优先。
+- 目录里已有同语言版本时命令报错，不会覆盖；语言按每个文件的 frontmatter `lang` 判断（缺失按 `zh`），并兜底检查 `<lang>.md` / `<lang>.mdx` 是否存在。同一 slug 目录下可以添加另一种语言版本。
 - `--no-edit` 跳过创建后的编辑器。
 - 语言默认 `zh`，英文版加 `--lang en`；同一篇文章的不同语言版本放在同一目录。
 
@@ -94,7 +94,7 @@ pnpm content link add https://astro.build --name Astro --name-en Astro \
 - `--name` 写中文名称，默认取域名；`--name-en` 写英文名称，可省略，缺少时按全站回退规则显示中文。
 - 文件名默认从英文名推导，其次中文名，最后域名，也可以用 `--slug` 指定；文件名是 `<slug>.md`，`slug` 同时写入 frontmatter，作为链接的稳定标识且必须唯一；列表不分先后，展示顺序不代表推荐程度。
 - `--description` 写中文介绍，`--description-en` 写英文介绍；都可以省略。
-- 链接已存在时命令报错，不会覆盖；删除链接直接删文件。
+- 链接已存在时命令报错，不会覆盖；文件名或该目录下任意 Markdown 的 frontmatter `slug` 冲突都会拒绝添加。删除链接直接删文件。
 - 交互运行时，未提供的名称、介绍、标签会依次询问。
 
 ## Tag
@@ -109,7 +109,7 @@ pnpm content tag remove seo
 
 - `tag add`：id 只能使用小写英文字母、数字和连字符；id 重复或缺少中英文名称时报错。交互运行且未给 `--zh` / `--en` 时会依次询问。
 - `tag list`：按 JSON 中的顺序列出 id、中文名和英文名。
-- `tag remove`：删除标签前会扫描文章、链接、动态的 frontmatter；仍被引用时拒绝删除并列出文件，避免构建失败。
+- `tag remove`：删除标签前会扫描文章、链接、动态的 frontmatter；仍被引用时拒绝删除并列出文件，避免构建失败；标签至少需要保留一个，删除最后一个会直接报错。
 - 直接手改 JSON 也可以，改完运行 `pnpm tags:generate`（或 `pnpm dev` / `pnpm build`）。
 
 ## 通用约定

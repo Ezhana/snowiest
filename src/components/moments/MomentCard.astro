@@ -1,19 +1,18 @@
 ---
 import { getLang } from '../../i18n/ui'
-import { momentDate, type Moment } from '../../lib/moments'
+import type { MomentView } from '../../lib/moments'
 import Tag from '../tag/Tag.astro'
 import DateTime from '../site/DateTime.astro'
 import OriginalLanguage from '../site/OriginalLanguage.astro'
 
 interface Props {
-  moment: Moment
+  moment: MomentView
   /** Hide tags when the surrounding page already scopes the cards to one tag. */
   showTags?: boolean
 }
 
 const { moment, showTags = true } = Astro.props
 const lang = getLang(Astro.currentLocale)
-const date = momentDate(moment)
 ---
 
 <article class="rounded-panel border border-border/70 bg-surface p-5">
@@ -21,11 +20,11 @@ const date = momentDate(moment)
     <slot />
   </div>
   <footer class="mt-4 flex flex-wrap items-center gap-2 text-caption text-fg-muted">
-    <DateTime date={date} format="datetime" tabular />
-    <OriginalLanguage lang={moment.data.lang} />
-    {showTags && moment.data.tags.length > 0 && (
+    <DateTime date={moment.date} format="datetime" tabular />
+    <OriginalLanguage lang={moment.lang} />
+    {showTags && moment.tags.length > 0 && (
       <div class="ms-auto flex flex-wrap items-center justify-end gap-2">
-        {moment.data.tags.map((tagId) => (
+        {moment.tags.map((tagId) => (
           <Tag tag={tagId} lang={lang} />
         ))}
       </div>

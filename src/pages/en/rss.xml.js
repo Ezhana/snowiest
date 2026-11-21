@@ -1,6 +1,7 @@
 import rss from '@astrojs/rss'
 import { SITE_DESCRIPTION, SITE_TITLE, withBase } from '../../consts'
-import { getBlogPosts, postSlug } from '../../lib/blog'
+import { localeUrl } from '../../i18n/routing'
+import { getBlogPosts, postLang, postSlug } from '../../lib/blog'
 
 export async function GET(context) {
   const posts = await getBlogPosts('en')
@@ -11,7 +12,9 @@ export async function GET(context) {
     site: new URL(withBase('/en/'), context.site),
     items: posts.map((post) => ({
       ...post.data,
-      link: withBase(`/en/blog/${postSlug(post)}/`),
+      // Link to the language the body is written in so fallback entries do not point at a page
+      // whose canonical is elsewhere.
+      link: localeUrl(postLang(post), `/blog/${postSlug(post)}/`),
     })),
   })
 }

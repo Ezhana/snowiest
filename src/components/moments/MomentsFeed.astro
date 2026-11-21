@@ -1,6 +1,6 @@
 ---
 import { getLang, useTranslations } from '../../i18n/ui'
-import { getMoments, renderMoments } from '../../lib/moments'
+import { getRenderedMoments } from '../../lib/moments'
 import MomentCard from './MomentCard.astro'
 
 /** Moments are short; several fit in one infinite-scroll batch. */
@@ -8,8 +8,7 @@ const MOMENT_BATCH_SIZE = 4
 
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
-const moments = await getMoments()
-const entries = await renderMoments(moments)
+const entries = await getRenderedMoments()
 const batches = Array.from(
   { length: Math.ceil(entries.length / MOMENT_BATCH_SIZE) },
   (_, batchIndex) => {
@@ -19,7 +18,7 @@ const batches = Array.from(
 )
 ---
 
-{moments.length === 0 ? (
+{entries.length === 0 ? (
   <p class="text-center text-fg-muted">{t('moment.empty')}</p>
 ) : (
   <section aria-label={t('moment.title')}>

@@ -10,10 +10,8 @@ import {
   FRIEND_LINK_SLUGS,
   ONE_WAY_FRIEND_LINK_SLUGS,
   SELF_LINK_SLUG,
-  getFriendLinks,
-  getLinks,
-  linkDescription,
-  linkName,
+  getFriendLinkViews,
+  getLinkViews,
 } from '../../lib/links'
 
 const lang = getLang(Astro.currentLocale)
@@ -26,16 +24,15 @@ const copy = linksCopy[lang]
  * reference panel below it; a missing self link fails the build rather than silently dropping the
  * panel.
  */
-const allLinks = await getLinks()
-const friendLinks = await getFriendLinks()
+const allLinks = await getLinkViews(lang)
+const friendLinks = await getFriendLinkViews(lang)
 const friendSlugs = new Set<string>(FRIEND_LINK_SLUGS)
-const otherLinks = allLinks.filter((link) => !friendSlugs.has(link.data.slug))
+const otherLinks = allLinks.filter((link) => !friendSlugs.has(link.slug))
 
-const selfLink = allLinks.find((link) => link.data.slug === SELF_LINK_SLUG)
+const selfLink = allLinks.find((link) => link.slug === SELF_LINK_SLUG)
 if (!selfLink) throw new Error(`Link "${SELF_LINK_SLUG}" is not defined in the links collection.`)
 
-const selfName = linkName(selfLink, lang)
-const selfDescription = linkDescription(selfLink, lang)
+const selfDescription = selfLink.description
 
 /**
  * The copy button writes the card's fields verbatim, one per line. Selecting the card by hand can
@@ -44,9 +41,9 @@ const selfDescription = linkDescription(selfLink, lang)
  * colon).
  */
 const selfInfoText = [
-  `${copy.selfNameLabel}${selfName}`,
-  selfLink.data.icon ? `${copy.selfIconLabel}${selfLink.data.icon}` : null,
-  `${copy.selfLinkLabel}${selfLink.data.url}`,
+  `${copy.selfNameLabel}${selfLink.name}`,
+  selfLink.icon ? `${copy.selfIconLabel}${selfLink.icon}` : null,
+  `${copy.selfLinkLabel}${selfLink.url}`,
   selfDescription ? `${copy.selfDescriptionLabel}${selfDescription}` : null,
 ]
   .filter((part): part is string => Boolean(part))
@@ -104,15 +101,15 @@ const title = `${copy.title} · ${t('site.title')}`
           <dl class="mt-2 space-y-1 text-small">
             <div>
               <dt class="inline text-fg-muted">{copy.selfNameLabel}</dt>
-              <dd class="inline font-semibold text-fg-strong">{selfName}</dd>
+              <dd class="inline font-semibold text-fg-strong">{selfLink.name}</dd>
             </div>
             <div>
               <dt class="inline text-fg-muted">{copy.selfIconLabel}</dt>
-              <dd class="inline break-all select-all">{selfLink.data.icon}</dd>
+              <dd class="inline break-all select-all">{selfLink.icon}</dd>
             </div>
             <div>
               <dt class="inline text-fg-muted">{copy.selfLinkLabel}</dt>
-              <dd class="inline break-all select-all">{selfLink.data.url}</dd>
+              <dd class="inline break-all select-all">{selfLink.url}</dd>
             </div>
             {selfDescription && (
               <div>

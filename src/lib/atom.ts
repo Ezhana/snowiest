@@ -11,7 +11,7 @@ import {
 } from '../consts'
 import { atomUrl, localeUrl, rssUrl } from '../i18n/routing'
 import { useTranslations, type Lang } from '../i18n/ui'
-import { getBlogPosts, postSlug } from './blog'
+import { getBlogPosts, postLang, postSlug } from './blog'
 import { getTagLabel } from './tags'
 
 /**
@@ -31,9 +31,13 @@ export async function buildAtomFeed(lang: Lang, site: URL | undefined): Promise<
   const homeUrl = new URL(localeUrl(lang, '/'), site).toString()
   const feedUrl = new URL(atomUrl(lang), site).toString()
   const rssFeedUrl = new URL(rssUrl(lang), site).toString()
-  const latestDate = posts.length
-    ? (posts[0].data.updatedDate ?? posts[0].data.pubDate)
-    : new Date()
+  // The feed-level timestamp is the newest update across entries, not the newest post's update; an
+  // older post edited later must advance it so aggregators refetch. An empty feed falls back to a
+  // fixed instant instead of the build time, keeping the output reproducible.
+  const latestDate = posts.reduce((latest, post) => {
+    const candidate = post.data.updatedDate ?? post.data.pubDate
+    return candidate.getTime() > latest.getTime() ? candidate : latest
+  }, new Date(0))
 
   const feed = new Feed({
     id: feedUrl,
@@ -48,7 +52,9 @@ export async function buildAtomFeed(lang: Lang, site: URL | undefined): Promise<
   })
 
   for (const post of posts) {
-    const url = new URL(localeUrl(lang, `/blog/${postSlug(post)}/`), site).toString()
+    // Link to the language the body is actually written in: a fallback entry in the other locale's
+    // feed must not point at the non-canonical fallback page.
+    const url = new URL(localeUrl(postLang(post), `/blog/${postSlug(post)}/`), site).toString()
 
     feed.addItem({
       title: post.data.title,

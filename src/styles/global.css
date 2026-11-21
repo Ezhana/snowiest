@@ -444,9 +444,13 @@
  * would be captured blank and fade in after the snapshot. See `src/lib/client-navigation.ts`.
  *
  * Unlayered on purpose: `animate-fade-in` lives in the utilities layer, which wins over components.
+ * The rise is gated behind `no-preference` because the unlayered rule would otherwise outrank the
+ * reduced-motion override above.
  */
-html[data-client-nav] .page-enter {
-  animation: rise 600ms cubic-bezier(0.2, 0, 0, 1);
+@media (prefers-reduced-motion: no-preference) {
+  html[data-client-nav] .page-enter {
+    animation: rise 600ms cubic-bezier(0.2, 0, 0, 1);
+  }
 }
 
 html[data-client-nav] [data-site-header] .animate-fade-in {

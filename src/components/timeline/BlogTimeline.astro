@@ -4,11 +4,11 @@ import OriginalLanguage from '../site/OriginalLanguage.astro'
 import Tag from '../tag/Tag.astro'
 import { getLang, useTranslations } from '../../i18n/ui'
 import { localeUrl } from '../../i18n/routing'
-import { getBlogPosts, groupBlogPostsByMonth, postLang, postSlug } from '../../lib/blog'
+import { getBlogPosts, groupBlogPostsByMonth, toBlogPostSummary } from '../../lib/blog'
 import { postTitleTransitionName } from '../../lib/view-transitions'
 
 const lang = getLang(Astro.currentLocale)
-const posts = await getBlogPosts(lang)
+const posts = (await getBlogPosts(lang)).map(toBlogPostSummary)
 const months = groupBlogPostsByMonth(posts)
 const t = useTranslations(lang)
 ---
@@ -17,71 +17,77 @@ const t = useTranslations(lang)
   <h2 id="timeline-heading" class="sr-only">
     {t('timeline.label')}
   </h2>
-  <div data-home-timeline class="relative mx-auto w-full max-w-[64rem]">
-    <div class="absolute inset-y-0 left-4 w-px bg-border md:left-1/2" aria-hidden="true"></div>
-    <ol class="m-0 list-none p-0">
-      {months.map((month, index) => (
-        <li
-          data-infinite-batch
-          class="relative pb-10 pl-12 md:grid md:grid-cols-2 md:gap-x-20 md:pb-12 md:pl-0"
-        >
-          <span
-            class="absolute left-4 top-1 size-2.5 -translate-x-1/2 rounded-full bg-accent md:left-1/2"
-            aria-hidden="true"
-          ></span>
-          <div
-            class:list={[
-              'md:row-start-1',
-              index % 2 === 0 ? 'md:col-start-2 md:pl-12' : 'md:col-start-1 md:pr-12 md:text-right',
-            ]}
+  {months.length === 0 ? (
+    <p class="text-center text-fg-muted">{t('timeline.empty')}</p>
+  ) : (
+    <div data-home-timeline class="relative mx-auto w-full max-w-[64rem]">
+      <div class="absolute inset-y-0 left-4 w-px bg-border md:left-1/2" aria-hidden="true"></div>
+      <ol class="m-0 list-none p-0">
+        {months.map((month, index) => (
+          <li
+            data-infinite-batch
+            class="relative pb-10 pl-12 md:grid md:grid-cols-2 md:gap-x-20 md:pb-12 md:pl-0"
           >
-            <p class="m-0 text-small font-semibold text-fg-strong">
-              <DateTime date={month.date} format="month" />
-            </p>
-            <ul class="m-0 mt-3 list-none p-0">
-              {month.posts.map((post) => (
-                <li class="mt-4 first:mt-0">
-                  <a
-                    class="group block no-underline"
-                    href={localeUrl(lang, `/blog/${postSlug(post)}/`)}
-                  >
-                    <h3
-                      transition:name={postTitleTransitionName(postSlug(post))}
-                      class="m-0 text-body font-medium text-fg-strong transition-colors group-hover:text-accent"
+            <span
+              class="absolute left-4 top-1 size-2.5 -translate-x-1/2 rounded-full bg-accent md:left-1/2"
+              aria-hidden="true"
+            ></span>
+            <div
+              class:list={[
+                'md:row-start-1',
+                index % 2 === 0
+                  ? 'md:col-start-2 md:pl-12'
+                  : 'md:col-start-1 md:pr-12 md:text-right',
+              ]}
+            >
+              <p class="m-0 text-small font-semibold text-fg-strong">
+                <DateTime date={month.date} format="month" />
+              </p>
+              <ul class="m-0 mt-3 list-none p-0">
+                {month.posts.map((post) => (
+                  <li class="mt-4 first:mt-0">
+                    <a
+                      class="group block no-underline"
+                      href={localeUrl(lang, `/blog/${post.slug}/`)}
                     >
-                      {post.data.title}
-                    </h3>
-                  </a>
-                  <p
-                    class:list={[
-                      'mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-small text-fg-muted',
-                      index % 2 === 0 ? 'md:justify-start' : 'md:justify-end',
-                    ]}
-                  >
-                    <DateTime date={post.data.pubDate} />
-                    <OriginalLanguage lang={postLang(post)} />
-                    {post.data.tags.map((tagId) => (
-                      <Tag tag={tagId} lang={lang} />
-                    ))}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </li>
-      ))}
-    </ol>
-    <div class="mt-2 flex justify-center">
-      <button
-        type="button"
-        data-infinite-sentinel
-        hidden
-        class="control inline-flex items-center justify-center border border-border px-4 py-2 text-small hover:border-accent-border"
-      >
-        {t('common.loadMore')}
-      </button>
+                      <h3
+                        transition:name={postTitleTransitionName(post.slug)}
+                        class="m-0 text-body font-medium text-fg-strong transition-colors group-hover:text-accent"
+                      >
+                        {post.title}
+                      </h3>
+                    </a>
+                    <p
+                      class:list={[
+                        'mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-small text-fg-muted',
+                        index % 2 === 0 ? 'md:justify-start' : 'md:justify-end',
+                      ]}
+                    >
+                      <DateTime date={post.pubDate} />
+                      <OriginalLanguage lang={post.lang} />
+                      {post.tags.map((tagId) => (
+                        <Tag tag={tagId} lang={lang} />
+                      ))}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <div class="mt-2 flex justify-center">
+        <button
+          type="button"
+          data-infinite-sentinel
+          hidden
+          class="control inline-flex items-center justify-center border border-border px-4 py-2 text-small hover:border-accent-border"
+        >
+          {t('common.loadMore')}
+        </button>
+      </div>
     </div>
-  </div>
+  )}
 </section>
 
 <script>

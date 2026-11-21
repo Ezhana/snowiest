@@ -20,6 +20,8 @@ const options = [
 ---
 
 <nav
+  data-order-filter
+  hidden
   aria-label={t('order.label')}
   class="inline-flex shrink-0 items-center gap-0.5 rounded-control border border-border p-0.5"
 >
@@ -27,7 +29,7 @@ const options = [
     <a
       href={option.href}
       data-order-link={option.order}
-      aria-current={option.order === 'newest' ? 'page' : undefined}
+      aria-current={option.order === 'newest' ? 'true' : undefined}
       class={itemClass}
     >
       {option.label}

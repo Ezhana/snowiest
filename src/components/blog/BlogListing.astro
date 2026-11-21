@@ -3,17 +3,18 @@ import OrderFilter from '../site/OrderFilter.astro'
 import BlogPagination from './BlogPagination.astro'
 import BlogPostList from './BlogPostList.astro'
 import BlogTagFilter from '../tag/BlogTagFilter.astro'
-import { BLOG_PAGE_SIZE, type BlogPost } from '../../lib/blog'
+import { BLOG_PAGE_SIZE, type BlogPostSummary } from '../../lib/blog'
 import { getLang, useTranslations } from '../../i18n/ui'
 
 interface Props {
-  posts: BlogPost[]
+  posts: BlogPostSummary[]
 }
 
 const { posts } = Astro.props
 const lang = getLang(Astro.currentLocale)
 const t = useTranslations(lang)
 const notice = t('blog.notice')
+const hasPosts = posts.length > 0
 const totalPages = Math.max(1, Math.ceil(posts.length / BLOG_PAGE_SIZE))
 const basePath = '/blog/'
 ---
@@ -26,13 +27,17 @@ const basePath = '/blog/'
   <header class="space-y-2 md:space-y-3 lg:space-y-4">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h1 class="text-h1 font-bold text-fg-strong">{t('blog.title')}</h1>
-      <OrderFilter basePath={basePath} />
+      {hasPosts && <OrderFilter basePath={basePath} />}
     </div>
-    <BlogTagFilter />
+    {hasPosts && <BlogTagFilter />}
   </header>
   {notice && <p class="text-small text-fg-muted">{notice}</p>}
-  <BlogPostList posts={posts} />
-  <BlogPagination totalPages={totalPages} basePath={basePath} />
+  {hasPosts ? (
+    <BlogPostList posts={posts} />
+  ) : (
+    <p class="text-small text-fg-muted">{t('blog.empty')}</p>
+  )}
+  {hasPosts && <BlogPagination totalPages={totalPages} basePath={basePath} />}
 </main>
 
 <script>

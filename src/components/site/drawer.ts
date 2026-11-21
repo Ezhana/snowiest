@@ -25,11 +25,14 @@ interface ActiveDrawer {
 
 export function setupDrawers(): void {
   let controller: AbortController | null = null
+  let generation = 0
 
   const setup = () => {
     controller?.abort()
     controller = new AbortController()
     const { signal } = controller
+    generation += 1
+    const setupId = generation
 
     // A ClientRouter swap can happen while a drawer is open; never leave the old page's lock on
     // the new document.
@@ -89,6 +92,9 @@ export function setupDrawers(): void {
       }
 
       window.setTimeout(() => {
+        // A newer setup (the initial `astro:page-load` after the immediate run) owns the dialog now;
+        // its pending timeout must not close a drawer the new controller adopted.
+        if (setupId !== generation) return
         if (active === state) finishClose(state, true)
       }, duration)
     }
@@ -112,11 +118,35 @@ export function setupDrawers(): void {
 
       // Let the closed position paint first so the panel actually transitions in.
       window.requestAnimationFrame(() => {
-        if (active === state) dialog.dataset.state = 'open'
+        if (setupId === generation && active === state) dialog.dataset.state = 'open'
       })
 
       dialog.querySelector<HTMLElement>('[data-drawer-close]')?.focus({ preventScroll: true })
     }
+
+    /**
+     * `onPageLoad` runs this setup immediately and again on the first `astro:page-load`. If the
+     * reader opens the drawer in between, the second run must take over the already-open modal
+     * instead of leaving it without a controller (`active === null` would make it unclosable).
+     */
+    const adoptOpenDialog = () => {
+      const dialog = dialogs.find((candidate) => candidate.open)
+      if (!dialog) return
+
+      const trigger = triggersFor(dialog.id)[0]
+      if (!trigger) {
+        dialog.close()
+        return
+      }
+
+      active = { dialog, trigger, closing: false }
+      dialog.dataset.state = 'open'
+      lockScroll()
+      setExpanded(dialog.id, true)
+      dialog.querySelector<HTMLElement>('[data-drawer-close]')?.focus({ preventScroll: true })
+    }
+
+    adoptOpenDialog()
 
     for (const dialog of dialogs) {
       dialog.addEventListener(

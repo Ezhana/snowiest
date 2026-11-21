@@ -1,14 +1,49 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
+import type { ImageMetadata } from 'astro'
 import type { Lang } from '../i18n/ui'
 import { BLOG_CONTENT_DIR } from './content-paths'
 import { siteMonthKey, siteMonthStart } from './site-date'
+import type { TagId } from './tags'
 
 export const BLOG_PAGE_SIZE = 5
 
+/** Content record behind a post; pages and components consume the view models below instead. */
 export type BlogPost = CollectionEntry<'blog'>
 
-/** All existing language versions of one slug, keyed by language. */
-export type BlogPostTranslations = Partial<Record<Lang, BlogPost>>
+/** What a listing or timeline needs from one post. */
+export interface BlogPostSummary {
+  slug: string
+  title: string
+  description: string
+  pubDate: Date
+  tags: TagId[]
+  /** Language the body is written in. */
+  lang: Lang
+  heroImage?: ImageMetadata
+}
+
+/** Everything the post page needs, including fields that only the article itself shows. */
+export interface BlogPostDetail extends BlogPostSummary {
+  updatedDate?: Date
+}
+
+/** Map a content record to the listing/timeline model. */
+export function toBlogPostSummary(post: BlogPost): BlogPostSummary {
+  return {
+    slug: postSlug(post),
+    title: post.data.title,
+    description: post.data.description,
+    pubDate: post.data.pubDate,
+    tags: post.data.tags,
+    lang: postLang(post),
+    heroImage: post.data.heroImage,
+  }
+}
+
+/** Map a content record to the article model. */
+export function toBlogPostDetail(post: BlogPost): BlogPostDetail {
+  return { ...toBlogPostSummary(post), updatedDate: post.data.updatedDate }
+}
 
 /** Publication-date order: `newest` sorts descending, `oldest` ascending. */
 export type BlogOrder = 'newest' | 'oldest'
@@ -90,16 +125,17 @@ function sortByPubDate(posts: BlogPost[], order: BlogOrder): BlogPost[] {
 
 /**
  * Visibility is the shared read layer for every query below: development includes drafts and
- * future posts, production excludes both, and convention violations fail the build.
+ * future posts, production excludes both. Conventions are checked on every record, including
+ * drafts, so a malformed draft folder cannot reach production unnoticed.
  */
 async function readVisibleBlogPosts(): Promise<BlogPost[]> {
   const posts = await getCollection('blog')
-  const visible = import.meta.env.DEV
+
+  assertPostConventions(posts)
+
+  return import.meta.env.DEV
     ? posts
     : posts.filter((post) => !post.data.draft && post.data.pubDate.valueOf() <= Date.now())
-
-  assertPostConventions(visible)
-  return visible
 }
 
 /**
@@ -144,28 +180,19 @@ export async function getBlogPostBySlug(slug: string, lang: Lang): Promise<BlogP
   return posts.find((post) => postSlug(post) === slug && postLang(post) === lang)
 }
 
-/** Every existing language version of `slug`, keyed by language. Missing languages are absent. */
-export async function getBlogPostTranslations(slug: string): Promise<BlogPostTranslations> {
-  const posts = (await readVisibleBlogPosts()).filter((post) => postSlug(post) === slug)
-  const translations: BlogPostTranslations = {}
-
-  for (const post of posts) translations[postLang(post)] = post
-  return translations
-}
-
 export interface BlogMonthGroup {
   key: string
   /** First day of the month, used for the localized month label. */
   date: Date
-  posts: BlogPost[]
+  posts: BlogPostSummary[]
 }
 
 /** Group posts (already newest-first) by calendar month, newest month first. */
-export function groupBlogPostsByMonth(posts: BlogPost[]): BlogMonthGroup[] {
+export function groupBlogPostsByMonth(posts: BlogPostSummary[]): BlogMonthGroup[] {
   const groups = new Map<string, BlogMonthGroup>()
 
   for (const post of posts) {
-    const date = post.data.pubDate
+    const date = post.pubDate
     // Month boundaries follow the site time zone, matching how the dates are rendered.
     const key = siteMonthKey(date)
     const existing = groups.get(key)

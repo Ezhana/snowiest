@@ -7,8 +7,8 @@
  * modules, while tags are read from and written to `src/content/tags.json`.
  */
 import { spawnSync } from 'node:child_process'
-import { existsSync } from 'node:fs'
-import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { existsSync, statSync } from 'node:fs'
+import { mkdir, mkdtemp, readFile, readdir, rm, rmdir, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 import process from 'node:process'
@@ -44,8 +44,8 @@ async function usageText() {
 命令：
   moment add [内容...] [--tag <id>]... [--lang zh|en]
       发布一条动态。不带内容时：管道输入会作为正文，终端中会打开 $EDITOR。
-  blog new [slug] [--title <标题>] [--description <摘要>] [--tag <id>]... [--lang zh|en]
-           [--no-edit]
+  blog new [slug] [--slug <id>] [--title <标题>] [--description <摘要>] [--tag <id>]...
+           [--lang zh|en] [--no-edit]
       创建草稿文章（元数据 + draft: true），随后在 $EDITOR 中写正文。
   blog publish <slug>
       把文章目录下所有语言版本的 draft 设为 false。
@@ -233,9 +233,22 @@ function closePrompt() {
   promptInterface = undefined
 }
 
+function askLine(text) {
+  const rl = prompt()
+  if (rl.closed) return Promise.reject(new CliError('输入已结束，已取消。'))
+
+  return new Promise((resolve, reject) => {
+    const onClose = () => reject(new CliError('输入已结束，已取消。'))
+    rl.once('close', onClose)
+    rl.question(text)
+      .then(resolve, reject)
+      .finally(() => rl.off('close', onClose))
+  })
+}
+
 async function ask(question, { defaultValue = '', optional = false } = {}) {
   const suffix = defaultValue ? `（${defaultValue}）` : ''
-  const answer = (await prompt().question(`${question}${suffix}：`)).trim()
+  const answer = (await askLine(`${question}${suffix}：`)).trim()
 
   if (answer) return answer
   if (defaultValue) return defaultValue
@@ -449,9 +462,32 @@ async function momentAdd(argv) {
   log(`已发布动态 → ${relativeToRoot(file)}`)
 }
 
+async function discardDraft(file, directory, directoryCreated) {
+  await rm(file, { force: true })
+  if (!directoryCreated) return
+
+  try {
+    await rmdir(directory)
+  } catch (error) {
+    if (error.code !== 'ENOENT' && error.code !== 'ENOTEMPTY') throw error
+  }
+}
+
+async function findBlogLangConflicts(directory, lang) {
+  const conflicts = []
+
+  for (const file of await listMarkdownFiles(directory)) {
+    if (frontmatterLang(await readFile(file, 'utf8')) === lang) {
+      conflicts.push(relativeToRoot(file))
+    }
+  }
+
+  return conflicts
+}
+
 async function blogNew(argv) {
   const { positionals, values, flags } = parseArgs(argv, {
-    values: ['title', 'description', 'tag', 'lang'],
+    values: ['slug', 'title', 'description', 'tag', 'lang'],
     booleans: ['no-edit'],
   })
 
@@ -465,11 +501,13 @@ async function blogNew(argv) {
     title = await ask('标题')
   }
 
-  let slug = positionals[0] ?? slugify(title)
+  let slug = positionals[0] ?? getValue(values, 'slug') ?? slugify(title)
 
   if (!slug) {
     if (!isInteractive()) {
-      fail('无法从标题推导 slug（标题不是纯英文）。请用 --slug 指定一个小写英文 id。')
+      fail(
+        '无法从标题推导 slug（标题不是纯英文）。请用位置参数指定，例如 `pnpm content blog new my-post`，或使用 `--slug my-post`。',
+      )
     }
     slug = await ask('slug（URL 片段，小写字母、数字与连字符）')
   }
@@ -477,7 +515,32 @@ async function blogNew(argv) {
   assertSlug(slug)
 
   const directory = join(ROOT, BLOG_CONTENT_DIR, slug)
-  if (existsSync(directory)) fail(`文章目录已存在：${relativeToRoot(directory)}`)
+  const file = join(directory, `${lang}.md`)
+
+  if (existsSync(directory)) {
+    if (!statSync(directory).isDirectory()) {
+      fail(
+        `文章路径已存在但不是目录：${relativeToRoot(directory)}。请换一个 slug，或手动处理该文件。`,
+      )
+    }
+
+    const conflicts = await findBlogLangConflicts(directory, lang)
+    for (const name of [`${lang}.md`, `${lang}.mdx`]) {
+      const candidate = join(directory, name)
+      if (!existsSync(candidate)) continue
+
+      const conflict = relativeToRoot(candidate)
+      if (!conflicts.includes(conflict)) conflicts.push(conflict)
+    }
+
+    if (conflicts.length > 0) {
+      fail(
+        `文章 ${lang} 版本已存在，不会覆盖：\n${conflicts
+          .map((conflict) => `  - ${conflict}`)
+          .join('\n')}\n请删除冲突文件，或改用其它语言（--lang zh|en）。`,
+      )
+    }
+  }
 
   let description = getValue(values, 'description')
   if (!description) {
@@ -491,17 +554,24 @@ async function blogNew(argv) {
     tags = await parseTagAnswer(answer)
   }
 
+  const directoryCreated = !existsSync(directory)
   await mkdir(directory, { recursive: true })
-  const file = join(directory, `${lang}.md`)
   await writeFile(file, blogFileContents({ title, description, tags, lang }), 'utf8')
-
-  log(`已创建草稿 → ${relativeToRoot(file)}`)
 
   if (isInteractive() && !flags.has('no-edit')) {
     closePrompt()
-    openEditor(file)
+    try {
+      openEditor(file)
+    } catch (error) {
+      await discardDraft(file, directory, directoryCreated)
+      if (error instanceof CliError) {
+        fail(`已删除刚创建的草稿 ${relativeToRoot(file)}。${error.message}`)
+      }
+      throw error
+    }
   }
 
+  log(`已创建草稿 → ${relativeToRoot(file)}`)
   log(`写完后发布：pnpm content blog publish ${slug}`)
 }
 
@@ -632,6 +702,15 @@ async function linkAdd(argv) {
   const file = join(directory, `${slug}.md`)
   if (existsSync(file)) fail(`链接已存在：${relativeToRoot(file)}`)
 
+  const conflicts = await findLinkSlugConflicts(slug)
+  if (conflicts.length > 0) {
+    fail(
+      `链接 slug "${slug}" 已被以下文件使用，请换一个 slug：\n${conflicts
+        .map((conflict) => `  - ${conflict}`)
+        .join('\n')}`,
+    )
+  }
+
   await mkdir(directory, { recursive: true })
   await writeFile(
     file,
@@ -665,12 +744,16 @@ async function listMarkdownFiles(directory) {
   return files
 }
 
+/** Frontmatter block of a Markdown file, without its delimiters; undefined when there is none. */
+function frontmatterOf(source) {
+  return /^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(source)?.[1]
+}
+
 /** Tag ids referenced by a content file's frontmatter, without a full YAML parser. */
 function frontmatterTags(source) {
-  const match = /^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(source)
-  if (!match) return []
+  const frontmatter = frontmatterOf(source)
+  if (!frontmatter) return []
 
-  const frontmatter = match[1]
   const tags = []
 
   const block = /^tags:[ \t]*\r?\n((?:[ \t]*-[ \t]*.*(?:\r?\n|$))*)/m.exec(frontmatter)
@@ -696,6 +779,41 @@ function frontmatterTags(source) {
   }
 
   return tags
+}
+
+function frontmatterScalar(source, key) {
+  const frontmatter = frontmatterOf(source)
+  if (!frontmatter) return undefined
+
+  const match = new RegExp(`^${key}:[ \\t]*(.*)$`, 'm').exec(frontmatter)
+  if (!match) return undefined
+
+  return (
+    match[1]
+      .replace(/[ \t]+#.*$/, '')
+      .trim()
+      .replace(/^['"]|['"]$/g, '') || undefined
+  )
+}
+
+function frontmatterSlug(source) {
+  return frontmatterScalar(source, 'slug')
+}
+
+function frontmatterLang(source) {
+  return frontmatterScalar(source, 'lang') ?? 'zh'
+}
+
+async function findLinkSlugConflicts(slug) {
+  const conflicts = []
+
+  for (const file of await listMarkdownFiles(join(ROOT, LINKS_CONTENT_DIR))) {
+    if (frontmatterSlug(await readFile(file, 'utf8')) === slug) {
+      conflicts.push(relativeToRoot(file))
+    }
+  }
+
+  return conflicts
 }
 
 async function findTagReferences(id) {
@@ -764,6 +882,11 @@ async function tagRemove(argv) {
   const id = positionals[0]
   const tags = await loadTags()
   if (!tags.some((tag) => tag.id === id)) fail(`标签不存在：${id}`)
+  if (tags.length <= 1) {
+    fail(
+      `标签至少需要保留一个，无法删除 "${id}"。请先运行 \`pnpm content tag add <id>\` 添加新标签，再删除这个标签。`,
+    )
+  }
 
   const references = await findTagReferences(id)
   if (references.length > 0) {
