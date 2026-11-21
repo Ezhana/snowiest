@@ -8,57 +8,70 @@ interface Props {
   lang: Lang
   /** Hide the category marker where the surrounding context already scopes the list to one tag. */
   showTag?: boolean
+  /** Friend links whose site does not link back: rendered dimmed and non-interactive. */
+  oneWaySlugs?: readonly string[]
 }
 
-const { links, lang, showTag = true } = Astro.props
+const { links, lang, showTag = true, oneWaySlugs = [] } = Astro.props
+const oneWay = new Set(oneWaySlugs)
 ---
 
 <ul class="grid gap-3 sm:grid-cols-2">
   {links.map((link) => {
     const name = linkName(link, lang)
     const description = linkDescription(link, lang)
-    return (
-      <li>
-        <a
-          href={link.data.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="group flex h-full flex-col rounded-surface border border-border bg-surface p-4 no-underline transition-colors hover:border-accent-border hover:bg-bg-subtle"
-        >
-          <span class="flex items-center justify-between gap-3">
-            <span class="flex min-w-0 items-center gap-2.5">
-              {link.data.icon ? (
-                <img
-                  src={link.data.icon}
-                  alt=""
-                  width="32"
-                  height="32"
-                  loading="lazy"
-                  decoding="async"
-                  class="size-8 shrink-0 rounded-control bg-accent-subtle object-cover"
-                />
-              ) : (
-                <span
-                  class="grid size-8 shrink-0 place-items-center rounded-control bg-accent-subtle text-small font-semibold text-accent"
-                  aria-hidden="true"
-                >
-                  {name.slice(0, 1)}
-                </span>
-              )}
-              <span class="truncate font-semibold text-fg-strong transition-colors group-hover:text-accent">
-                {name}
-              </span>
-            </span>
-            {showTag && link.data.tag && (
-              <span class="shrink-0 text-caption text-fg-muted">
-                <Tag tag={link.data.tag} lang={lang} />
+    const isOneWay = oneWay.has(link.data.slug)
+    const cardClass = isOneWay
+      ? 'flex h-full flex-col rounded-surface border border-border bg-surface p-4 opacity-60'
+      : 'group flex h-full flex-col rounded-surface border border-border bg-surface p-4 no-underline transition-colors hover:border-accent-border hover:bg-bg-subtle'
+    const nameClass = isOneWay
+      ? 'truncate font-semibold text-fg-muted'
+      : 'truncate font-semibold text-fg-strong transition-colors group-hover:text-accent'
+    const content = (
+      <>
+        <span class="flex items-center justify-between gap-3">
+          <span class="flex min-w-0 items-center gap-2.5">
+            {link.data.icon ? (
+              <img
+                src={link.data.icon}
+                alt=""
+                width="32"
+                height="32"
+                loading="lazy"
+                decoding="async"
+                class="size-8 shrink-0 rounded-control bg-accent-subtle object-cover"
+              />
+            ) : (
+              <span
+                class="grid size-8 shrink-0 place-items-center rounded-control bg-accent-subtle text-small font-semibold text-accent"
+                aria-hidden="true"
+              >
+                {name.slice(0, 1)}
               </span>
             )}
+            <span class={nameClass}>{name}</span>
           </span>
-          {description && (
-            <span class="mt-2 text-small leading-relaxed text-fg-muted">{description}</span>
+          {showTag && link.data.tag && (
+            <span class="shrink-0 text-caption text-fg-muted">
+              <Tag tag={link.data.tag} lang={lang} />
+            </span>
           )}
-        </a>
+        </span>
+        {description && (
+          <span class="mt-2 text-small leading-relaxed text-fg-muted">{description}</span>
+        )}
+      </>
+    )
+
+    return (
+      <li>
+        {isOneWay ? (
+          <div class={cardClass}>{content}</div>
+        ) : (
+          <a href={link.data.url} target="_blank" rel="noopener noreferrer" class={cardClass}>
+            {content}
+          </a>
+        )}
       </li>
     )
   })}

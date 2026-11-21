@@ -134,8 +134,9 @@ icon: 'https://astro.build/favicon.svg'
 | `tag`         | 否   | 标签 id；标签页会列出同标签的链接                                            |
 | `icon`        | 否   | 方形图标的外部 URL；缺失时回退为名称首字母方块                               |
 
-- 展示位置：`/links/` 分两个小节。「全部链接」展示链接集合中除本站和友情链接之外的条目（去重后），「友情链接」按 `src/lib/links.ts` 里 `FRIEND_LINK_SLUGS` 的顺序展示；同一链接不会在页面上出现两次。本站（`SELF_LINK_SLUG`，当前是 `snowiest`）不进入主列表，单独放在友情链接末尾，以「本站信息」为标题，按名称、图标、链接、介绍列出。`/tag/<tag>/` 展示该标签下的全部链接。
-- 新增友链时除了创建链接文件，还要把 `slug` 加进 `FRIEND_LINK_SLUGS`；列表里写了不存在的 slug 会让构建失败，避免友链悄悄消失。不该出现在友情链接小节里的工具、参考资料等链接不加进去，它们会出现在「全部链接」小节。本站链接由 `SELF_LINK_SLUG` 指定。
+- 展示位置：`/links/` 分两个小节。「全部链接」展示链接集合中除友情链接之外的条目（去重后），「友情链接」按 `src/lib/links.ts` 里 `FRIEND_LINK_SLUGS` 的顺序展示。本站（`SELF_LINK_SLUG`，当前是 `snowiest`）保留在友情链接列表里，按普通卡片渲染；fork 站点可以继续收录原站。列表之后另有「本站信息」面板，按名称、图标、链接、介绍再次列出本站信息，方便交换友链。除本站外，同一链接不会在页面上出现两次。`/tag/<tag>/` 展示该标签下的全部链接。
+- 新增友链时除了创建链接文件，还要把 `slug` 加进 `FRIEND_LINK_SLUGS`；如果对方站点没有回链本站，再把它加进 `ONE_WAY_FRIEND_LINK_SLUGS`（单向友链，见下）。列表里写了不存在的 slug 会让构建失败，避免友链悄悄消失。不该出现在友情链接小节里的工具、参考资料等链接不加进去，它们会出现在「全部链接」小节。本站链接由 `SELF_LINK_SLUG` 指定。
+- `ONE_WAY_FRIEND_LINK_SLUGS` 维护「单向友链」：对方还没有回链本站的条目。它们仍是友情链接列表的一部分，但渲染得更暗淡且不可点击（不是链接元素），避免让读者误以为可以正常跳转；其中的 slug 必须也在 `FRIEND_LINK_SLUGS` 中。
 - `icon` 只在编辑器中手动写入 frontmatter（content CLI 暂不询问），建议使用站点 favicon 或方形图标；图标在 Links 页、标签页和本站信息中都生效。本站的 `icon` 指向部署后的 `/snowiest/favicon.ico`。
 - 链接列表不分先后：「全部链接」和标签页按 `slug` 稳定排序，「友情链接」按 `FRIEND_LINK_SLUGS` 的顺序展示，都不代表推荐程度。将来若需要真正的排序，应新增独立的排序字段，而不是复用 `slug`。
 - 新增推荐用 CLI：`pnpm content link add <url> --name <中文名> --name-en <英文名> --description <介绍> --tag <id>`。
