@@ -14,6 +14,10 @@ export interface LinkView {
   description?: string
   tag?: TagId
   icon?: string
+  /** Render the card dimmed and non-interactive; the link stays in every listing. */
+  disabled: boolean
+  /** Localized explanation, shown as the disabled card's hover title. */
+  disabledReason?: string
 }
 
 /**
@@ -48,18 +52,6 @@ export const FRIEND_LINK_SLUGS = [
   'silvaire-s-blog',
 ]
 
-/**
- * Friend links whose site does not link back to this site. They remain in the friend list as a
- * record, but render dimmed and non-interactive so the list does not imply a reciprocal link.
- * Slugs must also be listed in `FRIEND_LINK_SLUGS`.
- */
-export const ONE_WAY_FRIEND_LINK_SLUGS = [
-  'umb-ink',
-  'dkrain-com',
-  'notbigcake-net',
-  'removeif',
-] as const
-
 /** The site's own link, also featured in the "this site" reference panel. */
 export const SELF_LINK_SLUG = 'snowiest'
 
@@ -75,6 +67,11 @@ export function linkDescription(link: Link, lang: Lang): string | undefined {
   return localizedValue(link.data.description, lang)
 }
 
+/** Bilingual reason a link is disabled, with cross-language fallback. */
+export function linkDisabledReason(link: Link, lang: Lang): string | undefined {
+  return localizedValue(link.data.disabledReason, lang)
+}
+
 /** Map a content record to the localized card model. */
 export function toLinkView(link: Link, lang: Lang): LinkView {
   return {
@@ -84,6 +81,8 @@ export function toLinkView(link: Link, lang: Lang): LinkView {
     description: linkDescription(link, lang),
     tag: link.data.tag,
     icon: link.data.icon,
+    disabled: link.data.disabled,
+    disabledReason: linkDisabledReason(link, lang),
   }
 }
 

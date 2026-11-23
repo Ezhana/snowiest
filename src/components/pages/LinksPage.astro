@@ -8,7 +8,6 @@ import { linksCopy } from '../../i18n/pages/links'
 import { getLang } from '../../i18n/ui'
 import {
   FRIEND_LINK_SLUGS,
-  ONE_WAY_FRIEND_LINK_SLUGS,
   SELF_LINK_SLUG,
   getFriendLinkViews,
   getLinkViews,
@@ -72,9 +71,7 @@ const selfInfoText = [
           </h2>
           <p>{copy.intro}</p>
         </div>
-        {friendLinks.length > 0 && (
-          <LinkListing links={friendLinks} lang={lang} oneWaySlugs={ONE_WAY_FRIEND_LINK_SLUGS} />
-        )}
+        {friendLinks.length > 0 && <LinkListing links={friendLinks} lang={lang} />}
 
         <p class="text-small text-fg-muted">
           {copy.exchange}{' '}

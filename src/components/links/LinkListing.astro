@@ -8,21 +8,18 @@ interface Props {
   lang: Lang
   /** Hide the category marker where the surrounding context already scopes the list to one tag. */
   showTag?: boolean
-  /** Friend links whose site does not link back: rendered dimmed and non-interactive. */
-  oneWaySlugs?: readonly string[]
 }
 
-const { links, lang, showTag = true, oneWaySlugs = [] } = Astro.props
-const oneWay = new Set(oneWaySlugs)
+const { links, lang, showTag = true } = Astro.props
 ---
 
 <ul class="grid gap-3 sm:grid-cols-2">
   {links.map((link) => {
-    const isOneWay = oneWay.has(link.slug)
-    const cardClass = isOneWay
+    const isDisabled = link.disabled
+    const cardClass = isDisabled
       ? 'flex h-full flex-col rounded-surface border border-border bg-surface p-4 opacity-60'
       : 'group flex h-full flex-col rounded-surface border border-border bg-surface p-4 no-underline transition-colors hover:border-accent-border hover:bg-bg-subtle'
-    const nameClass = isOneWay
+    const nameClass = isDisabled
       ? 'truncate font-semibold text-fg-muted'
       : 'truncate font-semibold text-fg-strong transition-colors group-hover:text-accent'
     const content = (
@@ -68,8 +65,10 @@ const oneWay = new Set(oneWaySlugs)
 
     return (
       <li>
-        {isOneWay ? (
-          <div class={cardClass}>{content}</div>
+        {isDisabled ? (
+          <div class={cardClass} title={link.disabledReason}>
+            {content}
+          </div>
         ) : (
           <a href={link.url} target="_blank" rel="noopener noreferrer" class={cardClass}>
             {content}

@@ -89,6 +89,12 @@ const links = defineCollection({
     // Optional square icon (absolute URL). Listings fall back to the name's initial when the
     // link has none.
     icon: z.url().optional(),
+    // A disabled link stays in every listing it belongs to, but renders dimmed and
+    // non-interactive. Optional, defaulting to enabled.
+    disabled: z.boolean().default(false),
+    // Bilingual explanation for a disabled link, surfaced as the card's hover title. Optional,
+    // because a disabled link is still meaningful without one.
+    disabledReason: localizedText.optional(),
   }),
 })
 
