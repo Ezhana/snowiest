@@ -45,6 +45,7 @@ export const FRIEND_LINK_SLUGS = [
   'kioshiroi-s-cs-learning-road',
   'yutong-s-site',
   'vullfin-s-blog',
+  'silvaire-s-blog',
 ]
 
 /**
