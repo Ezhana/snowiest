@@ -50,6 +50,7 @@ export const FRIEND_LINK_SLUGS = [
   'yutong-s-site',
   'vullfin-s-blog',
   'silvaire-s-blog',
+  'blog-lxlovo-top',
 ]
 
 /** The site's own link, also featured in the "this site" reference panel. */
