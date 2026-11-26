@@ -52,6 +52,7 @@ export const FRIEND_LINK_SLUGS = [
   'silvaire-s-blog',
   'blog-lxlovo-top',
   'hikaru-lab',
+  'linmeng-blog',
 ]
 
 /** The site's own link, also featured in the "this site" reference panel. */
