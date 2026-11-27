@@ -54,6 +54,7 @@ export const FRIEND_LINK_SLUGS = [
   'hikaru-lab',
   'linmeng-blog',
   'feiqi3-cn',
+  'x1anyu-cn',
 ]
 
 /** The site's own link, also featured in the "this site" reference panel. */
